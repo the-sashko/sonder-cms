@@ -16,9 +16,10 @@ if (!defined('APP_CMS_DIR_PATH')) {
 if (!defined('APP_FRAMEWORK_DIR_PATH')) {
     define(
         'APP_FRAMEWORK_DIR_PATH',
-        realpath(APP_CMS_DIR_PATH . '/cms')
+        realpath(APP_CMS_DIR_PATH . '/framework')
     );
 }
+
 if (!defined('APP_PUBLIC_DIR_PATH')) {
     define(
         'APP_PUBLIC_DIR_PATH',
