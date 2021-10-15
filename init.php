@@ -67,6 +67,11 @@ if (!defined('APP_SOURCE_PATHS')) {
                 APP_FRAMEWORK_DIR_PATH . '/plugins'
             ],
 
+            'config' => [
+                APP_CMS_DIR_PATH . '/config',
+                APP_PROTECTED_DIR_PATH . '/config'
+            ],
+
             'lang' => [
                 APP_PROTECTED_DIR_PATH . '/lang',
                 APP_CMS_DIR_PATH . '/lang'
