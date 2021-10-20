@@ -1,6 +1,6 @@
 <?php
 if (!defined('APP_MODE')) {
-    define('APP_MODE', 'prod');
+    define('APP_MODE', 'dev');
 }
 
 if (!defined('APP_AREA')) {

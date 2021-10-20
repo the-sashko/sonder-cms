@@ -18,3 +18,5 @@ if (!defined('APP_DEFAULT_LANGUAGE')) {
 if (!defined('APP_MULTI_LANGUAGE')) {
     define('APP_MULTI_LANGUAGE', false);
 }
+
+

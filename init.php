@@ -68,8 +68,8 @@ if (!defined('APP_SOURCE_PATHS')) {
             ],
 
             'config' => [
-                APP_CMS_DIR_PATH . '/config',
-                APP_PROTECTED_DIR_PATH . '/config'
+                APP_PROTECTED_DIR_PATH . '/config',
+                APP_CMS_DIR_PATH . '/config'
             ],
 
             'lang' => [
