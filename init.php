@@ -1,4 +1,8 @@
 <?php
+if (!defined('APP_ROUTING_TYPE')) {
+    define('APP_ROUTING_TYPE', 'annotations');
+}
+
 if (!defined('APP_PROTECTED_DIR_PATH')) {
     define(
         'APP_PROTECTED_DIR_PATH',
