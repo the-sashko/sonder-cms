@@ -8,6 +8,10 @@ use Sonder\Core\ResponseObject;
 
 final class MainController extends CoreController implements IController
 {
+    /**
+     *
+     * @return ResponseObject
+     */
     final public function displayIndex(): ResponseObject
     {
         return $this->render('index');
