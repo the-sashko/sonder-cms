@@ -81,6 +81,11 @@ if (!defined('APP_SOURCE_PATHS')) {
                 APP_CMS_DIR_PATH . '/lang'
             ],
 
+            'themes' => [
+                APP_PROTECTED_DIR_PATH . '/themes',
+                APP_CMS_DIR_PATH . '/themes'
+            ],
+
             'pages' => [
                 APP_PROTECTED_DIR_PATH . '/pages',
                 APP_CMS_DIR_PATH . '/pages'
