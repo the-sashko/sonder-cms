@@ -59,16 +59,16 @@ if (!defined('APP_SOURCE_PATHS')) {
                 APP_FRAMEWORK_DIR_PATH . '/models'
             ],
 
-            'hooks' => [
-                APP_PROTECTED_DIR_PATH . '/hooks',
-                APP_CMS_DIR_PATH . '/hooks',
-                APP_FRAMEWORK_DIR_PATH . '/hooks'
-            ],
-
             'plugins' => [
                 APP_PROTECTED_DIR_PATH . '/plugins',
                 APP_CMS_DIR_PATH . '/plugins',
                 APP_FRAMEWORK_DIR_PATH . '/plugins'
+            ],
+
+            'hooks' => [
+                APP_PROTECTED_DIR_PATH . '/hooks',
+                APP_CMS_DIR_PATH . '/hooks',
+                APP_FRAMEWORK_DIR_PATH . '/hooks'
             ],
 
             'config' => [
