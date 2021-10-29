@@ -1,0 +1,24 @@
+<?php
+/* @var array $meta */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><?= $meta['title']; ?></title>
+    <?php
+    __part('meta');
+    __part('css');
+    ?>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <?php
+        if (!isset($isHideNavigation) || !$isHideNavigation) {
+            __part('menu');
+        }
+        ?>
+        <div class="clear"></div>
+    </div>
+    <div class="main">
+        <div class="main-content">

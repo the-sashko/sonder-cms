@@ -1,0 +1,50 @@
+<?php
+/* @var string $currentUrl */
+?>
+<ul class="main-menu">
+    <li>
+        <?php if ($currentUrl == '/admin/'): ?>
+            <a href="/admin/" class="main-menu-link-active">Admin</a>
+        <?php else: ?>
+            <a href="/admin/">Admin</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if (preg_match('/^\/admin\/topic.*?$/su', $currentUrl)): ?>
+            <a href="/admin/topics/" class="main-menu-link-active">Topics</a>
+        <?php else: ?>
+            <a href="/admin/topics/">Topics</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if (preg_match('/^\/admin\/tag.*?$/su', $currentUrl)): ?>
+            <a href="/admin/tags/" class="main-menu-link-active">Tags</a>
+        <?php else: ?>
+            <a href="/admin/tags/">Tags</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if (preg_match('/^\/admin\/post.*?$/su', $currentUrl)): ?>
+            <a href="/admin/posts/" class="main-menu-link-active">Posts</a>
+        <?php else: ?>
+            <a href="/admin/posts/">Posts</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if ($currentUrl == '/admin/hits/'): ?>
+            <a href="/admin/hits/" class="main-menu-link-active">Hits</a>
+        <?php else: ?>
+            <a href="/admin/hits/">Hits</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if ($currentUrl == '/admin/cron/'): ?>
+            <a href="/admin/cron/" class="main-menu-link-active">Cron</a>
+        <?php else: ?>
+            <a href="/admin/cron/">Cron</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <a href="/admin/logout/">Logout</a>
+    </li>
+</ul>

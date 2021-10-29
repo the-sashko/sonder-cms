@@ -1,0 +1,16 @@
+<?php
+/* @var array $meta */
+?>
+
+</div>
+<div class="clear"></div>
+</div>
+<?php if (!isset($isHideNavigation) || !$isHideNavigation): ?>
+    <div class="footer">
+        <a href="/"><?= $meta['copyright']; ?></a>
+    </div>
+<?php endif; ?>
+</div>
+<?php __part('js'); ?>
+</body>
+</html>

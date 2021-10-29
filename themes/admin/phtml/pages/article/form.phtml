@@ -1,0 +1,120 @@
+<?php
+/* @var int|null $id */
+/* @var string|null $title */
+/* @var string|null $slug */
+/* @var string|null $text */
+/* @var string|null $shortText */
+/* @var int|null $topicId */
+/* @var array|null $topics */
+/* @var string|null $language */
+/* @var array|null $locales */
+
+$postFormAction = '/admin/post/';
+
+if (!empty($id)) {
+    $postFormAction = sprintf('/admin/post/%d/', $id);
+}
+?>
+<div class="form-wrapper">
+    <?php if (!empty($errors)): ?>
+        <div class="errors">
+            <?php foreach ($errors as $error): ?>
+                <p>
+                    <?= $error; ?>
+                </p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <form action="<?= $postFormAction; ?>"
+          enctype="multipart/form-data"
+          method="POST">
+        <p>
+            <input type="text"
+                   placeholder="Title"
+                   name="title"
+                   value="<?= $title; ?>">
+        </p>
+        <p>
+            <input type="text" name="slug" placeholder="Slug"
+                   value="<?= $slug; ?>">
+        </p>
+        <p>
+            <textarea placeholder="Text"
+                      name="text"
+                      id="post-form-text"><?= $text; ?></textarea>
+        </p>
+        <p>
+            <textarea placeholder="Short Text"
+                      name="text_short"><?= $shortText; ?></textarea>
+        </p>
+        <p>
+            <select name="language" id="post-form-language">
+                <?php if (empty($postLanguage)): ?>
+                    <option disabled selected value="">Select language</option>
+                <?php else: ?>
+                    <option disabled value="">Select language</option>
+                <?php endif; ?>
+                <?php if (!empty($locales)): ?>
+                    <?php foreach ($locales as $locale): ?>
+                        <?php if ($language == $locale): ?>
+                            <option value="<?= $locale; ?>" selected>
+                                <?= $locale; ?>
+                            </option>
+                        <?php else: ?>
+                            <option value="<?= $locale; ?>">
+                                <?= $locale; ?>
+                            </option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+            &nbsp;
+            <?php
+            $topicsHiddenClass = null;
+
+            if (empty($language)) {
+                $topicsHiddenClass = 'class="hidden"';
+            }
+            ?>
+            <select name="id_topic"<?= $topicsHiddenClass; ?>
+                    id="post-form-topics">
+                <?php if (empty($topicId)): ?>
+                    <option disabled selected value="">Select topic</option>
+                <?php else: ?>
+                    <option disabled value="">Select topic</option>
+                <?php endif; ?>
+                <?php if (!empty($topics)): ?>
+                    <?php foreach ($topics as $topic): ?>
+                        <?php if ($topic->getId() == $topicId): ?>
+                            <option value="<?= $topic->getId(); ?>"
+                                    class="post-form-topics-item
+                                    post-form-topics-item-<?=
+                                    $topic->getLanguage(); ?>"
+                                    selected>
+                                <?= $topic->getTitle(); ?>
+                            </option>
+                        <?php else: ?>
+                            <option value="<?= $topic->getId(); ?>"
+                                    class="hidden
+                                    post-form-topics-item
+                                    post-form-topics-item-<?=
+                                    $topic->getLanguage(); ?>">
+                                <?= $topic->getTitle(); ?>
+                            </option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+        </p>
+        <p>
+            <input type="file"
+                   placeholder="Image"
+                   name="media">
+        </p>
+        <p>
+            <input type="submit" value="save">
+        </p>
+
+        <input type="hidden" name="id" value="<?= $id; ?>">
+    </form>
+</div>

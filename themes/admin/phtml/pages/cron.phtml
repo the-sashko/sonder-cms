@@ -1,0 +1,48 @@
+<?php if (empty($cronToken)): ?>
+    Cron config is missing or has bad format
+<?php else: ?>
+    <a href="/cron/run/<?= $cronToken; ?>/" target="_blank" class="button">
+        Run cron jobs manually
+    </a>
+<?php endif; ?>
+
+<?php if (empty($cronJobs)): ?>
+    Empty...
+<?php else: ?>
+    <table>
+        <tr>
+            <th class="fixed-cell hide-on-tablet">ID</th>
+            <th>Action</th>
+            <th class="hide-on-tablet">Interval</th>
+            <th class="hide-on-mobile">Next Execution Time</th>
+            <th>Status</th>
+            <th>Error</th>
+        </tr>
+        <?php foreach ($cronJobs as $cronJob): ?>
+            <?php
+            $errorMessage = $cronJob->getErrorMessage();
+            $errorMessage = empty($errorMessage) ? '---' : $errorMessage;
+            ?>
+            <tr>
+                <td class="hide-on-tablet"><?= $cronJob->getId(); ?></td>
+                <td><?= $cronJob->getAction(); ?></td>
+                <td class="hide-on-tablet">
+                    <?= $cronJob->getIntervalFormatted(); ?>
+                </td>
+                <td class="hide-on-mobile">
+                    <?= $cronJob->getTimeNextExecFormatted(); ?>
+                </td>
+                <td><?= $cronJob->getStatus(); ?></td>
+                <td><?= $errorMessage; ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="fixed-cell hide-on-tablet">ID</th>
+            <th>Action</th>
+            <th class="hide-on-tablet">Interval</th>
+            <th class="hide-on-mobile">Next Execution Time</th>
+            <th>Status</th>
+            <th>Error</th>
+        </tr>
+    </table>
+<?php endif; ?>

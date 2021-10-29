@@ -1,0 +1,85 @@
+<?php
+/* @var TagValuesObject[]|null $tags */
+?>
+<a href="/admin/tag/" class="button">New tag</a>
+
+<?php if (empty($tags)): ?>
+    Empty...
+<?php else: ?>
+    <table>
+        <tbody>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Title</th>
+            <th class="hide-on-tablet">Slug</th>
+            <th class="hide-on-tablet">Language</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th colspan="3"></th>
+        </tr>
+        <?php foreach ($tags as $tag): ?>
+            <?php
+            $tagCdate = date('Y-m-d H:i:s', $tag->getCdate());
+
+            $tagMdate = '---';
+            $tagDdate = '---';
+
+            if (!empty($tag->getMdate())) {
+                $tagMdate = date('Y-m-d H:i:s', $tag->getMdate());
+            }
+
+            if (!empty($tag->getDdate())) {
+                $tagDdate = date('Y-m-d H:i:s', $tag->getDdate());
+            }
+            ?>
+            <?php if ($tag->isRemoved()): ?>
+                <tr class="list-item-removed">
+            <?php else: ?>
+                <tr>
+            <?php endif; ?>
+            <td class="hide-on-mobile"><?= $tag->getId(); ?></td>
+            <td><?= $tag->getTitle(); ?></td>
+            <td class="hide-on-tablet"><?= $tag->getSlug(); ?></td>
+            <td class="hide-on-tablet"><?= $tag->getLanguage(); ?></td>
+            <td class="hide-on-mobile"><?= $tagCdate ?></td>
+            <td class="hide-on-tablet"><?= $tagMdate; ?></td>
+            <td class="hide-on-tablet"><?= $tagDdate; ?></td>
+            <td>
+                <?php if (!$tag->isRemoved()): ?>
+                    <a href="<?= $tag->getLink(); ?>" target="_blank">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                <?php endif; ?>
+            </td>
+            <td>
+                <a href="<?= $tag->getEditLink(); ?>">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+            <td>
+                <?php if ($tag->isRemoved()): ?>
+                    <a href="<?= $tag->getRestoreLink(); ?>">
+                        <i class="fas fa-reply"></i>
+                    </a>
+                <?php else: ?>
+                    <a href="<?= $tag->getRemoveLink(); ?>">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                <?php endif; ?>
+            </td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Title</th>
+            <th class="hide-on-tablet">Slug</th>
+            <th class="hide-on-tablet">Language</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th colspan="3"></th>
+        </tr>
+        </tbody>
+    </table>
+<?php endif; ?>

@@ -1,0 +1,61 @@
+<?php
+/* @var string|null $title */
+/* @var string|null $slug */
+/* @var string|null $language */
+/* @var int|null $id */
+
+$tagFormAction = '/admin/tag/';
+
+if (!empty($id)) {
+    $tagFormAction = sprintf('/admin/tag/%d/', $id);
+}
+?>
+<div class="form-wrapper">
+    <?php if (!empty($errors)): ?>
+        <div class="errors">
+            <?php foreach ($errors as $error): ?>
+                <p>
+                    <?= $error; ?>
+                </p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <form action="<?= $tagFormAction; ?>" method="POST">
+        <p>
+            <input type="text"
+                   placeholder="Title"
+                   name="title"
+                   value="<?= $title; ?>">
+        </p>
+        <p>
+            <input type="text" name="slug" placeholder="Slug"
+                   value="<?= $slug; ?>">
+        </p>
+        <p>
+            <input type="submit" value="save">
+        </p>
+        <p>
+            <select name="language">
+                <?php if (empty($postLanguage)): ?>
+                    <option disabled selected value="">Select language</option>
+                <?php else: ?>
+                    <option disabled value="">Select language</option>
+                <?php endif; ?>
+                <?php if (!empty($locales)): ?>
+                    <?php foreach ($locales as $locale): ?>
+                        <?php if ($language == $locale): ?>
+                            <option value="<?= $locale; ?>" selected>
+                                <?= $locale; ?>
+                            </option>
+                        <?php else: ?>
+                            <option value="<?= $locale; ?>">
+                                <?= $locale; ?>
+                            </option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+        </p>
+        <input type="hidden" name="id" value="<?= $id; ?>">
+    </form>
+</div>

@@ -1,0 +1,76 @@
+<?php
+/* @var HitValuesObject[]|null $hits */
+?>
+<?php if (empty($hits)): ?>
+    Empty...
+<?php else: ?>
+    <table>
+        <tbody>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Post ID</th>
+            <th>Topic ID</th>
+            <th>IP</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th></th>
+        </tr>
+        <?php foreach ($hits as $hit): ?>
+            <?php
+            $hitCdate = date('Y-m-d H:i:s', $hit->getCdate());
+
+            $hitMdate = '---';
+            $hitDdate = '---';
+
+            if (!empty($hit->getMdate())) {
+                $hitMdate = date('Y-m-d H:i:s', $hit->getMdate());
+            }
+
+            if (!empty($hit->getDdate())) {
+                $hitDdate = date('Y-m-d H:i:s', $hit->getDdate());
+            }
+            ?>
+            <?php if ($hit->isRemoved()): ?>
+                <tr class="list-item-removed">
+            <?php else: ?>
+                <tr>
+            <?php endif; ?>
+            <td class="hide-on-mobile"><?= $hit->getId(); ?></td>
+            <td><?= $hit->getPostId(); ?></td>
+            <td><?= $hit->getTopicId(); ?></td>
+            <td><?= $hit->getIp(); ?></td>
+            <td class="hide-on-mobile"><?= $hitCdate ?></td>
+            <td class="hide-on-tablet"><?= $hitMdate; ?></td>
+            <td class="hide-on-tablet"><?= $hitDdate; ?></td>
+            <td>
+                <?php if ($hit->isRemoved()): ?>
+                    <a href="<?= $hit->getRestoreLink(); ?>">
+                        <i class="fas fa-reply"></i>
+                    </a>
+                <?php else: ?>
+                    <a href="<?= $hit->getRemoveLink(); ?>">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                <?php endif; ?>
+            </td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Post ID</th>
+            <th>Topic ID</th>
+            <th>IP</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th></th>
+        </tr>
+        </tbody>
+    </table>
+<?php endif; ?>
+<?php if (!empty($pagination)): ?>
+    <div class="pagination">
+        <?= $pagination; ?>
+    </div>
+<?php endif; ?>
