@@ -1,4 +1,8 @@
 <?php
+if (!defined('APP_MIDDLEWARES')) {
+    define('APP_MIDDLEWARES', ['user']);
+}
+
 if (!defined('APP_MODE')) {
     define('APP_MODE', 'prod');
 }

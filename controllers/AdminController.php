@@ -54,7 +54,7 @@ final class AdminController extends CoreController implements IController
 
 ?>
 <!--
-    
+
     /**
      * List Of Posts Admin Action
      *
