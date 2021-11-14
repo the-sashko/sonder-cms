@@ -14,26 +14,20 @@ final class AdminController extends CoreController implements IController
 
     const ADMIN_INDEX_URL = '/admin/';
 
+    const USER_ACTION_ADMIN = 'login_to_admin';
+
+    /**
+     * @var string|null
+     */
+    protected ?string $renderTheme = 'admin';
+
     /**
      * @param RequestObject $request
-     *
      * @throws Exception
      */
     final public function __construct(RequestObject $request)
     {
         parent::__construct($request);
-
-        /*$admin = $this->getModel('admin');
-
-        $isSignedIn = $admin->isSignedIn();
-
-        if (!$isSignedIn && $this->currentUrl != static::SIGN_IN_URL) {
-            $this->redirect(static::SIGN_IN_URL);
-        }
-
-        if ($isSignedIn && $this->currentUrl == static::SIGN_IN_URL) {
-            $this->redirect(static::ADMIN_INDEX_URL);
-        }*/
     }
 
     /**
@@ -43,27 +37,27 @@ final class AdminController extends CoreController implements IController
      * @no_cache true
      *
      * @return ResponseObject
-     *
-     * @throws Exception
      */
     final public function displayIndex(): ResponseObject
     {
         die('aaa');
     }
-}
-
-?>
-<!--
 
     /**
-     * List Of Posts Admin Action
+     * @area admin
+     * @route /admin/login/
+     * @no_cache true
      *
-     * @area  admin
-     * @route /admin/posts/
-     *
-     * @throws CoreException
+     * @return ResponseObject
      * @throws Exception
      */
+    final public function displayLogin(): ResponseObject
+    {
+        return $this->render('login');
+    }
+}
+
+/*
     final public function displayPosts(): void
     {
         $postModel = $this->getModel('post');
@@ -96,15 +90,6 @@ final class AdminController extends CoreController implements IController
 
         $this->render('post/list');
     }
-
-    /**
-     * New Post Admin Action
-     *
-     * @area  admin
-     * @route /admin/post/
-     *
-     * @throws Exception
-     */
     final public function displayNewPost(): void
     {
         $this->assign([
@@ -117,16 +102,6 @@ final class AdminController extends CoreController implements IController
 
         $this->displayPost();
     }
-
-    /**
-     * Single Post Admin Action
-     *
-     * @area  admin
-     * @route /admin/post/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws Exception
-     */
     final public function displayPost(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -238,15 +213,6 @@ final class AdminController extends CoreController implements IController
         $this->render('post/form');
     }
 
-    /**
-     * Remove Post Admin Action
-     *
-     * @area  admin
-     * @route /admin/post/remove/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRemovePost(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -264,15 +230,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/posts/');
     }
 
-    /**
-     * Restore Post Admin Action
-     *
-     * @area  admin
-     * @route /admin/post/restore/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRestorePost(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -290,14 +247,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/posts/');
     }
 
-    /**
-     * List Of Topics Admin Action
-     *
-     * @area  admin
-     * @route /admin/topics/
-     *
-     * @throws Exception
-     */
     final public function displayTopics(): void
     {
         $this->assign([
@@ -311,15 +260,6 @@ final class AdminController extends CoreController implements IController
         $this->render('topic/list');
     }
 
-    /**
-     * New Topic Admin Action
-     *
-     * @area  admin
-     * @route /admin/topic/
-     *
-     * @throws CoreException
-     * @throws Exception
-     */
     final public function displayNewTopic(): void
     {
         $this->assign([
@@ -333,17 +273,6 @@ final class AdminController extends CoreController implements IController
         $this->displayTopic();
     }
 
-    /**
-     *
-     * Single Topic Admin Action
-     *
-     * @area  admin
-     * @route /admin/topic/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     * @throws Exception
-     */
     final public function displayTopic(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -416,15 +345,6 @@ final class AdminController extends CoreController implements IController
         $this->render('topic/form');
     }
 
-    /**
-     * Remove Topic Admin Action
-     *
-     * @area  admin
-     * @route /admin/topic/remove/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRemoveTopic(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -442,15 +362,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/topics/');
     }
 
-    /**
-     * Restore Topic Admin Action
-     *
-     * @area  admin
-     * @route /admin/topic/restore/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRestoreTopic(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -468,14 +379,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/topics/');
     }
 
-    /**
-     * List Of Hits Admin Action
-     *
-     * @area  admin
-     * @route /admin/hits/
-     *
-     * @throws Exception
-     */
     final public function displayHits(): void
     {
         $hitModel = $this->getModel('hit');
@@ -509,15 +412,6 @@ final class AdminController extends CoreController implements IController
         $this->render('hits');
     }
 
-    /**
-     * Remove Hit Admin Action
-     *
-     * @area  admin
-     * @route /admin/hit/remove/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRemoveHit(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -535,15 +429,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/hits/');
     }
 
-    /**
-     * Restore Hit Admin Action
-     *
-     * @area  admin
-     * @route /admin/hit/restore/([0-9]+)/
-     * @url_params id=$1
-     *
-     * @throws CoreException
-     */
     final public function displayRestoreHit(): void
     {
         $id = $this->getValueFromUrl('id');
@@ -561,14 +446,6 @@ final class AdminController extends CoreController implements IController
         $this->redirect('/admin/hits/');
     }
 
-    /**
-     * Cron Status Admin Action
-     *
-     * @area  admin
-     * @route /admin/cron/
-     *
-     * @throws Exception
-     */
     final public function displayCron(): void
     {
         $cronConfig = $this->getConfig('cron');
@@ -595,15 +472,6 @@ final class AdminController extends CoreController implements IController
         $this->render('cron');
     }
 
-    /**
-     * Login Admin Action
-     *
-     * @area  admin
-     * @route /admin/login/
-     *
-     * @throws CoreException
-     * @throws Exception
-     */
     final public function displayLogin(): void
     {
         $isSignedIn = false;
@@ -649,14 +517,6 @@ final class AdminController extends CoreController implements IController
         $this->render('login');
     }
 
-    /**
-     * Login Admin Action
-     *
-     * @area  admin
-     * @route /admin/logout/
-     *
-     * @throws CoreException
-     */
     final public function displayLogout(): void
     {
         $admin = $this->getModel('admin');
@@ -666,4 +526,4 @@ final class AdminController extends CoreController implements IController
         $this->redirect(static::SIGN_IN_URL);
     }
 }
--->
+*/
