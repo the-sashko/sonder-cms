@@ -1,6 +1,6 @@
 <?php
 if (!defined('APP_MIDDLEWARES')) {
-    define('APP_MIDDLEWARES', ['user']);
+    define('APP_MIDDLEWARES', ['user', 'admin']);
 }
 
 if (!defined('APP_MODE')) {
