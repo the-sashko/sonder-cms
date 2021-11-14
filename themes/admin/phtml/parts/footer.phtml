@@ -1,4 +1,7 @@
 <?php
+
+namespace Sonder;
+
 /* @var array $meta */
 ?>
 
@@ -7,10 +10,10 @@
 </div>
 <?php if (!isset($isHideNavigation) || !$isHideNavigation): ?>
     <div class="footer">
-        <a href="/"><?= $meta['copyright']; ?></a>
+        <a href="/"><?php //<?=$meta['copyright']; ?></a>
     </div>
 <?php endif; ?>
 </div>
-<?php __part('js'); ?>
+<?php //__part('js'); ?>
 </body>
 </html>
