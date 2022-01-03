@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 2em;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 0 1rem;
+}
+
+h2 {
+    font-size: 1.75em;
+    font-weight: bold;
+    line-height: 1.75em;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 0 1rem;
+}
+
+h3 {
+    font-size: 1.625em;
+    font-weight: bold;
+    line-height: 1.625em;
+    text-align: left;
+    padding: 0 1rem;
+}
+
+h4 {
+    font-size: 1.5em;
+    font-weight: normal;
+    line-height: 1.5em;
+    text-align: left;
+    padding: 0 1rem;
+}
+
+h5 {
+    font-weight: normal;
+    font-size: 1.325em;
+    line-height: 1.325em;
+    text-align: left;
+    padding: 0 1rem;
+}
+
+h6 {
+    font-size: 1.25em;
+    font-weight: normal;
+    line-height: 1.25em;
+    text-align: left;
+    padding: 0 1rem;
+}
+
+img {
+    border: @border;
+    border-radius: 0.25em;
+    max-width: @image-max-size;
+}
+
+p {
+    line-height: 1.25em;
+    margin: 0 0 .625em;
+    padding: 0 1em;
+    text-align: left;
+}
+
+
+a {
+    color: @link-color;
+    font-weight: bold;
+    outline: none;
+    text-decoration: none;
+
+    &:focus, &:hover {
+        border: none;
+        color: @text-color;
+        outline: none;
+    }
+}
+
+ul, ol {
+    margin: 1em;
+    text-align: left;
+}
+
+ul {
+    li {
+        list-style-type: circle;
+        margin-left: 0.5em;
+        padding-left: 0.125em;
+    }
+}
+
+ol {
+    li {
+        margin-left: 0.5em;
+        padding-left: 0.125em;
+    }
+}
+
+form {
+    width: @form-width;
+    padding: 1em 1em 0 1em;
+    margin: 0;
+    font-weight: bold;
+    overflow-x: hidden;
+    display: inline-block;
+    border: @border;
+    border-radius: .25em;
+
+    p {
+        margin: .25em 0 0 0;
+        padding: 0;
+    }
+}
+
+label {
+    padding-left: 0.5em;
+}
+
+input {
+    font-size: 1em;
+    background: @background-alt-color;
+    color: @text-color;
+    border: @border;
+    border-radius: .125em;
+
+    &[type="text"], &[type="password"] {
+        width: calc(100% - 1em);
+        margin-right: 1em;
+        padding: .5em;
+    }
+
+    &[type="submit"] {
+        display: inline-block;
+        min-width: 100%;
+        background: @button-background-color;
+        text-transform: uppercase;
+        line-height: 2em;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+    }
+}
+
+select, textarea {
+    font-size: 1em;
+    background: @background-alt-color;
+    color: @text-color;
+    border: @border;
+    border-radius: .125em;
+}
+
+select {
+    padding: .5em;
+}
+
+textarea {
+    resize: none;
+    height: 10.21em;
+    padding: 0.5em;
+    line-height: 1.5em;
+    width: calc(100% - 1em);
+    display: inline-block;
+}
+
+.clear {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+.u {
+    text-decoration: underline;
+}

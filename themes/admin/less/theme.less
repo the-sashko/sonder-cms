@@ -1,0 +1,212 @@
+@import (less) "../css/lib/normalize.min.css";
+@import (less) "../css/lib/fonts.min.css";
+@import (less) "../css/lib/fontawesome.min.css";
+
+@import "_colors";
+@import "_variables";
+@import "_typography";
+@import "_tinymce";
+
+html {
+    height: 100%;
+    min-width: @min-width;
+
+    body {
+        overflow-x: hidden;
+        text-align: center;
+        background: @background-color;
+        color: @text-color;
+        font-family: @font-family;
+        font-size: @main-font-size;
+        height: 100%;
+        min-width: @min-width;
+        line-height: 1em;
+        word-wrap: anywhere;
+
+        .wrapper {
+            width: 100%;
+            max-width: @max-width;
+            display: inline-block;
+            text-align: left;
+            position: relative;
+            min-height: calc(100% - @footer-height);
+            padding-bottom: @footer-height;
+
+            .header {
+                text-align: center;
+                padding: 1rem;
+
+                .main-menu {
+                    margin: 0;
+                    padding: 0;
+                    display: inline-block;
+
+                    li {
+                        margin: 0;
+                        font-size: .75em;
+                        font-weight: bold;
+                        line-height: 1em;
+                        padding: 0 .25em;
+                        display: block;
+                        float: left;
+                        text-transform: uppercase;
+                        list-style-type: none;
+
+                        .main-menu-link-active {
+                            color: @text-color;
+                        }
+                    }
+                }
+            }
+
+            .main {
+                margin: 0 1rem;
+                padding: 0 0 1em 0;
+
+                .main-content {
+                    table {
+                        border: @border;
+                        width: 100%;
+                        border-collapse: collapse;
+                        border-radius: 2em;
+                        margin: 1em 0;
+
+                        tbody {
+                            tr {
+                                th, td {
+                                    padding: .5em;
+                                    border: @border;
+                                    text-align: center;
+                                }
+
+                                th {
+                                    background: @background-alt-color;
+                                }
+
+                                td {
+                                    .post-list-image-wrapper {
+                                        display: inline-block;
+                                        position: relative;
+                                        height: @post-list-image-size;
+                                        width: @post-list-image-size;
+
+                                        .post-list-image {
+                                            position: absolute;
+                                            top: 0;
+                                            left: 0;
+                                            right: 0;
+                                            bottom: 0;
+                                            height: @post-list-image-size;
+                                            width: @post-list-image-size;
+                                        }
+                                    }
+                                }
+
+                                .hide-on-tablet, .hide-on-mobile {
+                                    display: none;
+                                }
+
+                                .fixed-cell {
+                                    min-width: @fixed-cell-min-width;
+                                }
+                            }
+
+                            .list-item-removed {
+                                color: @background-alt-color;
+                            }
+                        }
+                    }
+
+                    p {
+                        padding: 0;
+                        margin: 0 0 1em 0;
+                        text-align: left;
+                    }
+
+                    .button {
+                        color: @text-color;
+                        display: inline-block;
+                        background: @button-background-color;
+                        text-transform: uppercase;
+                        padding: .5em;
+                        font-weight: bold;
+                        cursor: pointer;
+                    }
+
+                    .form-wrapper {
+                        text-align: center;
+                        width: 100%;
+                        margin-bottom: 1em;
+
+                        .errors {
+                            width: 90%;
+                            display: inline-block;
+                            padding: 1em;
+                            color: @error-color;
+                            border: @border;
+                            border-radius: .25em;
+                            margin-bottom: 1em;
+
+                            p {
+                                margin: 0;
+                                padding: 0;
+                                font-size: 1.125em;
+                                font-weight: bold;
+                            }
+                        }
+
+                        form {
+                            p {
+                                img {
+                                    width: 100%;
+                                    margin: 0;
+                                    padding: 0;
+                                    max-width: none;
+                                }
+                            }
+                        }
+
+                        .login-form {
+                            max-width: @min-width;
+
+                            .login-image-wrapper {
+                                text-align: center;
+
+                                .login-image {
+                                    width: 50%;
+                                    border: none;
+                                    border-radius: 0;
+                                    display: inline-block;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .pagination {
+                    a, span {
+                        font-weight: bold;
+                        font-size: 1.125em;
+                        margin-right: .5em;
+                    }
+                }
+            }
+
+            .footer {
+                display: block;
+                margin: 0 1rem;
+                border-top: @border;
+                font-weight: bold;
+                line-height: 3em;
+                position: absolute;
+                text-align: center;
+                text-transform: uppercase;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+        }
+    }
+}
+
+@import "_screen_sizes";

@@ -8,6 +8,8 @@
     "css": [],
     "less": [
       "less/theme.less"
-    ]
+    ],
+    "font": [],
+    "img": []
   }
 }
