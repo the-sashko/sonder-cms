@@ -7,6 +7,7 @@ use Sonder\Core\CoreController;
 use Sonder\Core\Interfaces\IController;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
+use Sonder\Models\User\SignInForm;
 
 final class AdminController extends CoreController implements IController
 {
@@ -37,10 +38,11 @@ final class AdminController extends CoreController implements IController
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws Exception
      */
     final public function displayIndex(): ResponseObject
     {
-        die('aaa');
+        return $this->render('main');
     }
 
     /**
@@ -53,13 +55,334 @@ final class AdminController extends CoreController implements IController
      */
     final public function displayLogin(): ResponseObject
     {
+        $isSignedIn = false;
+
+        $user = $this->request->getUser();
+
+        $postValues = $this->request->getPostValues();
+
+        $signInForm = $user->getForm($postValues, 'sign_in');
+        $errors = empty($postValues) ? null : $signInForm->getErrors();
+
+        if (!empty($signInForm) && $signInForm->getStatus()) {
+            $isSignedIn = $user->signInByLoginAndPassword(
+                $signInForm->getLogin(),
+                $signInForm->getPassword(),
+            );
+
+            if (!$isSignedIn) {
+                $errors = [
+                    SignInForm::INVALID_LOGIN_OR_PASSWORD
+                ];
+            }
+        }
+
+        if ($isSignedIn) {
+            return $this->redirect(AdminController::ADMIN_INDEX_URL);
+        }
+
+        $this->assign([
+            'errors' => $errors,
+            'is_hide_navigation' => true,
+            'form' => $signInForm, 'page_path' => [
+                '/admin/' => 'Admin',
+                '#' => 'Login'
+            ]
+        ]);
+
         return $this->render('login');
     }
-}
 
-/*
+    /**
+     * @area admin
+     * @route /admin/logout/
+     * @no_cache true
+     *
+     * @return ResponseObject
+     */
+    final public function displayLogout(): ResponseObject
+    {
+        $user = $this->request->getUser();
+
+        if (!empty($user)) {
+            $user->signOut();
+        }
+
+        return $this->redirect(AdminController::SIGN_IN_URL);
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws Exception
+     */
+    final public function displayUsers(): ResponseObject
+    {
+        //TODO
+        $page = 1;
+
+        $userModel = $this->getModel('user');
+
+        $users = [];//$userModel->getAll($page);
+        $pageCount = 1;//$userModel->getPageCount();
+
+        if (empty($users) && $page > 1) {
+            return $this->redirect('/admin/users/');
+        }
+
+        if (($page > $pageCount) && $page > 1) {
+            return $this->redirect('/admin/users/');
+        }
+
+        $pagination = $this->getPlugin('paginator')->getPagination(
+            $pageCount,
+            $page,
+            '/admin/users/'
+        );
+
+        $this->assign([
+            'users' => $users,
+            'pagination' => $pagination,
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '#' => 'Posts'
+            ]
+        ]);
+
+        return $this->render('user/list');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/roles/
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws Exception
+     */
+    final public function displayRoles(): ResponseObject
+    {
+        //TODO
+        $page = 1;
+
+        $roleModel = $this->getModel('role');
+
+        $roles = [];//$roleModel->getAll($page);
+        $pageCount = 1;//$roleModel->getPageCount();
+
+        if (empty($roles) && $page > 1) {
+            return $this->redirect('/admin/roles/');
+        }
+
+        if (($page > $pageCount) && $page > 1) {
+            return $this->redirect('/admin/roles/');
+        }
+
+        $pagination = $this->getPlugin('paginator')->getPagination(
+            $pageCount,
+            $page,
+            '/admin/users/roles/'
+        );
+
+        $this->assign([
+            'roles' => $roles,
+            'pagination' => $pagination,
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '#' => 'Posts'
+            ]
+        ]);
+
+        return $this->render('role/list');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/roles/actions((/page-([0-9]+)/)|/)
+     * @url_params page=$3
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws Exception
+     */
+    final public function displayRoleActions(): ResponseObject
+    {
+        $page = $this->request->getUrlValue('page');
+        $page = empty($page) ? 1 : (int)$page;
+
+        $roleModel = $this->getModel('role');
+
+        $roleActions = $roleModel->getRoleActionsByPage($page);
+        $pageCount = $roleModel->getRoleActionsPageCount();
+
+        if (empty($roleActions) && $page > 1) {
+            return $this->redirect('/admin/users/roles/actions/');
+        }
+
+        if (($page > $pageCount) && $page > 1) {
+            return $this->redirect('/admin/users/roles/actions/');
+        }
+
+        $pagination = $this->getPlugin('paginator')->getPagination(
+            $pageCount,
+            $page,
+            '/admin/users/roles/actions/'
+        );
+
+        $this->assign([
+            'role_actions' => $roleActions,
+            'pagination' => $pagination,
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '/admin/users/' => 'Users',
+                '/admin/users/roles/' => 'Roles',
+                '#' => 'Actions'
+            ]
+        ]);
+
+        return $this->render('role/action/list');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/roles/action((/([0-9]+)/)|/)
+     * @url_params id=$3
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws Exception
+     */
+    final public function displayRoleAction(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        $errors = [];
+
+        $name = null;
+        $isActive = true;
+
+        $roleActionVO = null;
+        $roleActionForm = null;
+
+        $pageTitle = 'new';
+
+        $roleModel = $this->getModel('role');
+
+        if (!empty($id)) {
+            $roleActionVO = $roleModel->getRoleActionVOById($id);
+            $pageTitle = 'Edit';
+        }
+
+        if (!empty($id) && empty($roleActionVO)) {
+            return $this->redirect('/admin/users/roles/action/');
+        }
+
+        if ($this->request->getHttpMethod() == 'post') {
+            $roleActionForm = $roleModel->getForm(
+                $this->request->getPostValues(),
+                'role_action'
+            );
+
+            $roleModel->saveRoleAction($roleActionForm);
+        }
+
+        if (!empty($roleActionForm) && $roleActionForm->getStatus()) {
+            return $this->redirect('/admin/users/roles/actions/');
+        }
+
+        if (!empty($roleActionForm)) {
+            $errors = $roleActionForm->getErrors();
+        }
+
+        if (!empty($roleActionVO)) {
+            $name = $roleActionVO->getName();
+            $isActive = $roleActionVO->getIsActive();
+        }
+
+        if (!empty($roleActionForm) && !empty($roleActionForm->getName())) {
+            $name = $roleActionForm->getName();
+        }
+
+        if (!empty($roleActionForm) && !empty($roleActionForm->getIsActive())) {
+            $isActive = $roleActionForm->getIsActive();
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '/admin/users/roles/' => 'Roles',
+            '/admin/users/roles/actions/' => 'Actions',
+            '#' => $pageTitle
+        ];
+
+        $this->assign([
+            'id' => $id,
+            'errors' => $errors,
+            'name' => $name,
+            'is_active' => $isActive,
+            'page_path' => $pagePath
+        ]);
+
+
+        return $this->render('role/action/form');
+    }
+
+    final public function displayNewRoleAction(): void
+    {
+        //TODO
+    }
+
+    final public function displayRemoveRoleAction(): void
+    {
+        //TODO
+    }
+
+    final public function displayNewRole(): void
+    {
+        //TODO
+    }
+
+    final public function displayRole(): void
+    {
+        //TODO
+    }
+
+    final public function displayRemoveRole(): void
+    {
+        //TODO
+    }
+
+    final public function displayRestoreRole(): void
+    {
+        //TODO
+    }
+
+    final public function displayNewUser(): void
+    {
+        //TODO
+    }
+
+    final public function displayUser(): void
+    {
+        //TODO
+    }
+
+    final public function displayRemoveUser(): void
+    {
+        //TODO
+    }
+
+    final public function displayRestoreUser(): void
+    {
+        //TODO
+    }
+
     final public function displayPosts(): void
     {
+        //TODO
         $postModel = $this->getModel('post');
 
         $posts = $postModel->getAll($this->page);
@@ -90,8 +413,10 @@ final class AdminController extends CoreController implements IController
 
         $this->render('post/list');
     }
+
     final public function displayNewPost(): void
     {
+        //TODO
         $this->assign([
             'pagePath' => [
                 '/admin/' => 'Admin',
@@ -102,8 +427,10 @@ final class AdminController extends CoreController implements IController
 
         $this->displayPost();
     }
+
     final public function displayPost(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $title = null;
@@ -215,6 +542,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRemovePost(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $post = $this->getModel('post');
@@ -232,6 +560,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRestorePost(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $post = $this->getModel('post');
@@ -249,6 +578,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayTopics(): void
     {
+        //TODO
         $this->assign([
             'topics' => $this->getModel('topic')->getAll(),
             'pagePath' => [
@@ -262,6 +592,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayNewTopic(): void
     {
+        //TODO
         $this->assign([
             'pagePath' => [
                 '/admin/' => 'Admin',
@@ -275,6 +606,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayTopic(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $title = null;
@@ -347,6 +679,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRemoveTopic(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $topic = $this->getModel('topic');
@@ -364,6 +697,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRestoreTopic(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $topic = $this->getModel('topic');
@@ -381,6 +715,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayHits(): void
     {
+        //TODO
         $hitModel = $this->getModel('hit');
 
         $hits = $hitModel->getAll($this->page);
@@ -414,6 +749,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRemoveHit(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $hit = $this->getModel('hit');
@@ -431,6 +767,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayRestoreHit(): void
     {
+        //TODO
         $id = $this->getValueFromUrl('id');
 
         $hit = $this->getModel('hit');
@@ -448,6 +785,7 @@ final class AdminController extends CoreController implements IController
 
     final public function displayCron(): void
     {
+        //TODO
         $cronConfig = $this->getConfig('cron');
         $cronToken = null;
 
@@ -471,59 +809,4 @@ final class AdminController extends CoreController implements IController
 
         $this->render('cron');
     }
-
-    final public function displayLogin(): void
-    {
-        $isSignedIn = false;
-
-        $errors = null;
-
-        $signInForm = null;
-
-        $admin = $this->getModel('admin');
-
-        if (!empty($this->post)) {
-            $signInForm = $admin->getSignInForm($this->post);
-
-            $errors = $signInForm->getErrors();
-        }
-
-        if (!empty($signInForm) && $signInForm->getStatus()) {
-            $isSignedIn = $admin->signInByLoginAndPassword(
-                $signInForm->getLogin(),
-                $signInForm->getPassword(),
-            );
-
-            if (!$isSignedIn) {
-                $errors = [
-                    $signInForm::INVALID_LOGIN_OR_PASSWORD
-                ];
-            }
-        }
-
-        if ($isSignedIn) {
-            $this->redirect(static::ADMIN_INDEX_URL);
-        }
-
-        $this->assign([
-            'errors' => $errors,
-            'isHideNavigation' => true,
-            'pagePath' => [
-                '/admin/' => 'Admin',
-                '#' => 'Login'
-            ]
-        ]);
-
-        $this->render('login');
-    }
-
-    final public function displayLogout(): void
-    {
-        $admin = $this->getModel('admin');
-
-        $admin->signOut();
-
-        $this->redirect(static::SIGN_IN_URL);
-    }
 }
-*/
