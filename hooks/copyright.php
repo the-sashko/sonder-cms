@@ -20,10 +20,12 @@ final class CopyrightHook extends CoreHook implements IHook
             'launch_date'
         );
 
+        $launchDate = sprintf('%s 00:00:00', $launchDate);
+
         $launchYear = date('Y', strtotime($launchDate));
         $currentYear = date('Y');
 
-        $copyright = $launchDate;
+        $copyright = $launchYear;
 
         if ($launchYear != $currentYear) {
             $copyright = sprintf('%s-%s', $copyright, $currentYear);
