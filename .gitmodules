@@ -1,3 +1,6 @@
 [submodule "framework"]
 	path = framework
 	url = git@github.com:the-sashko/sonder-core.git
+[submodule "themes/admin/js/lib/tinymce"]
+	path = themes/admin/js/lib/tinymce
+	url = git@github.com:the-sashko/tinymce.git
