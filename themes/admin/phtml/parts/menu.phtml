@@ -1,13 +1,19 @@
 <?php
 /* @var string $currentUrl */
 ?>
-<?php /*
 <ul class="main-menu">
     <li>
         <?php if ($currentUrl == '/admin/'): ?>
             <a href="/admin/" class="main-menu-link-active">Admin</a>
         <?php else: ?>
             <a href="/admin/">Admin</a>
+        <?php endif; ?>
+    </li>
+    <li>
+        <?php if (preg_match('/^\/admin\/user.*?$/su', $currentUrl)): ?>
+            <a href="/admin/users/" class="main-menu-link-active">Users</a>
+        <?php else: ?>
+            <a href="/admin/users/">Users</a>
         <?php endif; ?>
     </li>
     <li>
@@ -49,7 +55,3 @@
         <a href="/admin/logout/">Logout</a>
     </li>
 </ul>
-*/
-
-//TODO
-?>

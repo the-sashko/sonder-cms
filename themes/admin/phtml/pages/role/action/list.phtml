@@ -1,0 +1,95 @@
+<?php
+
+use Sonder\Models\Role\RoleActionValuesObject;
+
+/* @var RoleActionValuesObject[]|null $roleActions */
+?>
+<p>
+    <a href="/admin/users/roles/action/" class="button">New action</a>
+</p>
+<?php if (empty($roleActions)): ?>
+    Empty...
+<?php else: ?>
+    <table>
+        <tbody>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Name</th>
+            <th class="hide-on-tablet">Is System</th>
+            <th class="hide-on-tablet">Is Active</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th colspan="2"></th>
+        </tr>
+        <?php foreach ($roleActions as $roleAction): ?>
+            <?php
+            $roleActionIsActive = $roleAction->getIsActive() ? 'Yes' : 'No';
+
+            $roleActionIsSystem = $roleAction->getIsSystem() ? 'Yes' : 'No';
+
+            $roleActionCdate = $roleAction->getCdate('Y-m-d H:i:s');
+
+            $roleActionMdate = '---';
+            $roleActionDdate = '---';
+
+            if (!empty($roleAction->getMdate())) {
+                $roleActionMdate = $roleAction->getMdate('Y-m-d H:i:s');
+            }
+
+            if (!empty($roleAction->getDdate())) {
+                $roleActionDdate = $roleAction->getDdate('Y-m-d H:i:s');
+            }
+            ?>
+            <?php if ($roleAction->isRemoved()): ?>
+                <tr class="list-item-removed">
+            <?php else: ?>
+                <tr>
+            <?php endif; ?>
+            <td class="hide-on-mobile"><?= $roleAction->getId() ?></td>
+            <td><?= $roleAction->getName() ?></td>
+            <td class="hide-on-tablet"><?= $roleActionIsActive ?></td>
+            <td class="hide-on-tablet"><?= $roleActionIsSystem ?></td>
+            <td class="hide-on-mobile"><?= $roleActionCdate ?></td>
+            <td class="hide-on-tablet"><?= $roleActionMdate ?></td>
+            <td class="hide-on-tablet"><?= $roleActionDdate ?></td>
+            <?php if ($roleAction->getIsSystem()): ?>
+                <td colspan="2">---</td>
+            <?php else: ?>
+                <td>
+                    <a href="<?= $roleAction->getEditLink() ?>">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </td>
+                <td>
+                    <?php if ($roleAction->isRemoved()): ?>
+                        <a href="<?= $roleAction->getRestoreLink() ?>">
+                            <i class="fas fa-reply"></i>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= $roleAction->getRemoveLink() ?>">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    <?php endif; ?>
+                </td>
+            <?php endif; ?>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Name</th>
+            <th class="hide-on-tablet">Is System</th>
+            <th class="hide-on-tablet">Is Active</th>
+            <th class="hide-on-mobile">Created At</th>
+            <th class="hide-on-tablet">Updated At</th>
+            <th class="hide-on-tablet">Removed At</th>
+            <th colspan="2"></th>
+        </tr>
+        </tbody>
+    </table>
+<?php endif; ?>
+<?php if (!empty($pagination)): ?>
+    <div class="pagination">
+        <?= $pagination ?>
+    </div>
+<?php endif; ?>

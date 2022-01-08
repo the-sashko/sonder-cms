@@ -1,0 +1,49 @@
+<?php
+/* @var string|null $csrfToken */
+/* @var int|null $id */
+/* @var string|null $name */
+/* @var bool $isActive */
+/* @var array|null $errors */
+
+$formAction = '/admin/users/roles/action/';
+
+if (!empty($id)) {
+    $formAction = sprintf('/admin/users/roles/action/%d/', $id);
+}
+?>
+<div class="form-wrapper">
+    <?php if (!empty($errors)): ?>
+        <div class="errors">
+            <?php foreach ($errors as $error): ?>
+                <p>
+                    <?= $error; ?>
+                </p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <form action="<?= $formAction; ?>"
+          enctype="multipart/form-data"
+          method="POST">
+        <p>
+            <input type="text"
+                   name="name"
+                   placeholder="Name"
+                   value="<?= $name; ?>">
+        </p>
+        <p>
+            <?php
+            $checked = $isActive ? ' checked' : '';
+            ?>
+            <input type="checkbox"
+                   name="is_active"
+                   value="1"
+                   <?= $checked ?>>
+            Is Active
+        </p>
+        <p>
+            <input type="submit" value="save">
+        </p>
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+        <input type="hidden" name="id" value="<?= $id; ?>">
+    </form>
+</div>
