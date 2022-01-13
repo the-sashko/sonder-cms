@@ -1,0 +1,9 @@
+TRUNCATE "users" CASCADE;
+TRUNCATE "roles" CASCADE;
+TRUNCATE "role_actions" CASCADE;
+TRUNCATE "role2action" CASCADE;
+
+ALTER SEQUENCE "users_id_seq" RESTART WITH 1;
+ALTER SEQUENCE "role2action_id_seq" RESTART WITH 1;
+ALTER SEQUENCE "role_actions_id_seq" RESTART WITH 1;
+ALTER SEQUENCE "roles_id_seq" RESTART WITH 1;
