@@ -4,7 +4,7 @@ if (!defined('APP_MODE')) {
 }
 
 if (!defined('APP_API_MODE')) {
-    define('APP_API_MODE', 'dev');
+    define('APP_API_MODE', 'prod');
 }
 
 if (!defined('APP_CACHE')) {

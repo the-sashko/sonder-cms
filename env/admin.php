@@ -12,11 +12,11 @@ if (!defined('APP_AREA')) {
 }
 
 if (!defined('APP_CACHE')) {
-    define('APP_CACHE', false);
+    define('APP_CACHE', true);
 }
 
 if (!defined('APP_CACHE_TTL')) {
-    define('APP_CACHE_TTL', 0);
+    define('APP_CACHE_TTL', 60 * 30);
 }
 
 if (!defined('APP_NOT_FOUND_URL')) {
