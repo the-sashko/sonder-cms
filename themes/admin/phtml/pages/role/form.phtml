@@ -1,18 +1,19 @@
 <?php
+/* @var string|null $csrfToken */
 /* @var int|null $id */
-/* @var string|null $title */
-/* @var string|null $slug */
-/* @var string|null $text */
-/* @var string|null $shortText */
-/* @var int|null $topicId */
-/* @var array|null $topics */
-/* @var string|null $language */
-/* @var array|null $locales */
+/* @var int|null $parentId */
+/* @var string|null $name */
+/* @var array|null $allowedActions */
+/* @var array|null $deniedActions */
+/* @var array|null $roles */
+/* @var array|null $roleActions */
+/* @var bool $isActive */
+/* @var array|null $errors */
 
-$postFormAction = '/admin/post/';
+$formAction = '/admin/users/role/';
 
 if (!empty($id)) {
-    $postFormAction = sprintf('/admin/post/%d/', $id);
+    $formAction = sprintf('/admin/users/role/%d/', $id);
 }
 ?>
 <div class="form-wrapper">
@@ -25,96 +26,109 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $postFormAction; ?>"
+    <form action="<?= $formAction; ?>"
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <input type="text"
-                   placeholder="Title"
-                   name="title"
-                   value="<?= $title; ?>">
+            <label>
+                <input type="text"
+                       name="name"
+                       placeholder="Name"
+                       value="<?= $name; ?>">
+            </label>
         </p>
         <p>
-            <input type="text" name="slug" placeholder="Slug"
-                   value="<?= $slug; ?>">
-        </p>
-        <p>
-            <textarea placeholder="Text"
-                      name="text"
-                      id="post-form-text"><?= $text; ?></textarea>
-        </p>
-        <p>
-            <textarea placeholder="Short Text"
-                      name="text_short"><?= $shortText; ?></textarea>
-        </p>
-        <p>
-            <select name="language" id="post-form-language">
-                <?php if (empty($postLanguage)): ?>
-                    <option disabled selected value="">Select language</option>
-                <?php else: ?>
-                    <option disabled value="">Select language</option>
-                <?php endif; ?>
-                <?php if (!empty($locales)): ?>
-                    <?php foreach ($locales as $locale): ?>
-                        <?php if ($language == $locale): ?>
-                            <option value="<?= $locale; ?>" selected>
-                                <?= $locale; ?>
+            <label>
+                <select name="parent_id">
+                    <?php
+                    $selected = empty($parentId) ? ' selected="selected"' : '';
+                    ?>
+                    <option value="0" disabled<?= $selected; ?>>
+                        Parent
+                    </option>
+                    <?php if (!empty($roles)): ?>
+                        <?php foreach ($roles as $role): ?>
+                            <?php
+                            $selected = '';
+                            if ($role->getId() == $parentId) {
+                                $selected = ' selected';
+                            }
+                            ?>
+                            <option value="<?= $role->getId(); ?>"
+                                <?= $selected; ?>>
+                                <?= $role->getName(); ?>
                             </option>
-                        <?php else: ?>
-                            <option value="<?= $locale; ?>">
-                                <?= $locale; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-            &nbsp;
-            <?php
-            $topicsHiddenClass = null;
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </label>
+        </p>
+        <?php if (!empty($roleActions)): ?>
+            <p>
+                <span>Allowed actions</span>
+                <br>
+                <?php foreach ($roleActions as $roleAction): ?>
+                    <?php
+                    $roleActionId = $roleAction->getId();
 
-            if (empty($language)) {
-                $topicsHiddenClass = 'class="hidden"';
-            }
-            ?>
-            <select name="id_topic"<?= $topicsHiddenClass; ?>
-                    id="post-form-topics">
-                <?php if (empty($topicId)): ?>
-                    <option disabled selected value="">Select topic</option>
-                <?php else: ?>
-                    <option disabled value="">Select topic</option>
-                <?php endif; ?>
-                <?php if (!empty($topics)): ?>
-                    <?php foreach ($topics as $topic): ?>
-                        <?php if ($topic->getId() == $topicId): ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>"
-                                    selected>
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php else: ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="hidden
-                                    post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>">
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-        </p>
+                    $checked = '';
+
+                    if (in_array($roleActionId, $allowedActions)) {
+                        $checked = ' checked';
+                    }
+                    ?>
+                    <input type="checkbox"
+                           name="allowed_actions[]"
+                           value="<?= $roleActionId; ?>"
+                           id="allowed-action-input-<?= $roleActionId; ?>"
+                        <?= $checked; ?>>
+                    <label for="allowed-action-input-<?= $roleActionId; ?>">
+                        <?= $roleAction->getName(); ?>
+                    </label>
+                    <br>
+                <?php endforeach; ?>
+            </p>
+            <p>
+                <span>Denied actions</span>
+                <br>
+                <?php foreach ($roleActions as $roleAction): ?>
+                    <?php
+                    $roleActionId = $roleAction->getId();
+
+                    $checked = '';
+
+                    if (in_array($roleActionId, $allowedActions)) {
+                        $checked = ' checked';
+                    }
+                    ?>
+                    <input type="checkbox"
+                           name="denied_actions[]"
+                           value="<?= $roleActionId; ?>"
+                           id="denied-action-input-<?= $roleActionId; ?>"
+                        <?= $checked; ?>>
+                    <label for="denied-action-input-<?= $roleActionId; ?>">
+                        <?= $roleAction->getName(); ?>
+                    </label>
+                    <br>
+                <?php endforeach; ?>
+            </p>
+        <?php endif; ?>
         <p>
-            <input type="file"
-                   placeholder="Image"
-                   name="media">
+            <?php
+            $checked = $isActive ? ' checked' : '';
+            ?>
+            <label>
+                <input type="checkbox"
+                       name="is_active"
+                       value="1"
+                    <?= $checked ?>>
+            </label>
+            Is Active
         </p>
         <p>
             <input type="submit" value="save">
         </p>
-
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
     </form>
 </div>

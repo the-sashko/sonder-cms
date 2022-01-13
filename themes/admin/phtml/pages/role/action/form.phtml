@@ -25,10 +25,12 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <input type="text"
-                   name="name"
-                   placeholder="Name"
-                   value="<?= $name; ?>">
+            <label>
+                <input type="text"
+                       name="name"
+                       placeholder="Name"
+                       value="<?= $name; ?>">
+            </label>
         </p>
         <p>
             <?php
@@ -37,8 +39,9 @@ if (!empty($id)) {
             <input type="checkbox"
                    name="is_active"
                    value="1"
-                   <?= $checked ?>>
-            Is Active
+                   id="is-active-input"
+                <?= $checked ?>>
+            <label for="is-active-input">Is Active</label>
         </p>
         <p>
             <input type="submit" value="save">
