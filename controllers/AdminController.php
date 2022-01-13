@@ -15,7 +15,7 @@ final class AdminController extends CoreController implements IController
 
     const ADMIN_INDEX_URL = '/admin/';
 
-    const USER_ACTION_ADMIN = 'login_to_admin';
+    const USER_ACTION_ADMIN = 'login-to-admin';
 
     /**
      * @var string|null
@@ -157,7 +157,8 @@ final class AdminController extends CoreController implements IController
 
     /**
      * @area admin
-     * @route /admin/users/roles/
+     * @route /admin/users/roles((/page-([0-9]+)/)|/)
+     * @url_params page=$3
      * @no_cache true
      *
      * @return ResponseObject
@@ -165,20 +166,20 @@ final class AdminController extends CoreController implements IController
      */
     final public function displayRoles(): ResponseObject
     {
-        //TODO
-        $page = 1;
+        $page = $this->request->getUrlValue('page');
+        $page = empty($page) ? 1 : (int)$page;
 
         $roleModel = $this->getModel('role');
 
-        $roles = [];//$roleModel->getAll($page);
-        $pageCount = 1;//$roleModel->getPageCount();
+        $roles = $roleModel->getRolesByPage($page);
+        $pageCount = $roleModel->getRolesPageCount();
 
         if (empty($roles) && $page > 1) {
-            return $this->redirect('/admin/roles/');
+            return $this->redirect('/admin/users/roles/');
         }
 
         if (($page > $pageCount) && $page > 1) {
-            return $this->redirect('/admin/roles/');
+            return $this->redirect('/admin/users/roles/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
@@ -192,11 +193,130 @@ final class AdminController extends CoreController implements IController
             'pagination' => $pagination,
             'page_path' => [
                 '/admin/' => 'Admin',
-                '#' => 'Posts'
+                '/admin/users/' => 'Users',
+                '#' => 'Roles'
             ]
         ]);
 
         return $this->render('role/list');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/role((/([0-9]+)/)|/)
+     * @url_params id=$3
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws Exception
+     */
+    final public function displayRole(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        $errors = [];
+
+        $name = null;
+        $parentId = null;
+        $allowedActions = [];
+        $deniedActions = [];
+        $isActive = true;
+
+        $roleVO = null;
+        $roleForm = null;
+
+        $pageTitle = 'new';
+
+        $roleModel = $this->getModel('role');
+
+        if (!empty($id)) {
+            $roleVO = $roleModel->getVOById($id);
+            $pageTitle = 'Edit';
+        }
+
+        if (!empty($id) && empty($roleVO)) {
+            return $this->redirect('/admin/users/role/');
+        }
+
+        if ($this->request->getHttpMethod() == 'post') {
+            $roleForm = $roleModel->getForm(
+                $this->request->getPostValues(),
+                'role'
+            );
+
+            $roleModel->saveRole($roleForm);
+        }
+
+        if (!empty($roleForm) && $roleForm->getStatus()) {
+            return $this->redirect('/admin/users/role/');
+        }
+
+        if (!empty($roleForm)) {
+            $errors = $roleForm->getErrors();
+        }
+
+        if (!empty($roleVO)) {
+            $name = $roleVO->getName();
+            $parentId = $roleVO->getParentId();
+            $allowedActions = $roleVO->getAllowedActions();
+            $deniedActions = $roleVO->getDeniedActions();
+            $isActive = $roleVO->getIsActive();
+        }
+
+        if (!empty($roleForm) && !empty($roleForm->getName())) {
+            $name = $roleForm->getName();
+        }
+
+        if (!empty($roleForm) && !empty($roleForm->getParentId())) {
+            $parentId = $roleForm->getParentId();
+        }
+
+        if (!empty($roleForm) && !empty($roleForm->getAllowedActions())) {
+            $allowedActions = $roleForm->getAllowedActions();
+        }
+
+        if (!empty($roleForm) && !empty($roleForm->getDeniedActions())) {
+            $deniedActions = $roleForm->getDeniedActions();
+        }
+
+        if (!empty($roleActionForm) && !empty($roleActionForm->getIsActive())) {
+            $isActive = $roleActionForm->getIsActive();
+        }
+
+        $roles = $roleModel->getAllRoles();
+        $roleActions = $roleModel->getAllRoleActions();
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '/admin/users/roles/' => 'Roles',
+            '#' => $pageTitle
+        ];
+
+        $this->assign([
+            'id' => $id,
+            'name' => $name,
+            'parentId' => $parentId,
+            'allowedActions' => $allowedActions,
+            'deniedActions' => $deniedActions,
+            'is_active' => $isActive,
+            'errors' => $errors,
+            'roles' => $roles,
+            'role_actions' => $roleActions,
+            'page_path' => $pagePath
+        ]);
+
+        return $this->render('role/form');
+    }
+
+    final public function displayRemoveRole(): void
+    {
+        //TODO
+    }
+
+    final public function displayRestoreRole(): void
+    {
+        //TODO
     }
 
     /**
@@ -251,9 +371,6 @@ final class AdminController extends CoreController implements IController
      * @route /admin/users/roles/action((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
-     * @return ResponseObject
-     * @throws Exception
      */
     final public function displayRoleAction(): ResponseObject
     {
@@ -320,9 +437,9 @@ final class AdminController extends CoreController implements IController
 
         $this->assign([
             'id' => $id,
-            'errors' => $errors,
             'name' => $name,
             'is_active' => $isActive,
+            'errors' => $errors,
             'page_path' => $pagePath
         ]);
 
@@ -330,32 +447,53 @@ final class AdminController extends CoreController implements IController
         return $this->render('role/action/form');
     }
 
-    final public function displayNewRoleAction(): void
+    /**
+     * @area admin
+     * @route /admin/users/roles/actions/remove/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     * @throws Exception
+     */
+    final public function displayRemoveRoleAction(): ResponseObject
     {
-        //TODO
+        $id = (int)$this->request->getUrlValue('id');
+
+        if (!$this->getModel('role')->removeRoleActionById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Remove Role Action With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/roles/actions/');
     }
 
-    final public function displayRemoveRoleAction(): void
+    /**
+     * @area admin
+     * @route /admin/users/roles/actions/restore/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     * @throws Exception
+     */
+    final public function displayRestoreRoleAction(): ResponseObject
     {
-        //TODO
+        $id = (int)$this->request->getUrlValue('id');
+
+        if (!$this->getModel('role')->restoreRoleActionById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Restore Role Action With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/roles/actions/');
     }
 
     final public function displayNewRole(): void
-    {
-        //TODO
-    }
-
-    final public function displayRole(): void
-    {
-        //TODO
-    }
-
-    final public function displayRemoveRole(): void
-    {
-        //TODO
-    }
-
-    final public function displayRestoreRole(): void
     {
         //TODO
     }
