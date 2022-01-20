@@ -7,7 +7,15 @@ use Sonder\Core\CoreController;
 use Sonder\Core\Interfaces\IController;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
+use Sonder\Models\Role;
+use Sonder\Models\Role\RoleActionForm;
+use Sonder\Models\Role\RoleForm;
+use Sonder\Models\Role\RoleValuesObject;
+use Sonder\Models\User;
 use Sonder\Models\User\SignInForm;
+use Sonder\Models\User\UserForm;
+use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
+use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
 final class AdminController extends CoreController implements IController
 {
@@ -61,6 +69,7 @@ final class AdminController extends CoreController implements IController
 
         $postValues = $this->request->getPostValues();
 
+        /* @var $signInForm SignInForm */
         $signInForm = $user->getForm($postValues, 'sign_in');
         $errors = empty($postValues) ? null : $signInForm->getErrors();
 
@@ -113,21 +122,25 @@ final class AdminController extends CoreController implements IController
 
     /**
      * @area admin
-     * @route /admin/users/
+     * @route /admin/users((/page-([0-9]+)/)|/)
+     * @url_params page=$3
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayUsers(): ResponseObject
     {
-        //TODO
-        $page = 1;
+        $page = $this->request->getUrlValue('page');
+        $page = empty($page) ? 1 : (int)$page;
 
+        /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        $users = [];//$userModel->getAll($page);
-        $pageCount = 1;//$userModel->getPageCount();
+        $users = $userModel->getUsersByPage($page);
+        $pageCount = $userModel->getUsersPageCount();
 
         if (empty($users) && $page > 1) {
             return $this->redirect('/admin/users/');
@@ -148,11 +161,156 @@ final class AdminController extends CoreController implements IController
             'pagination' => $pagination,
             'page_path' => [
                 '/admin/' => 'Admin',
-                '#' => 'Posts'
+                '#' => 'Users'
             ]
         ]);
 
         return $this->render('user/list');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/user((/([0-9]+)/)|/)
+     * @url_params id=$3
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayUser(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        $errors = [];
+
+        $login = null;
+        $password = null;
+        $roleId = null;
+        $isActive = true;
+
+        $userVO = null;
+        $userForm = null;
+
+        $pageTitle = 'new';
+
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        if (!empty($id)) {
+            $userVO = $userModel->getVOById($id);
+            $pageTitle = 'Edit';
+        }
+
+        if (!empty($id) && empty($userVO)) {
+            return $this->redirect('/admin/user/');
+        }
+
+        if (!empty($userVO)) {
+            $login = $userVO->getLogin();
+            $roleId = $userVO->getRoleId();
+            $isActive = $userVO->getIsActive();
+        }
+
+        if ($this->request->getHttpMethod() == 'post') {
+            /* @var $userForm UserForm|null */
+            $userForm = $userModel->getForm(
+                $this->request->getPostValues(),
+                'user'
+            );
+
+            $userModel->save($userForm);
+        }
+
+        if (!empty($userForm) && $userForm->getStatus()) {
+            return $this->redirect('/admin/users/');
+        }
+
+        if (!empty($userForm)) {
+            $login = $userForm->getLogin();
+            $password = $userForm->getPassword();
+            $roleId = $userForm->getRoleId();
+            $isActive = $userForm->getIsActive();
+            $errors = $userForm->getErrors();
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '#' => $pageTitle
+        ];
+
+        $this->assign([
+            'id' => $id,
+            'login' => $login,
+            'password' => $password,
+            'role_id' => $roleId,
+            'is_active' => $isActive,
+            'errors' => $errors,
+            'page_path' => $pagePath
+        ]);
+
+
+        return $this->render('user/form');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/remove/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRemoveUser(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        if (!$userModel->removeById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Remove User With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/restore/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRestoreUser(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        if (!$userModel->restoreById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Restore User With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/');
     }
 
     /**
@@ -162,6 +320,8 @@ final class AdminController extends CoreController implements IController
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayRoles(): ResponseObject
@@ -169,6 +329,7 @@ final class AdminController extends CoreController implements IController
         $page = $this->request->getUrlValue('page');
         $page = empty($page) ? 1 : (int)$page;
 
+        /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
         $roles = $roleModel->getRolesByPage($page);
@@ -208,6 +369,8 @@ final class AdminController extends CoreController implements IController
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayRole(): ResponseObject
@@ -227,9 +390,11 @@ final class AdminController extends CoreController implements IController
 
         $pageTitle = 'new';
 
+        /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
+            /* @var $roleVO RoleValuesObject|null */
             $roleVO = $roleModel->getVOById($id);
             $pageTitle = 'Edit';
         }
@@ -239,6 +404,7 @@ final class AdminController extends CoreController implements IController
         }
 
         if ($this->request->getHttpMethod() == 'post') {
+            /* @var $roleForm RoleForm|null */
             $roleForm = $roleModel->getForm(
                 $this->request->getPostValues(),
                 'role'
@@ -248,7 +414,7 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($roleForm) && $roleForm->getStatus()) {
-            return $this->redirect('/admin/users/role/');
+            return $this->redirect('/admin/users/roles/');
         }
 
         if (!empty($roleForm)) {
@@ -263,24 +429,12 @@ final class AdminController extends CoreController implements IController
             $isActive = $roleVO->getIsActive();
         }
 
-        if (!empty($roleForm) && !empty($roleForm->getName())) {
+        if (!empty($roleForm)) {
             $name = $roleForm->getName();
-        }
-
-        if (!empty($roleForm) && !empty($roleForm->getParentId())) {
             $parentId = $roleForm->getParentId();
-        }
-
-        if (!empty($roleForm) && !empty($roleForm->getAllowedActions())) {
             $allowedActions = $roleForm->getAllowedActions();
-        }
-
-        if (!empty($roleForm) && !empty($roleForm->getDeniedActions())) {
             $deniedActions = $roleForm->getDeniedActions();
-        }
-
-        if (!empty($roleActionForm) && !empty($roleActionForm->getIsActive())) {
-            $isActive = $roleActionForm->getIsActive();
+            $isActive = $roleForm->getIsActive();
         }
 
         $roles = $roleModel->getAllRoles();
@@ -297,8 +451,8 @@ final class AdminController extends CoreController implements IController
             'id' => $id,
             'name' => $name,
             'parentId' => $parentId,
-            'allowedActions' => $allowedActions,
-            'deniedActions' => $deniedActions,
+            'allowedActions' => (array)$allowedActions,
+            'deniedActions' => (array)$deniedActions,
             'is_active' => $isActive,
             'errors' => $errors,
             'roles' => $roles,
@@ -309,14 +463,62 @@ final class AdminController extends CoreController implements IController
         return $this->render('role/form');
     }
 
-    final public function displayRemoveRole(): void
+    /**
+     * @area admin
+     * @route /admin/users/roles/remove/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRemoveRole(): ResponseObject
     {
-        //TODO
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (!$roleModel->removeRoleById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Remove Role With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/roles/');
     }
 
-    final public function displayRestoreRole(): void
+    /**
+     * @area admin
+     * @route /admin/users/roles/restore/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRestoreRole(): ResponseObject
     {
-        //TODO
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (!$roleModel->restoreRoleById($id)) {
+            $loggerPlugin = $this->getPlugin('logger');
+
+            $errorMessage = 'Can Not Restore Role With "%d"';
+            $errorMessage = sprintf($errorMessage, $id);
+
+            $loggerPlugin->logError($errorMessage);
+        }
+
+        return $this->redirect('/admin/users/roles/');
     }
 
     /**
@@ -326,6 +528,8 @@ final class AdminController extends CoreController implements IController
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayRoleActions(): ResponseObject
@@ -333,6 +537,7 @@ final class AdminController extends CoreController implements IController
         $page = $this->request->getUrlValue('page');
         $page = empty($page) ? 1 : (int)$page;
 
+        /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
         $roleActions = $roleModel->getRoleActionsByPage($page);
@@ -371,6 +576,11 @@ final class AdminController extends CoreController implements IController
      * @route /admin/users/roles/action((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
      */
     final public function displayRoleAction(): ResponseObject
     {
@@ -386,6 +596,7 @@ final class AdminController extends CoreController implements IController
 
         $pageTitle = 'new';
 
+        /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
@@ -397,7 +608,13 @@ final class AdminController extends CoreController implements IController
             return $this->redirect('/admin/users/roles/action/');
         }
 
+        if (!empty($roleActionVO)) {
+            $name = $roleActionVO->getName();
+            $isActive = $roleActionVO->getIsActive();
+        }
+
         if ($this->request->getHttpMethod() == 'post') {
+            /* @var $roleActionForm RoleActionForm|null */
             $roleActionForm = $roleModel->getForm(
                 $this->request->getPostValues(),
                 'role_action'
@@ -411,20 +628,9 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($roleActionForm)) {
-            $errors = $roleActionForm->getErrors();
-        }
-
-        if (!empty($roleActionVO)) {
-            $name = $roleActionVO->getName();
-            $isActive = $roleActionVO->getIsActive();
-        }
-
-        if (!empty($roleActionForm) && !empty($roleActionForm->getName())) {
             $name = $roleActionForm->getName();
-        }
-
-        if (!empty($roleActionForm) && !empty($roleActionForm->getIsActive())) {
             $isActive = $roleActionForm->getIsActive();
+            $errors = $roleActionForm->getErrors();
         }
 
         $pagePath = [
@@ -452,13 +658,19 @@ final class AdminController extends CoreController implements IController
      * @route /admin/users/roles/actions/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayRemoveRoleAction(): ResponseObject
     {
         $id = (int)$this->request->getUrlValue('id');
 
-        if (!$this->getModel('role')->removeRoleActionById($id)) {
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (!$roleModel->removeRoleActionById($id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Role Action With "%d"';
@@ -475,13 +687,19 @@ final class AdminController extends CoreController implements IController
      * @route /admin/users/roles/actions/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayRestoreRoleAction(): ResponseObject
     {
         $id = (int)$this->request->getUrlValue('id');
 
-        if (!$this->getModel('role')->restoreRoleActionById($id)) {
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (!$roleModel->restoreRoleActionById($id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Role Action With "%d"';
@@ -491,31 +709,6 @@ final class AdminController extends CoreController implements IController
         }
 
         return $this->redirect('/admin/users/roles/actions/');
-    }
-
-    final public function displayNewRole(): void
-    {
-        //TODO
-    }
-
-    final public function displayNewUser(): void
-    {
-        //TODO
-    }
-
-    final public function displayUser(): void
-    {
-        //TODO
-    }
-
-    final public function displayRemoveUser(): void
-    {
-        //TODO
-    }
-
-    final public function displayRestoreUser(): void
-    {
-        //TODO
     }
 
     final public function displayPosts(): void
