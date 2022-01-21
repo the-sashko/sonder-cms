@@ -46,7 +46,7 @@ fi
 cd "$scriptDir/../../../public/assets" || exit
 
 #lessc "less/$inputFilePath" "css/$outputFilePath"
-lessc -clean-css "css/$outputFilePath" "css/$outputFilePath"
+lessc -clean-css "less/$inputFilePath" "css/$outputFilePath"
 
 cd "$currDir" || exit
 
