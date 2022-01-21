@@ -16,6 +16,11 @@ if (!empty($id)) {
     $formAction = sprintf('/admin/users/role/%d/', $id);
 }
 ?>
+<p>
+    <a href="/admin/users/">Users</a> /
+    <a href="/admin/users/roles/">Roles</a> /
+    <a href="/admin/users/roles/actions/">Actions</a>
+</p>
 <div class="form-wrapper">
     <?php if (!empty($errors)): ?>
         <div class="errors">
@@ -30,7 +35,7 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <label>
+            <label for="name" class="label-input-wrapper">
                 <input type="text"
                        name="name"
                        placeholder="Name"
@@ -38,7 +43,7 @@ if (!empty($id)) {
             </label>
         </p>
         <p>
-            <label>
+            <label for="parent_id" class="label-input-wrapper">
                 <select name="parent_id">
                     <?php
                     $selected = empty($parentId) ? ' selected="selected"' : '';
@@ -63,67 +68,73 @@ if (!empty($id)) {
                 </select>
             </label>
         </p>
-        <?php if (!empty($roleActions)): ?>
+        <div class="checkbox-list-wrapper">
+            <?php if (!empty($roleActions)): ?>
             <p>
-                <span>Allowed actions</span>
-                <br>
-                <?php foreach ($roleActions as $roleAction): ?>
-                    <?php
-                    $roleActionId = $roleAction->getId();
+                Allowed actions
+            </p>
+            <?php foreach ($roleActions as $roleAction): ?>
+                <?php
+                $roleActionId = $roleAction->getId();
+                $roleActionName = $roleAction->getName();
 
-                    $checked = '';
+                $checked = '';
 
-                    if (in_array($roleActionId, $allowedActions)) {
-                        $checked = ' checked';
-                    }
-                    ?>
+                if (in_array($roleActionName, $allowedActions)) {
+                    $checked = ' checked';
+                }
+                ?>
+                <p>
                     <input type="checkbox"
                            name="allowed_actions[]"
                            value="<?= $roleActionId; ?>"
                            id="allowed-action-input-<?= $roleActionId; ?>"
                         <?= $checked; ?>>
                     <label for="allowed-action-input-<?= $roleActionId; ?>">
-                        <?= $roleAction->getName(); ?>
+                        <?= $roleActionName; ?>
                     </label>
-                    <br>
-                <?php endforeach; ?>
-            </p>
+                </p>
+            <?php endforeach; ?>
+        </div>
+        <div class="checkbox-list-wrapper">
             <p>
-                <span>Denied actions</span>
-                <br>
-                <?php foreach ($roleActions as $roleAction): ?>
-                    <?php
-                    $roleActionId = $roleAction->getId();
+                Denied actions
+            </p>
+            <?php foreach ($roleActions as $roleAction): ?>
+                <?php
+                $roleActionId = $roleAction->getId();
+                $roleActionName = $roleAction->getName();
 
-                    $checked = '';
+                $checked = '';
 
-                    if (in_array($roleActionId, $allowedActions)) {
-                        $checked = ' checked';
-                    }
-                    ?>
+                if (in_array($roleActionName, $deniedActions)) {
+                    $checked = ' checked';
+                }
+                ?>
+                <p>
                     <input type="checkbox"
                            name="denied_actions[]"
                            value="<?= $roleActionId; ?>"
                            id="denied-action-input-<?= $roleActionId; ?>"
                         <?= $checked; ?>>
                     <label for="denied-action-input-<?= $roleActionId; ?>">
-                        <?= $roleAction->getName(); ?>
+                        <?= $roleActionName; ?>
                     </label>
-                    <br>
-                <?php endforeach; ?>
-            </p>
+                </p>
+            <?php endforeach; ?>
+        </div>
         <?php endif; ?>
         <p>
             <?php
             $checked = $isActive ? ' checked' : '';
             ?>
-            <label>
-                <input type="checkbox"
-                       name="is_active"
-                       value="1"
-                    <?= $checked ?>>
+            <input type="checkbox"
+                   name="is_active"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_active">
+                Is Active
             </label>
-            Is Active
         </p>
         <p>
             <input type="submit" value="save">

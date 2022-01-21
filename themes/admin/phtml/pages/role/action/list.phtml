@@ -5,10 +5,17 @@ use Sonder\Models\Role\RoleActionValuesObject;
 /* @var RoleActionValuesObject[]|null $roleActions */
 ?>
 <p>
+    <a href="/admin/users/">Users</a> /
+    <a href="/admin/users/roles/">Roles</a> /
+    <span>Actions</span>
+</p>
+<p>
     <a href="/admin/users/roles/action/" class="button">New action</a>
 </p>
 <?php if (empty($roleActions)): ?>
-    Empty...
+    <p>
+        Empty
+    </p>
 <?php else: ?>
     <table>
         <tbody>
@@ -48,8 +55,8 @@ use Sonder\Models\Role\RoleActionValuesObject;
             <?php endif; ?>
             <td class="hide-on-mobile"><?= $roleAction->getId() ?></td>
             <td><?= $roleAction->getName() ?></td>
-            <td class="hide-on-tablet"><?= $roleActionIsActive ?></td>
             <td class="hide-on-tablet"><?= $roleActionIsSystem ?></td>
+            <td class="hide-on-tablet"><?= $roleActionIsActive ?></td>
             <td class="hide-on-mobile"><?= $roleActionCdate ?></td>
             <td class="hide-on-tablet"><?= $roleActionMdate ?></td>
             <td class="hide-on-tablet"><?= $roleActionDdate ?></td>

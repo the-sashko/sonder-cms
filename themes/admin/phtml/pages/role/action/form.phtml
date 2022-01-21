@@ -11,6 +11,11 @@ if (!empty($id)) {
     $formAction = sprintf('/admin/users/roles/action/%d/', $id);
 }
 ?>
+<p>
+    <a href="/admin/users/">Users</a> /
+    <a href="/admin/users/roles/">Roles</a> /
+    <a href="/admin/users/roles/actions/">Actions</a>
+</p>
 <div class="form-wrapper">
     <?php if (!empty($errors)): ?>
         <div class="errors">
@@ -25,7 +30,7 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <label>
+            <label for="name" class="label-input-wrapper">
                 <input type="text"
                        name="name"
                        placeholder="Name"

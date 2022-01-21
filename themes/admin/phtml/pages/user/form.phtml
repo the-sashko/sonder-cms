@@ -1,20 +1,25 @@
 <?php
+/* @var string|null $csrfToken */
 /* @var int|null $id */
-/* @var string|null $title */
-/* @var string|null $slug */
-/* @var string|null $text */
-/* @var string|null $shortText */
-/* @var int|null $topicId */
-/* @var array|null $topics */
-/* @var string|null $language */
-/* @var array|null $locales */
+/* @var string|null $login */
+/* @var string|null $password */
+/* @var int|null $roleId */
+/* @var array|null $roles */
+/* @var bool $isAllowAccessByApi */
+/* @var bool $isActive */
+/* @var array|null $errors */
 
-$postFormAction = '/admin/post/';
+$formAction = '/admin/user/';
 
 if (!empty($id)) {
-    $postFormAction = sprintf('/admin/post/%d/', $id);
+    $formAction = sprintf('/admin/user/%d/', $id);
 }
 ?>
+<p>
+    <a href="/admin/users/">Users</a> /
+    <a href="/admin/users/roles/">Roles</a> /
+    <a href="/admin/users/roles/actions/">Actions</a>
+</p>
 <div class="form-wrapper">
     <?php if (!empty($errors)): ?>
         <div class="errors">
@@ -25,96 +30,79 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $postFormAction; ?>"
+    <form action="<?= $formAction; ?>"
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <input type="text"
-                   placeholder="Title"
-                   name="title"
-                   value="<?= $title; ?>">
+            <label for="login" class="label-input-wrapper">
+                <input type="text"
+                       name="login"
+                       placeholder="Login"
+                       value="<?= $login; ?>">
+            </label>
         </p>
         <p>
-            <input type="text" name="slug" placeholder="Slug"
-                   value="<?= $slug; ?>">
-        </p>
-        <p>
-            <textarea placeholder="Text"
-                      name="text"
-                      id="post-form-text"><?= $text; ?></textarea>
-        </p>
-        <p>
-            <textarea placeholder="Short Text"
-                      name="text_short"><?= $shortText; ?></textarea>
-        </p>
-        <p>
-            <select name="language" id="post-form-language">
-                <?php if (empty($postLanguage)): ?>
-                    <option disabled selected value="">Select language</option>
-                <?php else: ?>
-                    <option disabled value="">Select language</option>
-                <?php endif; ?>
-                <?php if (!empty($locales)): ?>
-                    <?php foreach ($locales as $locale): ?>
-                        <?php if ($language == $locale): ?>
-                            <option value="<?= $locale; ?>" selected>
-                                <?= $locale; ?>
+            <label for="role_id" class="label-input-wrapper">
+                <select name="role_id">
+                    <?php
+                    $selected = empty($parentId) ? ' selected="selected"' : '';
+                    ?>
+                    <option value="0" disabled<?= $selected; ?>>
+                        Role
+                    </option>
+                    <?php if (!empty($roles)): ?>
+                        <?php foreach ($roles as $role): ?>
+                            <?php
+                            $selected = '';
+                            if ($role->getId() == $roleId) {
+                                $selected = ' selected';
+                            }
+                            ?>
+                            <option value="<?= $role->getId(); ?>"
+                                <?= $selected; ?>>
+                                <?= $role->getName(); ?>
                             </option>
-                        <?php else: ?>
-                            <option value="<?= $locale; ?>">
-                                <?= $locale; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-            &nbsp;
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </label>
+        </p>
+        <p>
+            <label for="password" class="label-input-wrapper">
+                <input type="text"
+                       name="password"
+                       placeholder="Password"
+                       value="<?= $password; ?>">
+            </label>
+        </p>
+        <p>
             <?php
-            $topicsHiddenClass = null;
-
-            if (empty($language)) {
-                $topicsHiddenClass = 'class="hidden"';
-            }
+            $checked = $isAllowAccessByApi ? ' checked' : '';
             ?>
-            <select name="id_topic"<?= $topicsHiddenClass; ?>
-                    id="post-form-topics">
-                <?php if (empty($topicId)): ?>
-                    <option disabled selected value="">Select topic</option>
-                <?php else: ?>
-                    <option disabled value="">Select topic</option>
-                <?php endif; ?>
-                <?php if (!empty($topics)): ?>
-                    <?php foreach ($topics as $topic): ?>
-                        <?php if ($topic->getId() == $topicId): ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>"
-                                    selected>
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php else: ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="hidden
-                                    post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>">
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
+            <input type="checkbox"
+                   name="is_allow_access_by_api"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_allow_access_by_api">
+                Is Allow Access By API
+            </label>
         </p>
         <p>
-            <input type="file"
-                   placeholder="Image"
-                   name="media">
+            <?php
+            $checked = $isActive ? ' checked' : '';
+            ?>
+            <input type="checkbox"
+                   name="is_active"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_active">
+                Is Active
+            </label>
         </p>
         <p>
             <input type="submit" value="save">
         </p>
-
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
     </form>
 </div>

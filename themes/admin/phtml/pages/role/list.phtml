@@ -5,13 +5,17 @@ use Sonder\Models\Role\RoleValuesObject;
 /* @var RoleValuesObject[]|null $roles */
 ?>
 <p>
-    <a href="/admin/users/role/" class="button">New role</a>
+    <a href="/admin/users/">Users</a> /
+    <span>Roles</span> /
+    <a href="/admin/users/roles/actions/">Actions</a>
 </p>
 <p>
-    <a href="/admin/users/roles/actions/" class="button">Actions</a>
+    <a href="/admin/users/role/" class="button">New role</a>
 </p>
 <?php if (empty($roles)): ?>
-    Empty...
+    <p>
+        Empty
+    </p>
 <?php else: ?>
     <table>
         <tbody>
@@ -78,8 +82,8 @@ use Sonder\Models\Role\RoleValuesObject;
             <td class="hide-on-mobile"><?= $roleParent ?></td>
             <td class="hide-on-tablet"><?= $allowedActions ?></td>
             <td class="hide-on-tablet"><?= $deniedActions ?></td>
-            <td class="hide-on-tablet"><?= $roleIsActive ?></td>
             <td class="hide-on-tablet"><?= $roleIsSystem ?></td>
+            <td class="hide-on-tablet"><?= $roleIsActive ?></td>
             <td class="hide-on-mobile"><?= $roleCdate ?></td>
             <td class="hide-on-tablet"><?= $roleMdate ?></td>
             <td class="hide-on-tablet"><?= $roleDdate ?></td>
