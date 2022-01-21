@@ -188,6 +188,7 @@ final class AdminController extends CoreController implements IController
         $login = null;
         $password = null;
         $roleId = null;
+        $isAllowAccessByApi = false;
         $isActive = true;
 
         $userVO = null;
@@ -197,6 +198,9 @@ final class AdminController extends CoreController implements IController
 
         /* @var $userModel User */
         $userModel = $this->getModel('user');
+
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
             $userVO = $userModel->getVOById($id);
@@ -210,6 +214,7 @@ final class AdminController extends CoreController implements IController
         if (!empty($userVO)) {
             $login = $userVO->getLogin();
             $roleId = $userVO->getRoleId();
+            $isAllowAccessByApi = !empty($userVO->getApiToken());
             $isActive = $userVO->getIsActive();
         }
 
@@ -231,6 +236,7 @@ final class AdminController extends CoreController implements IController
             $login = $userForm->getLogin();
             $password = $userForm->getPassword();
             $roleId = $userForm->getRoleId();
+            $isAllowAccessByApi = $userForm->getIsAllowAccessByApi();
             $isActive = $userForm->getIsActive();
             $errors = $userForm->getErrors();
         }
@@ -241,16 +247,19 @@ final class AdminController extends CoreController implements IController
             '#' => $pageTitle
         ];
 
+        $roles = $roleModel->getAllRoles();
+
         $this->assign([
             'id' => $id,
             'login' => $login,
             'password' => $password,
             'role_id' => $roleId,
+            'is_allow_access_by_api' => $isAllowAccessByApi,
             'is_active' => $isActive,
+            'roles' => $roles,
             'errors' => $errors,
             'page_path' => $pagePath
         ]);
-
 
         return $this->render('user/form');
     }
