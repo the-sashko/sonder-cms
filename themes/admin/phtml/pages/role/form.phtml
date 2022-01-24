@@ -22,6 +22,11 @@ if (!empty($id)) {
     <a href="/admin/users/roles/actions/">Actions</a>
 </p>
 <div class="form-wrapper">
+    <?php if (empty($id)): ?>
+        <h1>Add New Role</h1>
+    <?php else: ?>
+        <h1>Edit Role</h1>
+    <?php endif; ?>
     <?php if (!empty($errors)): ?>
         <div class="errors">
             <?php foreach ($errors as $error): ?>

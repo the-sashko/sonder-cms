@@ -16,6 +16,11 @@ if (!empty($id)) {
     <a href="/admin/users/roles/">Roles</a> /
     <a href="/admin/users/roles/actions/">Actions</a>
 </p>
+<?php if (empty($id)): ?>
+    <h1>Add New Role Action</h1>
+<?php else: ?>
+    <h1>Edit Role Action</h1>
+<?php endif; ?>
 <div class="form-wrapper">
     <?php if (!empty($errors)): ?>
         <div class="errors">

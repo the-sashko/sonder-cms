@@ -1,0 +1,92 @@
+<?php
+
+use Sonder\Models\Role\RoleActionValuesObject;
+
+/* @var RoleActionValuesObject $roleAction */
+?>
+    <p>
+        <a href="/admin/users/">Users</a> /
+        <a href="/admin/users/roles/">Roles</a> /
+        <a href="/admin/users/roles/actions/">Actions</a>
+    </p>
+    <table>
+        <tr>
+            <th colspan="2">
+                Role Action &#xab;<?= $roleAction->getName() ?>&#xbb;
+            </th>
+        </tr>
+        <tr>
+            <td>
+                ID
+            </td>
+            <td>
+                <?= $roleAction->getId(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                <?= $roleAction->getName(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Is System
+            </td>
+            <td>
+                <?= $roleAction->getIsSystem() ? 'Yes' : 'No'; ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Is Active
+            </td>
+            <td>
+                <?= $roleAction->getIsActive() ? 'Yes' : 'No'; ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Created At
+            </td>
+            <td>
+                <?= $roleAction->getCdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+        <?php if (!empty($roleAction->getMdate())): ?>
+            <tr>
+                <td>
+                    Updates At
+                </td>
+                <td>
+                    <?= $roleAction->getMdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($roleAction->getDdate())): ?>
+            <tr>
+                <td>
+                    Removed At
+                </td>
+                <td>
+                    <?= $roleAction->getDdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </table>
+<?php if (!$roleAction->getIsSystem()): ?>
+    <p>
+        <a href="<?= $roleAction->getEditLink(); ?>">Edit</a>
+    </p>
+    <?php if ($roleAction->isRemoved()): ?>
+        <p>
+            <a href="<?= $roleAction->getRestoreLink(); ?>">Restore</a>
+        </p>
+    <?php else: ?>
+        <p>
+            <a href="<?= $roleAction->getRemoveLink(); ?>">Remove</a>
+        </p>
+    <?php endif; ?>
+<?php endif; ?>

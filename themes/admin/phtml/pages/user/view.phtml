@@ -1,0 +1,113 @@
+<?php
+
+use Sonder\Models\User\UserValuesObject;
+
+/* @var UserValuesObject $user */
+?>
+    <p>
+        <a href="/admin/users/">Users</a> /
+        <a href="/admin/users/roles/">Roles</a> /
+        <a href="/admin/users/roles/actions/">Actions</a>
+    </p>
+    <table>
+        <tr>
+            <th colspan="2">
+                User &#xab;<?= $user->getLogin() ?>&#xbb;
+            </th>
+        </tr>
+        <tr>
+            <td>
+                ID
+            </td>
+            <td>
+                <?= $user->getId(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Login
+            </td>
+            <td>
+                <?= $user->getLogin(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Email
+            </td>
+            <td>
+                <?= $user->getEmail(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Role
+            </td>
+            <td>
+                <a href="<?= $user->getRoleVO()->getAdminViewLink() ?>">
+                    <?= $user->getRoleVO()->getName() ?>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Is Active
+            </td>
+            <td>
+                <?= $user->getIsActive() ? 'Yes' : 'No'; ?>
+            </td>
+        </tr>
+        <?php if (!empty($user->getLastLoginDate())): ?>
+            <tr>
+                <td>
+                    Last Login At
+                </td>
+                <td>
+                    <?= $user->getLastLoginDate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <tr>
+            <td>
+                Created At
+            </td>
+            <td>
+                <?= $user->getCdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+        <?php if (!empty($user->getMdate())): ?>
+            <tr>
+                <td>
+                    Updates At
+                </td>
+                <td>
+                    <?= $user->getMdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($user->getDdate())): ?>
+            <tr>
+                <td>
+                    Removed At
+                </td>
+                <td>
+                    <?= $user->getDdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </table>
+    <p>
+        <a href="<?= $user->getEditLink(); ?>">Edit</a>
+    </p>
+    <p>
+        <a href="<?= $user->getAdminCredentialsLink(); ?>">Credentials</a>
+    </p>
+<?php if ($user->isRemoved()): ?>
+    <p>
+        <a href="<?= $user->getRestoreLink(); ?>">Restore</a>
+    </p>
+<?php else: ?>
+    <p>
+        <a href="<?= $user->getRemoveLink(); ?>">Remove</a>
+    </p>
+<?php endif; ?>

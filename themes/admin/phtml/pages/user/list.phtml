@@ -22,14 +22,12 @@ use Sonder\Models\User\UserValuesObject;
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Login</th>
-            <th class="hide-on-tablet">API Token</th>
             <th class="hide-on-mobile">Role</th>
-            <th class="hide-on-mobile">Last Login At</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
-            <th colspan="2"></th>
+            <th colspan="4"></th>
         </tr>
         <?php foreach ($users as $user): ?>
             <?php
@@ -37,28 +35,15 @@ use Sonder\Models\User\UserValuesObject;
 
             $userCdate = $user->getCdate('Y-m-d H:i:s');
 
-            $userLastLoginDate = '---';
             $userMdate = '---';
             $userDdate = '---';
-
-            $userApiToken = '---';
-
-            if (!empty($user->getLastLoginDate())) {
-                $userLastLoginDate = $user->getLastLoginDate(
-                    'Y-m-d H:i:s'
-                );
-            }
 
             if (!empty($user->getMdate())) {
                 $userMdate = $user->getMdate('Y-m-d H:i:s');
             }
 
             if (!empty($user->getDdate())) {
-                $userMdate = $user->getDdate('Y-m-d H:i:s');
-            }
-
-            if (!empty($user->getApiToken())) {
-                $userApiToken = $user->getApiToken();
+                $userDdate = $user->getDdate('Y-m-d H:i:s');
             }
             ?>
             <?php if ($user->isRemoved()): ?>
@@ -68,18 +53,26 @@ use Sonder\Models\User\UserValuesObject;
             <?php endif; ?>
             <td class="hide-on-mobile"><?= $user->getId(); ?></td>
             <td><?= $user->getLogin(); ?></td>
-            <td class="hide-on-tablet"><?= $userApiToken; ?></td>
-            <td class="hide-on-tablet">
+            <td class="hide-on-mobile">
                 <?= $user->getRoleVO()->getName(); ?>
             </td>
-            <td class="hide-on-tablet"><?= $userLastLoginDate; ?></td>
             <td class="hide-on-tablet"><?= $userIsActive; ?></td>
             <td class="hide-on-mobile"><?= $userCdate; ?></td>
             <td class="hide-on-tablet"><?= $userMdate; ?></td>
             <td class="hide-on-tablet"><?= $userDdate; ?></td>
             <td>
+                <a href="<?= $user->getAdminViewLink(); ?>">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </td>
+            <td>
                 <a href="<?= $user->getEditLink(); ?>">
                     <i class="fas fa-edit"></i>
+                </a>
+            </td>
+            <td>
+                <a href="<?= $user->getAdminCredentialsLink(); ?>">
+                    <i class="fas fa-lock"></i>
                 </a>
             </td>
             <td>
@@ -98,14 +91,12 @@ use Sonder\Models\User\UserValuesObject;
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Login</th>
-            <th class="hide-on-tablet">API Token</th>
             <th class="hide-on-mobile">Role</th>
-            <th class="hide-on-mobile">Last Login At</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
-            <th colspan="2"></th>
+            <th colspan="4"></th>
         </tr>
         </tbody>
     </table>

@@ -23,14 +23,12 @@ use Sonder\Models\Role\RoleValuesObject;
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Name</th>
             <th class="hide-on-mobile">Parent</th>
-            <th class="hide-on-tablet">Allowed actions</th>
-            <th class="hide-on-tablet">Denied actions</th>
             <th class="hide-on-tablet">Is System</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
-            <th colspan="2"></th>
+            <th colspan="3"></th>
         </tr>
         <?php foreach ($roles as $role): ?>
             <?php
@@ -44,17 +42,6 @@ use Sonder\Models\Role\RoleValuesObject;
 
             $roleMdate = '---';
             $roleDdate = '---';
-
-            $allowedActions = $role->getAllowedActions();
-            $deniedActions = $role->getDeniedActions();
-
-            if (!empty($allowedActions)) {
-                $allowedActions = implode('<br><br>', $allowedActions);
-            }
-
-            if (!empty($deniedActions)) {
-                $deniedActions = implode('<br><br>', $deniedActions);
-            }
 
             if (!empty($role->getParentVO())) {
                 $roleParent = sprintf(
@@ -80,16 +67,23 @@ use Sonder\Models\Role\RoleValuesObject;
             <td class="hide-on-mobile"><?= $role->getId() ?></td>
             <td><?= $role->getName() ?></td>
             <td class="hide-on-mobile"><?= $roleParent ?></td>
-            <td class="hide-on-tablet"><?= $allowedActions ?></td>
-            <td class="hide-on-tablet"><?= $deniedActions ?></td>
             <td class="hide-on-tablet"><?= $roleIsSystem ?></td>
             <td class="hide-on-tablet"><?= $roleIsActive ?></td>
             <td class="hide-on-mobile"><?= $roleCdate ?></td>
             <td class="hide-on-tablet"><?= $roleMdate ?></td>
             <td class="hide-on-tablet"><?= $roleDdate ?></td>
             <?php if ($role->getIsSystem()): ?>
-                <td colspan="2">---</td>
+                <td colspan="3">
+                    <a href="<?= $role->getAdminViewLink() ?>">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
             <?php else: ?>
+                <td>
+                    <a href="<?= $role->getAdminViewLink() ?>">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
                 <td>
                     <a href="<?= $role->getEditLink() ?>">
                         <i class="fas fa-edit"></i>
@@ -113,14 +107,12 @@ use Sonder\Models\Role\RoleValuesObject;
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Name</th>
             <th class="hide-on-mobile">Parent</th>
-            <th class="hide-on-tablet">Allowed actions</th>
-            <th class="hide-on-tablet">Denied actions</th>
             <th class="hide-on-tablet">Is System</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
-            <th colspan="2"></th>
+            <th colspan="3"></th>
         </tr>
         </tbody>
     </table>

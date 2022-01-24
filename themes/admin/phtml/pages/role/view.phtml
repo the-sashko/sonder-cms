@@ -1,0 +1,142 @@
+<?php
+
+use Sonder\Models\Role\RoleValuesObject;
+
+/* @var RoleValuesObject $role */
+
+$allowedActions = $role->getAllowedActions();
+$deniedActions = $role->getDeniedActions();
+
+if (!empty($allowedActions)) {
+    $allowedActions = implode('<br><br>', $allowedActions);
+}
+
+if (!empty($deniedActions)) {
+    $deniedActions = implode('<br><br>', $deniedActions);
+}
+?>
+    <p>
+        <a href="/admin/users/">Users</a> /
+        <a href="/admin/users/roles/">Roles</a> /
+        <a href="/admin/users/roles/actions/">Actions</a>
+    </p>
+    <table>
+        <tr>
+            <th colspan="2">
+                Role &#xab;<?= $role->getName() ?>&#xbb;
+            </th>
+        </tr>
+        <tr>
+            <td>
+                ID
+            </td>
+            <td>
+                <?= $role->getId(); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                <?= $role->getName(); ?>
+            </td>
+        </tr>
+        <?php if (!empty($role->getParentVO())): ?>
+            <?php
+            $parent = sprintf(
+                '%s (ID: %d)',
+                $role->getParentVO()->getName(),
+                $role->getParentVO()->getId()
+            );
+            ?>
+            <tr>
+                <td>
+                    Parent
+                </td>
+                <td>
+                    <a href="<?= $role->getParentVO()->getAdminViewLink() ?>">
+                        <?= $parent ?>
+                    </a>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($allowedActions)): ?>
+        <tr>
+            <td>
+                Allowed actions
+            </td>
+            <td>
+                <?= $allowedActions; ?>
+            </td>
+        </tr>
+        <?php endif; ?>
+        <?php if (!empty($deniedActions)): ?>
+            <tr>
+                <td>
+                    Denied actions
+                </td>
+                <td>
+                    <?= $deniedActions; ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <tr>
+            <td>
+                Is System
+            </td>
+            <td>
+                <?= $role->getIsSystem() ? 'Yes' : 'No'; ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Is Active
+            </td>
+            <td>
+                <?= $role->getIsActive() ? 'Yes' : 'No'; ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Created At
+            </td>
+            <td>
+                <?= $role->getCdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+        <?php if (!empty($role->getMdate())): ?>
+            <tr>
+                <td>
+                    Updates At
+                </td>
+                <td>
+                    <?= $role->getMdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <?php if (!empty($role->getDdate())): ?>
+            <tr>
+                <td>
+                    Removed At
+                </td>
+                <td>
+                    <?= $role->getDdate('Y-m-d H:i:s'); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </table>
+<?php if (!$role->getIsSystem()): ?>
+    <p>
+        <a href="<?= $role->getEditLink(); ?>">Edit</a>
+    </p>
+    <?php if ($role->isRemoved()): ?>
+        <p>
+            <a href="<?= $role->getRestoreLink(); ?>">Restore</a>
+        </p>
+    <?php else: ?>
+        <p>
+            <a href="<?= $role->getRemoveLink(); ?>">Remove</a>
+        </p>
+    <?php endif; ?>
+<?php endif; ?>
