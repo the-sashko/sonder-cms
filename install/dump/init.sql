@@ -78,8 +78,8 @@ VALUES (1, 1, 1, 't'),
        (45, 10, 18, 't'),
        (46, 10, 19, 't');
 
-INSERT INTO "users" ("id", "login", "role_id", "is_active", "cdate", "mdate", "ddate")
-VALUES (1, 'admin', 10, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+INSERT INTO "users" ("id", "login", "email", "role_id", "is_active", "cdate", "mdate", "ddate")
+VALUES (1, 'admin', 'admin@admin.admin', 10, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
 
 ALTER SEQUENCE "role_actions_id_seq" RESTART WITH 20;
 
