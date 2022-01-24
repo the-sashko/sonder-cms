@@ -12,6 +12,7 @@ use Sonder\Models\Role\RoleActionForm;
 use Sonder\Models\Role\RoleForm;
 use Sonder\Models\Role\RoleValuesObject;
 use Sonder\Models\User;
+use Sonder\Models\User\CredentialsForm;
 use Sonder\Models\User\SignInForm;
 use Sonder\Models\User\UserForm;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
@@ -170,8 +171,8 @@ final class AdminController extends CoreController implements IController
 
     /**
      * @area admin
-     * @route /admin/user((/([0-9]+)/)|/)
-     * @url_params id=$3
+     * @route /admin/users/view/([0-9]+)/
+     * @url_params id=$1
      * @no_cache true
      *
      * @return ResponseObject
@@ -183,9 +184,53 @@ final class AdminController extends CoreController implements IController
     {
         $id = (int)$this->request->getUrlValue('id');
 
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        if (empty($id)) {
+            return $this->redirect('/admin/users/');
+        }
+
+        $userVO = $userModel->getVOById($id);
+
+        if (empty($userVO)) {
+            return $this->redirect('/admin/users/');
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '#' => $userVO->getLogin()
+        ];
+
+        $this->assign([
+            'user' => $userVO,
+            'page_path' => $pagePath
+        ]);
+
+
+        return $this->render('user/view');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/user((/([0-9]+)/)|/)
+     * @url_params id=$3
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayUserForm(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
         $errors = [];
 
         $login = null;
+        $email = null;
         $password = null;
         $roleId = null;
         $isAllowAccessByApi = false;
@@ -213,6 +258,7 @@ final class AdminController extends CoreController implements IController
 
         if (!empty($userVO)) {
             $login = $userVO->getLogin();
+            $email = $userVO->getEmail();
             $roleId = $userVO->getRoleId();
             $isAllowAccessByApi = !empty($userVO->getApiToken());
             $isActive = $userVO->getIsActive();
@@ -229,11 +275,19 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($userForm) && $userForm->getStatus()) {
-            return $this->redirect('/admin/users/');
+            $id = $userForm->getId();
+
+            $urlPattern = '/admin/users/view/%d/';
+            $url = '/admin/users/';
+
+            $url = empty($id) ? $url : sprintf($urlPattern, $id);
+
+            return $this->redirect($url);
         }
 
         if (!empty($userForm)) {
             $login = $userForm->getLogin();
+            $email = $userForm->getEmail();
             $password = $userForm->getPassword();
             $roleId = $userForm->getRoleId();
             $isAllowAccessByApi = $userForm->getIsAllowAccessByApi();
@@ -252,6 +306,7 @@ final class AdminController extends CoreController implements IController
         $this->assign([
             'id' => $id,
             'login' => $login,
+            'email' => $email,
             'password' => $password,
             'role_id' => $roleId,
             'is_allow_access_by_api' => $isAllowAccessByApi,
@@ -262,6 +317,87 @@ final class AdminController extends CoreController implements IController
         ]);
 
         return $this->render('user/form');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/users/credentials/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayUserCredentialsForm(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        if (empty($id)) {
+            return $this->redirect('/admin/users/');
+        }
+
+        $errors = [];
+
+        $password = null;
+
+        $credentialsForm = null;
+
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        $userVO = $userModel->getVOById($id);
+
+        if (empty($userVO)) {
+            return $this->redirect('/admin/users/');
+        }
+
+        $login = $userVO->getLogin();
+        $apiToken = $userVO->getApiToken();
+        $isAllowAccessByApi = !empty($userVO->getApiToken());
+
+        if ($this->request->getHttpMethod() == 'post') {
+            /* @var $credentialsForm CredentialsForm|null */
+            $credentialsForm = $userModel->getForm(
+                $this->request->getPostValues(),
+                'credentials'
+            );
+
+            $userModel->saveCredentials($credentialsForm);
+        }
+
+        if (!empty($credentialsForm) && $credentialsForm->getStatus()) {
+            return $this->redirect(sprintf(
+                '/admin/users/view/%d/',
+                $id
+            ));
+        }
+
+        if (!empty($credentialsForm)) {
+            $login = $credentialsForm->getLogin();
+            $password = $credentialsForm->getPassword();
+            $isAllowAccessByApi = $credentialsForm->getIsAllowAccessByApi();
+            $errors = $credentialsForm->getErrors();
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '#' => 'Credentials'
+        ];
+
+        $this->assign([
+            'id' => $id,
+            'login' => $login,
+            'password' => $password,
+            'api_token' => $apiToken,
+            'is_allow_access_by_api' => $isAllowAccessByApi,
+            'errors' => $errors,
+            'page_path' => $pagePath
+        ]);
+
+        return $this->render('user/credentials_form');
     }
 
     /**
@@ -373,6 +509,50 @@ final class AdminController extends CoreController implements IController
 
     /**
      * @area admin
+     * @route /admin/users/roles/view/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRole(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (empty($id)) {
+            return $this->redirect('/admin/users/roles/');
+        }
+
+        $roleVO = $roleModel->getRoleVOById($id);
+
+        if (empty($roleVO)) {
+            return $this->redirect('/admin/users/roles/');
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '/admin/users/roles/' => 'Roles',
+            '#' => $roleVO->getName()
+        ];
+
+        $this->assign([
+            'role' => $roleVO,
+            'page_path' => $pagePath
+        ]);
+
+
+        return $this->render('role/view');
+    }
+
+    /**
+     * @area admin
      * @route /admin/users/role((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
@@ -382,7 +562,7 @@ final class AdminController extends CoreController implements IController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRole(): ResponseObject
+    final public function displayRoleForm(): ResponseObject
     {
         $id = (int)$this->request->getUrlValue('id');
 
@@ -423,7 +603,14 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($roleForm) && $roleForm->getStatus()) {
-            return $this->redirect('/admin/users/roles/');
+            $id = $roleForm->getId();
+
+            $urlPattern = '/admin/users/roles/view/%d/';
+            $url = '/admin/users/roles/';
+
+            $url = empty($id) ? $url : sprintf($urlPattern, $id);
+
+            return $this->redirect($url);
         }
 
         if (!empty($roleForm)) {
@@ -431,10 +618,12 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($roleVO)) {
+            $roleId = $roleVO->getId();
+
             $name = $roleVO->getName();
             $parentId = $roleVO->getParentId();
-            $allowedActions = $roleVO->getAllowedActions();
-            $deniedActions = $roleVO->getDeniedActions();
+            $allowedActions = $roleModel->getAllowedActionsByRoleId($roleId);
+            $deniedActions = $roleModel->getDeniedActionsByRoleId($roleId);
             $isActive = $roleVO->getIsActive();
         }
 
@@ -582,6 +771,51 @@ final class AdminController extends CoreController implements IController
 
     /**
      * @area admin
+     * @route /admin/users/roles/actions/view/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRoleAction(): ResponseObject
+    {
+        $id = (int)$this->request->getUrlValue('id');
+
+        /* @var $roleModel Role */
+        $roleModel = $this->getModel('role');
+
+        if (empty($id)) {
+            return $this->redirect('/admin/users/roles/actions/');
+        }
+
+        $roleActionVO = $roleModel->getRoleActionVOById($id);
+
+        if (empty($roleActionVO)) {
+            return $this->redirect('/admin/users/roles/actions/');
+        }
+
+        $pagePath = [
+            '/admin/' => 'Admin',
+            '/admin/users/' => 'Users',
+            '/admin/users/roles/' => 'Roles',
+            '/admin/users/roles/actions/' => 'Actions',
+            '#' => $roleActionVO->getName()
+        ];
+
+        $this->assign([
+            'role_action' => $roleActionVO,
+            'page_path' => $pagePath
+        ]);
+
+
+        return $this->render('role/action/view');
+    }
+
+    /**
+     * @area admin
      * @route /admin/users/roles/action((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
@@ -591,7 +825,7 @@ final class AdminController extends CoreController implements IController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoleAction(): ResponseObject
+    final public function displayRoleActionForm(): ResponseObject
     {
         $id = (int)$this->request->getUrlValue('id');
 
@@ -633,7 +867,14 @@ final class AdminController extends CoreController implements IController
         }
 
         if (!empty($roleActionForm) && $roleActionForm->getStatus()) {
-            return $this->redirect('/admin/users/roles/actions/');
+            $id = $roleActionForm->getId();
+
+            $urlPattern = '/admin/users/roles/actions/view/%d/';
+            $url = '/admin/users/roles/actions/';
+
+            $url = empty($id) ? $url : sprintf($urlPattern, $id);
+
+            return $this->redirect($url);
         }
 
         if (!empty($roleActionForm)) {
