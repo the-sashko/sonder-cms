@@ -1,3 +1,65 @@
+CREATE SEQUENCE "topics_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "tags_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+
+CREATE TABLE "topics"
+(
+    "id"        integer DEFAULT nextval('topics_id_seq') NOT NULL,
+    "title"     character varying(64)                    NOT NULL,
+    "slug"      character varying(128)                   NOT NULL,
+    "parent_id" integer,
+    "is_active" boolean DEFAULT true                     NOT NULL,
+    "cdate"     integer                                  NOT NULL,
+    "mdate"     integer,
+    "ddate"     integer,
+    CONSTRAINT "topics_id" PRIMARY KEY ("id"),
+    CONSTRAINT "topics_title" UNIQUE ("title"),
+    CONSTRAINT "topics_slug" UNIQUE ("slug"),
+    CONSTRAINT "topics_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "topics" ("id")
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+        NOT DEFERRABLE
+) WITH (oids = false);
+
+CREATE TABLE "tags"
+(
+    "id"        integer DEFAULT nextval('tags_id_seq') NOT NULL,
+    "title"     character varying(64)                  NOT NULL,
+    "slug"      character varying(128)                 NOT NULL,
+    "is_active" boolean DEFAULT true                   NOT NULL,
+    "cdate"     integer                                NOT NULL,
+    "mdate"     integer,
+    "ddate"     integer,
+    CONSTRAINT "tags_id" PRIMARY KEY ("id"),
+    CONSTRAINT "tags_title" UNIQUE ("title"),
+    CONSTRAINT "tags_slug" UNIQUE ("slug")
+) WITH (oids = false);
+
+CREATE INDEX "topics_is_active" ON "topics" USING btree ("is_active");
+CREATE INDEX "topics_cdate" ON "topics" USING btree ("cdate");
+CREATE INDEX "topics_mdate" ON "topics" USING btree ("mdate");
+CREATE INDEX "topics_ddate" ON "topics" USING btree ("ddate");
+CREATE INDEX "topics_id_title" ON "topics" USING btree ("id", "title");
+CREATE INDEX "topics_id_slug" ON "topics" USING btree ("id", "slug");
+CREATE INDEX "topics_is_active_ddate" ON "topics" USING btree ("is_active", "ddate");
+CREATE INDEX "topics_id_is_active" ON "topics" USING btree ("id", "is_active");
+CREATE INDEX "topics_id_is_active_ddate" ON "topics" USING btree ("id", "is_active", "ddate");
+CREATE INDEX "topics_slug_is_active" ON "topics" USING btree ("slug", "is_active");
+CREATE INDEX "topics_slug_is_active_ddate" ON "topics" USING btree ("slug", "is_active", "ddate");
+CREATE INDEX "topics_parent_id_is_active" ON "topics" USING btree ("parent_id", "is_active");
+CREATE INDEX "topics_parent_id_is_active_ddate" ON "topics" USING btree ("parent_id", "is_active", "ddate");
+
+CREATE INDEX "tags_is_active" ON "tags" USING btree ("is_active");
+CREATE INDEX "tags_cdate" ON "tags" USING btree ("cdate");
+CREATE INDEX "tags_mdate" ON "tags" USING btree ("mdate");
+CREATE INDEX "tags_ddate" ON "tags" USING btree ("ddate");
+CREATE INDEX "tags_id_title" ON "tags" USING btree ("id", "title");
+CREATE INDEX "tags_id_slug" ON "tags" USING btree ("id", "slug");
+CREATE INDEX "tags_is_active_ddate" ON "tags" USING btree ("is_active", "ddate");
+CREATE INDEX "tags_id_is_active" ON "tags" USING btree ("id", "is_active");
+CREATE INDEX "tags_id_is_active_ddate" ON "tags" USING btree ("id", "is_active", "ddate");
+CREATE INDEX "tags_slug_is_active" ON "tags" USING btree ("slug", "is_active");
+CREATE INDEX "tags_slug_is_active_ddate" ON "tags" USING btree ("slug", "is_active", "ddate");
+
 INSERT INTO "role_actions" ("id", "name", "is_system", "is_active", "cdate", "mdate", "ddate")
 VALUES (1, 'read-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
        (2, 'read-comments', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
