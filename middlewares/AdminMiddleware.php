@@ -2,7 +2,6 @@
 
 namespace Sonder\Middlewares;
 
-use Exception;
 use Sonder\Controllers\AdminController;
 use Sonder\Core\CoreMiddleware;
 use Sonder\Core\Interfaces\IMiddleware;
@@ -10,6 +9,9 @@ use Sonder\Core\ResponseObject;
 
 final class AdminMiddleware extends CoreMiddleware implements IMiddleware
 {
+    /**
+     * @return void
+     */
     final public function run(): void
     {
         $isSignedIn = false;
@@ -44,6 +46,7 @@ final class AdminMiddleware extends CoreMiddleware implements IMiddleware
 
     /**
      * @param string $url
+     * @return void
      */
     private function _redirect(string $url): void
     {
