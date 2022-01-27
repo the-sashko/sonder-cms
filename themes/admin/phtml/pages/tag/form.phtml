@@ -1,16 +1,23 @@
 <?php
+/* @var string|null $csrfToken */
+/* @var int|null $id */
 /* @var string|null $title */
 /* @var string|null $slug */
-/* @var string|null $language */
-/* @var int|null $id */
+/* @var bool $isActive */
+/* @var array|null $errors */
 
-$tagFormAction = '/admin/tag/';
+$formAction = '/admin/tag/';
 
 if (!empty($id)) {
-    $tagFormAction = sprintf('/admin/tag/%d/', $id);
+    $formAction = sprintf('/admin/tag/%d/', $id);
 }
 ?>
 <div class="form-wrapper">
+    <?php if (empty($id)): ?>
+        <h1>Add New Tag</h1>
+    <?php else: ?>
+        <h1>Edit tag</h1>
+    <?php endif; ?>
     <?php if (!empty($errors)): ?>
         <div class="errors">
             <?php foreach ($errors as $error): ?>
@@ -20,42 +27,41 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $tagFormAction; ?>" method="POST">
+    <form action="<?= $formAction; ?>"
+          enctype="multipart/form-data"
+          method="POST">
         <p>
-            <input type="text"
-                   placeholder="Title"
-                   name="title"
-                   value="<?= $title; ?>">
+            <label for="name" class="label-input-wrapper">
+                <input type="text"
+                       name="title"
+                       placeholder="Title"
+                       value="<?= $title; ?>">
+            </label>
         </p>
         <p>
-            <input type="text" name="slug" placeholder="Slug"
-                   value="<?= $slug; ?>">
+            <label for="name" class="label-input-wrapper">
+                <input type="text"
+                       name="slug"
+                       placeholder="Slug"
+                       value="<?= $slug; ?>">
+            </label>
+        </p>
+        <p>
+            <?php
+            $checked = $isActive ? ' checked' : '';
+            ?>
+            <input type="checkbox"
+                   name="is_active"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_active">
+                Is Active
+            </label>
         </p>
         <p>
             <input type="submit" value="save">
         </p>
-        <p>
-            <select name="language">
-                <?php if (empty($postLanguage)): ?>
-                    <option disabled selected value="">Select language</option>
-                <?php else: ?>
-                    <option disabled value="">Select language</option>
-                <?php endif; ?>
-                <?php if (!empty($locales)): ?>
-                    <?php foreach ($locales as $locale): ?>
-                        <?php if ($language == $locale): ?>
-                            <option value="<?= $locale; ?>" selected>
-                                <?= $locale; ?>
-                            </option>
-                        <?php else: ?>
-                            <option value="<?= $locale; ?>">
-                                <?= $locale; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-        </p>
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
     </form>
 </div>

@@ -1,0 +1,85 @@
+<?php
+
+use Sonder\Models\Tag\TagValuesObject;
+
+/* @var TagValuesObject $tag */
+?>
+<table>
+    <tr>
+        <th colspan="2">
+            Tag &#xab;<?= $tag->getTitle() ?>&#xbb;
+        </th>
+    </tr>
+    <tr>
+        <td>
+            ID
+        </td>
+        <td>
+            <?= $tag->getId(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            <?= $tag->getTitle(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Slug
+        </td>
+        <td>
+            <?= $tag->getSlug(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Is Active
+        </td>
+        <td>
+            <?= $tag->getIsActive() ? 'Yes' : 'No'; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Created At
+        </td>
+        <td>
+            <?= $tag->getCdate('Y-m-d H:i:s'); ?>
+        </td>
+    </tr>
+    <?php if (!empty($tag->getMdate())): ?>
+        <tr>
+            <td>
+                Updates At
+            </td>
+            <td>
+                <?= $tag->getMdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($tag->getDdate())): ?>
+        <tr>
+            <td>
+                Removed At
+            </td>
+            <td>
+                <?= $tag->getDdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>
+<p>
+    <a href="<?= $tag->getEditLink(); ?>">Edit</a>
+</p>
+<?php if ($tag->isRemoved()): ?>
+    <p>
+        <a href="<?= $tag->getRestoreLink(); ?>">Restore</a>
+    </p>
+<?php else: ?>
+    <p>
+        <a href="<?= $tag->getRemoveLink(); ?>">Remove</a>
+    </p>
+<?php endif; ?>

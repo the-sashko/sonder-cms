@@ -1,0 +1,104 @@
+<?php
+
+use Sonder\Models\Topic\TopicValuesObject;
+
+/* @var TopicValuesObject $topic */
+?>
+<table>
+    <tr>
+        <th colspan="2">
+            Topic &#xab;<?= $topic->getTitle() ?>&#xbb;
+        </th>
+    </tr>
+    <tr>
+        <td>
+            ID
+        </td>
+        <td>
+            <?= $topic->getId(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            <?= $topic->getTitle(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Slug
+        </td>
+        <td>
+            <?= $topic->getSlug(); ?>
+        </td>
+    </tr>
+    <?php if (!empty($topic->getParentVO())): ?>
+        <?php
+        $parent = sprintf(
+            '%s (ID: %d)',
+            $topic->getParentVO()->getName(),
+            $topic->getParentVO()->getId()
+        );
+        ?>
+        <tr>
+            <td>
+                Parent
+            </td>
+            <td>
+                <a href="<?= $topic->getParentVO()->getAdminViewLink() ?>">
+                    <?= $parent ?>
+                </a>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <tr>
+        <td>
+            Is Active
+        </td>
+        <td>
+            <?= $topic->getIsActive() ? 'Yes' : 'No'; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Created At
+        </td>
+        <td>
+            <?= $topic->getCdate('Y-m-d H:i:s'); ?>
+        </td>
+    </tr>
+    <?php if (!empty($topic->getMdate())): ?>
+        <tr>
+            <td>
+                Updates At
+            </td>
+            <td>
+                <?= $topic->getMdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($topic->getDdate())): ?>
+        <tr>
+            <td>
+                Removed At
+            </td>
+            <td>
+                <?= $topic->getDdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>
+<p>
+    <a href="<?= $topic->getEditLink(); ?>">Edit</a>
+</p>
+<?php if ($topic->isRemoved()): ?>
+    <p>
+        <a href="<?= $topic->getRestoreLink(); ?>">Restore</a>
+    </p>
+<?php else: ?>
+    <p>
+        <a href="<?= $topic->getRemoveLink(); ?>">Remove</a>
+    </p>
+<?php endif; ?>

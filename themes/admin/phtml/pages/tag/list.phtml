@@ -1,18 +1,24 @@
 <?php
+
+use Sonder\Models\Tag\TagValuesObject;
+
 /* @var TagValuesObject[]|null $tags */
 ?>
-<a href="/admin/tag/" class="button">New tag</a>
-
+<p>
+    <a href="/admin/tag/" class="button">New Tag</a>
+</p>
 <?php if (empty($tags)): ?>
-    Empty...
+    <p>
+        Empty
+    </p>
 <?php else: ?>
     <table>
         <tbody>
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Title</th>
-            <th class="hide-on-tablet">Slug</th>
-            <th class="hide-on-tablet">Language</th>
+            <th class="hide-on-mobile">Slug</th>
+            <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
@@ -20,17 +26,19 @@
         </tr>
         <?php foreach ($tags as $tag): ?>
             <?php
-            $tagCdate = date('Y-m-d H:i:s', $tag->getCdate());
+            $tagIsActive = $tag->getIsActive() ? 'Yes' : 'No';
+
+            $tagCdate = $tag->getCdate('Y-m-d H:i:s');
 
             $tagMdate = '---';
             $tagDdate = '---';
 
             if (!empty($tag->getMdate())) {
-                $tagMdate = date('Y-m-d H:i:s', $tag->getMdate());
+                $tagMdate = $tag->getMdate('Y-m-d H:i:s');
             }
 
             if (!empty($tag->getDdate())) {
-                $tagDdate = date('Y-m-d H:i:s', $tag->getDdate());
+                $tagDdate = $tag->getDdate('Y-m-d H:i:s');
             }
             ?>
             <?php if ($tag->isRemoved()): ?>
@@ -38,32 +46,30 @@
             <?php else: ?>
                 <tr>
             <?php endif; ?>
-            <td class="hide-on-mobile"><?= $tag->getId(); ?></td>
-            <td><?= $tag->getTitle(); ?></td>
-            <td class="hide-on-tablet"><?= $tag->getSlug(); ?></td>
-            <td class="hide-on-tablet"><?= $tag->getLanguage(); ?></td>
+            <td class="hide-on-mobile"><?= $tag->getId() ?></td>
+            <td><?= $tag->getTitle() ?></td>
+            <td class="hide-on-mobile"><?= $tag->getSlug() ?></td>
+            <td class="hide-on-tablet"><?= $tagIsActive ?></td>
             <td class="hide-on-mobile"><?= $tagCdate ?></td>
-            <td class="hide-on-tablet"><?= $tagMdate; ?></td>
-            <td class="hide-on-tablet"><?= $tagDdate; ?></td>
+            <td class="hide-on-tablet"><?= $tagMdate ?></td>
+            <td class="hide-on-tablet"><?= $tagDdate ?></td>
             <td>
-                <?php if (!$tag->isRemoved()): ?>
-                    <a href="<?= $tag->getLink(); ?>" target="_blank">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                <?php endif; ?>
+                <a href="<?= $tag->getAdminViewLink() ?>">
+                    <i class="fas fa-eye"></i>
+                </a>
             </td>
             <td>
-                <a href="<?= $tag->getEditLink(); ?>">
+                <a href="<?= $tag->getEditLink() ?>">
                     <i class="fas fa-edit"></i>
                 </a>
             </td>
             <td>
                 <?php if ($tag->isRemoved()): ?>
-                    <a href="<?= $tag->getRestoreLink(); ?>">
+                    <a href="<?= $tag->getRestoreLink() ?>">
                         <i class="fas fa-reply"></i>
                     </a>
                 <?php else: ?>
-                    <a href="<?= $tag->getRemoveLink(); ?>">
+                    <a href="<?= $tag->getRemoveLink() ?>">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 <?php endif; ?>
@@ -73,8 +79,8 @@
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Title</th>
-            <th class="hide-on-tablet">Slug</th>
-            <th class="hide-on-tablet">Language</th>
+            <th class="hide-on-mobile">Slug</th>
+            <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
             <th class="hide-on-tablet">Removed At</th>
@@ -82,4 +88,9 @@
         </tr>
         </tbody>
     </table>
+<?php endif; ?>
+<?php if (!empty($pagination)): ?>
+    <div class="pagination">
+        <?= $pagination ?>
+    </div>
 <?php endif; ?>
