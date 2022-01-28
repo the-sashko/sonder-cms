@@ -50,6 +50,7 @@ if (!defined('APP_SOURCE_PATHS')) {
             'controllers' => [
                 APP_PROTECTED_DIR_PATH . '/controllers',
                 APP_CMS_DIR_PATH . '/controllers',
+                APP_CMS_DIR_PATH . '/controllers/admin',
                 APP_FRAMEWORK_DIR_PATH . '/controllers'
             ],
 
@@ -90,6 +91,15 @@ if (!defined('APP_SOURCE_PATHS')) {
                 APP_PROTECTED_DIR_PATH . '/pages',
                 APP_CMS_DIR_PATH . '/pages'
             ]
+        ]
+    );
+}
+
+if (!defined('APP_HOOKS')) {
+    define(
+        'APP_SYSTEM_HOOKS',
+        [
+            'system'
         ]
     );
 }
