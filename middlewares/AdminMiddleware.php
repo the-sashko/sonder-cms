@@ -2,7 +2,7 @@
 
 namespace Sonder\Middlewares;
 
-use Sonder\Controllers\AdminController;
+use Sonder\Controllers\AdminMainController;
 use Sonder\Core\CoreMiddleware;
 use Sonder\Core\Interfaces\IMiddleware;
 use Sonder\Core\ResponseObject;
@@ -23,7 +23,7 @@ final class AdminMiddleware extends CoreMiddleware implements IMiddleware
             !empty($user->getId()) &&
             !empty($user->getRole()) &&
             $user->getRole()->can(
-                AdminController::USER_ACTION_ADMIN
+                AdminMainController::USER_ACTION_ADMIN
             )
         ) {
             $isSignedIn = true;
@@ -31,16 +31,16 @@ final class AdminMiddleware extends CoreMiddleware implements IMiddleware
 
         if (
             !$isSignedIn &&
-            $this->request->getUrl() != AdminController::SIGN_IN_URL
+            $this->request->getUrl() != AdminMainController::SIGN_IN_URL
         ) {
-            $this->_redirect(AdminController::SIGN_IN_URL);
+            $this->_redirect(AdminMainController::SIGN_IN_URL);
         }
 
         if (
             $isSignedIn &&
-            $this->request->getUrl() == AdminController::SIGN_IN_URL
+            $this->request->getUrl() == AdminMainController::SIGN_IN_URL
         ) {
-            $this->_redirect(AdminController::ADMIN_INDEX_URL);
+            $this->_redirect(AdminMainController::ADMIN_INDEX_URL);
         }
     }
 
