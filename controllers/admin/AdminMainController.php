@@ -3,13 +3,11 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\User\SignInForm;
 
-final class AdminController extends CoreController implements IController
+final class AdminMainController extends AdminBaseController
 {
     const SIGN_IN_URL = '/admin/login/';
 
@@ -34,7 +32,6 @@ final class AdminController extends CoreController implements IController
     /**
      * @area admin
      * @route /admin/
-     * @url_params test=$1&page=$2
      * @no_cache true
      *
      * @return ResponseObject

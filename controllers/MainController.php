@@ -3,11 +3,9 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
 use Sonder\Core\ResponseObject;
 
-final class MainController extends CoreController implements IController
+final class MainController extends BaseController
 {
     /**
      * @area blog

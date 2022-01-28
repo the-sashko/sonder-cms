@@ -3,8 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Role;
 use Sonder\Models\Role\RoleActionForm;
@@ -13,7 +11,7 @@ use Sonder\Models\Role\RoleValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
-final class AdminRoleController extends CoreController implements IController
+final class AdminRoleController extends AdminBaseController
 {
     /**
      * @var string|null
@@ -33,26 +31,23 @@ final class AdminRoleController extends CoreController implements IController
      */
     final public function displayRoles(): ResponseObject
     {
-        $page = $this->request->getUrlValue('page');
-        $page = empty($page) ? 1 : (int)$page;
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        $roles = $roleModel->getRolesByPage($page);
+        $roles = $roleModel->getRolesByPage($this->page);
         $pageCount = $roleModel->getRolesPageCount();
 
-        if (empty($roles) && $page > 1) {
+        if (empty($roles) && $this->page > 1) {
             return $this->redirect('/admin/users/roles/');
         }
 
-        if (($page > $pageCount) && $page > 1) {
+        if (($this->page > $pageCount) && $this->page > 1) {
             return $this->redirect('/admin/users/roles/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
-            $page,
+            $this->page,
             '/admin/users/roles/'
         );
 
@@ -294,26 +289,23 @@ final class AdminRoleController extends CoreController implements IController
      */
     final public function displayRoleActions(): ResponseObject
     {
-        $page = $this->request->getUrlValue('page');
-        $page = empty($page) ? 1 : (int)$page;
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        $roleActions = $roleModel->getRoleActionsByPage($page);
+        $roleActions = $roleModel->getRoleActionsByPage($this->page);
         $pageCount = $roleModel->getRoleActionsPageCount();
 
-        if (empty($roleActions) && $page > 1) {
+        if (empty($roleActions) && $this->page > 1) {
             return $this->redirect('/admin/users/roles/actions/');
         }
 
-        if (($page > $pageCount) && $page > 1) {
+        if (($this->page > $pageCount) && $this->page > 1) {
             return $this->redirect('/admin/users/roles/actions/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
-            $page,
+            $this->page,
             '/admin/users/roles/actions/'
         );
 

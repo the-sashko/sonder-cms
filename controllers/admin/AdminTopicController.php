@@ -13,7 +13,7 @@ use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
-final class AdminTopicController extends CoreController implements IController
+final class AdminTopicController extends AdminBaseController
 {
     /**
      * @var string|null
@@ -42,26 +42,23 @@ final class AdminTopicController extends CoreController implements IController
      */
     final public function displayTopics(): ResponseObject
     {
-        $page = $this->request->getUrlValue('page');
-        $page = empty($page) ? 1 : (int)$page;
-
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        $topics = $topicModel->getTopicsByPage($page);
+        $topics = $topicModel->getTopicsByPage($this->page);
         $pageCount = $topicModel->getTopicsPageCount();
 
-        if (empty($topics) && $page > 1) {
+        if (empty($topics) && $this->page > 1) {
             return $this->redirect('/admin/topics/');
         }
 
-        if (($page > $pageCount) && $page > 1) {
+        if (($this->page > $pageCount) && $this->page > 1) {
             return $this->redirect('/admin/topics/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
-            $page,
+            $this->page,
             '/admin/topics/'
         );
 

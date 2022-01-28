@@ -14,7 +14,7 @@ use Sonder\Models\User\UserForm;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
-final class AdminUserController extends CoreController implements IController
+final class AdminUserController extends AdminBaseController
 {
     /**
      * @var string|null
@@ -43,26 +43,23 @@ final class AdminUserController extends CoreController implements IController
      */
     final public function displayUsers(): ResponseObject
     {
-        $page = $this->request->getUrlValue('page');
-        $page = empty($page) ? 1 : (int)$page;
-
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        $users = $userModel->getUsersByPage($page);
+        $users = $userModel->getUsersByPage($this->page);
         $pageCount = $userModel->getUsersPageCount();
 
-        if (empty($users) && $page > 1) {
+        if (empty($users) && $this->page > 1) {
             return $this->redirect('/admin/users/');
         }
 
-        if (($page > $pageCount) && $page > 1) {
+        if (($this->page > $pageCount) && $this->page > 1) {
             return $this->redirect('/admin/users/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
-            $page,
+            $this->page,
             '/admin/users/'
         );
 

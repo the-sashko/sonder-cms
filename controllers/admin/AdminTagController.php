@@ -3,8 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Tag;
@@ -13,7 +11,7 @@ use Sonder\Models\Tag\TagValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
-final class AdminTagController extends CoreController implements IController
+final class AdminTagController extends AdminBaseController
 {
     /**
      * @var string|null
@@ -42,26 +40,23 @@ final class AdminTagController extends CoreController implements IController
      */
     final public function displayTags(): ResponseObject
     {
-        $page = $this->request->getUrlValue('page');
-        $page = empty($page) ? 1 : (int)$page;
-
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
 
-        $tags = $tagModel->getTagsByPage($page);
+        $tags = $tagModel->getTagsByPage($this->page);
         $pageCount = $tagModel->getTagsPageCount();
 
-        if (empty($tags) && $page > 1) {
+        if (empty($tags) && $this->page > 1) {
             return $this->redirect('/admin/tags/');
         }
 
-        if (($page > $pageCount) && $page > 1) {
+        if (($this->page > $pageCount) && $this->page > 1) {
             return $this->redirect('/admin/tags/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
-            $page,
+            $this->page,
             '/admin/tags/'
         );
 
