@@ -21,15 +21,6 @@ final class AdminTopicController extends AdminBaseController
     protected ?string $renderTheme = 'admin';
 
     /**
-     * @param RequestObject $request
-     * @throws Exception
-     */
-    final public function __construct(RequestObject $request)
-    {
-        parent::__construct($request);
-    }
-
-    /**
      * @area admin
      * @route /admin/topics((/page-([0-9]+)/)|/)
      * @url_params page=$3
