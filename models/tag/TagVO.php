@@ -10,7 +10,7 @@ final class TagValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $editLinkPattern = '/admin/tags/%d/';
+    protected ?string $editLinkPattern = '/admin/tag/%d/';
 
     /**
      * @var string|null

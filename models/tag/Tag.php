@@ -234,7 +234,6 @@ final class Tag extends CoreModel implements IModel
 
         $tagVO = new TagValuesObject($row);
 
-        $tagVO->setParentId($tagForm->getParentId());
         $tagVO->setTitle($tagForm->getTitle());
         $tagVO->setSlug($tagForm->getSlug());
         $tagVO->setIsActive($tagForm->getIsActive());
