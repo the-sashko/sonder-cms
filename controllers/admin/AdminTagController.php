@@ -3,7 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Tag;
 use Sonder\Models\Tag\TagForm;
@@ -137,7 +136,7 @@ final class AdminTagController extends AdminBaseController
         $tagModel = $this->getModel('tag');
 
         if (!empty($id)) {
-            /* @var $tagVO TagValuesObject | null */
+            /* @var $tagVO TagValuesObject|null */
             $tagVO = $tagModel->getVOById($id);
             $pageTitle = 'Edit';
         }
@@ -147,7 +146,7 @@ final class AdminTagController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod() == 'post') {
-            /* @var $tagForm TagForm | null */
+            /* @var $tagForm TagForm|null */
             $tagForm = $tagModel->getForm(
                 $this->request->getPostValues(),
                 'tag'

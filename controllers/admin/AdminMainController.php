@@ -67,7 +67,7 @@ final class AdminMainController extends AdminBaseController
         }
 
         if ($isSignedIn) {
-            return $this->redirect(AdminController::ADMIN_INDEX_URL);
+            return $this->redirect(AdminMainController::ADMIN_INDEX_URL);
         }
 
         $this->assign([
@@ -97,7 +97,7 @@ final class AdminMainController extends AdminBaseController
             $user->signOut();
         }
 
-        return $this->redirect(AdminController::SIGN_IN_URL);
+        return $this->redirect(AdminMainController::SIGN_IN_URL);
     }
 
     final public function displayPosts(): void

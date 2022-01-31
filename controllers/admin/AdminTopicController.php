@@ -105,7 +105,6 @@ final class AdminTopicController extends AdminBaseController
             'page_path' => $pagePath
         ]);
 
-
         return $this->render('topic/view');
     }
 
@@ -150,7 +149,7 @@ final class AdminTopicController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod() == 'post') {
-            /* @var $topicForm TopicForm | null */
+            /* @var $topicForm TopicForm|null */
             $topicForm = $topicModel->getForm(
                 $this->request->getPostValues(),
                 'topic'
