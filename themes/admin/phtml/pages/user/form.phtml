@@ -44,6 +44,7 @@ if (!empty($id)) {
                 <label for="login" class="label-input-wrapper">
                     <input type="text"
                            name="login"
+                           id="login"
                            placeholder="Login"
                            value="<?= $login; ?>">
                 </label>
@@ -56,13 +57,14 @@ if (!empty($id)) {
             <label for="email" class="label-input-wrapper">
                 <input type="text"
                        name="email"
+                       id="email"
                        placeholder="Email"
                        value="<?= $email; ?>">
             </label>
         </p>
         <p>
             <label for="role_id" class="label-input-wrapper">
-                <select name="role_id">
+                <select name="role_id" id="role_id">
                     <?php
                     $selected = empty($parentId) ? ' selected="selected"' : '';
                     ?>
@@ -91,6 +93,7 @@ if (!empty($id)) {
                 <label for="password" class="label-input-wrapper">
                     <input type="text"
                            name="password"
+                           id="password"
                            placeholder="Password"
                            value="<?= $password; ?>">
                 </label>
@@ -101,6 +104,7 @@ if (!empty($id)) {
                 ?>
                 <input type="checkbox"
                        name="is_allow_access_by_api"
+                       id="is_allow_access_by_api"
                        value="1"
                     <?= $checked ?>>
                 <label for="is_allow_access_by_api">
@@ -118,6 +122,7 @@ if (!empty($id)) {
             ?>
             <input type="checkbox"
                    name="is_active"
+                   id="is_active"
                    value="1"
                 <?= $checked ?>>
             <label for="is_active">

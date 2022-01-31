@@ -31,10 +31,13 @@
         <?php endif; ?>
     </li>
     <li>
-        <?php if (preg_match('/^\/admin\/post.*?$/su', $currentUrl)): ?>
-            <a href="/admin/posts/" class="main-menu-link-active">Posts</a>
+        <?php if (preg_match('/^\/admin\/articles.*?$/su', $currentUrl)): ?>
+            <a href="/admin/articles/"
+               class="main-menu-link-active">
+                Articles
+            </a>
         <?php else: ?>
-            <a href="/admin/posts/">Posts</a>
+            <a href="/admin/articles/">Articles</a>
         <?php endif; ?>
     </li>
     <li>

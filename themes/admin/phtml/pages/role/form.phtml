@@ -43,13 +43,14 @@ if (!empty($id)) {
             <label for="name" class="label-input-wrapper">
                 <input type="text"
                        name="name"
+                       id="name"
                        placeholder="Name"
                        value="<?= $name; ?>">
             </label>
         </p>
         <p>
             <label for="parent_id" class="label-input-wrapper">
-                <select name="parent_id">
+                <select name="parent_id" id="parent_id">
                     <?php
                     $selected = empty($parentId) ? ' selected="selected"' : '';
                     ?>
@@ -135,6 +136,7 @@ if (!empty($id)) {
             ?>
             <input type="checkbox"
                    name="is_active"
+                   id="is_active"
                    value="1"
                 <?= $checked ?>>
             <label for="is_active">

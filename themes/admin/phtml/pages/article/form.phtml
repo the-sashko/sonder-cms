@@ -1,21 +1,30 @@
 <?php
+/* @var string|null $csrfToken */
 /* @var int|null $id */
 /* @var string|null $title */
 /* @var string|null $slug */
 /* @var string|null $text */
-/* @var string|null $shortText */
+/* @var string|null $summary */
+/* @var string|null $metaTitle */
+/* @var string|null $metaDescription */
 /* @var int|null $topicId */
+/* @var bool $isActive */
 /* @var array|null $topics */
-/* @var string|null $language */
-/* @var array|null $locales */
+/* @var array|null $tags */
+/* @var array|null $errors */
 
-$postFormAction = '/admin/post/';
+$formAction = '/admin/article/';
 
 if (!empty($id)) {
-    $postFormAction = sprintf('/admin/post/%d/', $id);
+    $formAction = sprintf('/admin/article/%d/', $id);
 }
 ?>
 <div class="form-wrapper">
+    <?php if (empty($id)): ?>
+        <h1>Add New Article</h1>
+    <?php else: ?>
+        <h1>Edit Article</h1>
+    <?php endif; ?>
     <?php if (!empty($errors)): ?>
         <div class="errors">
             <?php foreach ($errors as $error): ?>
@@ -25,96 +34,114 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $postFormAction; ?>"
+    <form action="<?= $formAction; ?>"
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <input type="text"
-                   placeholder="Title"
-                   name="title"
-                   value="<?= $title; ?>">
+            <label for="title" class="label-input-wrapper">
+                <input type="text"
+                       name="title"
+                       id="title"
+                       placeholder="Title"
+                       value="<?= $title; ?>">
+            </label>
         </p>
         <p>
-            <input type="text" name="slug" placeholder="Slug"
-                   value="<?= $slug; ?>">
+            <label for="slug" class="label-input-wrapper">
+                <input type="text"
+                       name="slug"
+                       id="slug"
+                       placeholder="Slug"
+                       value="<?= $slug; ?>">
+            </label>
         </p>
         <p>
-            <textarea placeholder="Text"
-                      name="text"
-                      id="post-form-text"><?= $text; ?></textarea>
+            <label for="summary" class="label-input-wrapper">
+                <textarea name="summary"
+                          id="summary"
+                          placeholder="Summary">
+                    <?= $summary ?>
+                </textarea>
+            </label>
         </p>
         <p>
-            <textarea placeholder="Short Text"
-                      name="text_short"><?= $shortText; ?></textarea>
+            <label for="text" class="label-input-wrapper">
+                <textarea name="text"
+                          id="text"
+                          placeholder="Text">
+                    <?= $text ?>
+                </textarea>
+            </label>
         </p>
         <p>
-            <select name="language" id="post-form-language">
-                <?php if (empty($postLanguage)): ?>
-                    <option disabled selected value="">Select language</option>
-                <?php else: ?>
-                    <option disabled value="">Select language</option>
-                <?php endif; ?>
-                <?php if (!empty($locales)): ?>
-                    <?php foreach ($locales as $locale): ?>
-                        <?php if ($language == $locale): ?>
-                            <option value="<?= $locale; ?>" selected>
-                                <?= $locale; ?>
-                            </option>
-                        <?php else: ?>
-                            <option value="<?= $locale; ?>">
-                                <?= $locale; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-            &nbsp;
+            <label for="meta-title" class="label-input-wrapper">
+                <input type="text"
+                       name="meta_title"
+                       id="meta-title"
+                       placeholder="Meta title"
+                       value="<?= $metaTitle; ?>">
+            </label>
+        </p>
+        <p>
+            <label for="meta-description" class="label-input-wrapper">
+                <textarea name="meta_description"
+                          id="meta-description"
+                          placeholder="Meta Description">
+                    <?= $metaDescription ?>
+                </textarea>
+            </label>
+        </p>
+        <p>
+            Topics
+            <?php foreach ($tags as $tag): ?>
+                <?php
+                /*
+                    <input type="checkbox"
+                       name="is_active"
+                       id="is_active"
+                       value="1"
+                    <?= $checked ?>>
+                <label for="is_active">
+                    Is Active
+                </label>
+                */
+                ?>
+            <?php endforeach; ?>
+        </p>
+        <p>
+            Tags
+            <?php foreach ($tags as $tag): ?>
             <?php
-            $topicsHiddenClass = null;
-
-            if (empty($language)) {
-                $topicsHiddenClass = 'class="hidden"';
-            }
+            /*
+                <input type="checkbox"
+                   name="is_active"
+                   id="is_active"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_active">
+                Is Active
+            </label>
+            */
             ?>
-            <select name="id_topic"<?= $topicsHiddenClass; ?>
-                    id="post-form-topics">
-                <?php if (empty($topicId)): ?>
-                    <option disabled selected value="">Select topic</option>
-                <?php else: ?>
-                    <option disabled value="">Select topic</option>
-                <?php endif; ?>
-                <?php if (!empty($topics)): ?>
-                    <?php foreach ($topics as $topic): ?>
-                        <?php if ($topic->getId() == $topicId): ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>"
-                                    selected>
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php else: ?>
-                            <option value="<?= $topic->getId(); ?>"
-                                    class="hidden
-                                    post-form-topics-item
-                                    post-form-topics-item-<?=
-                                    $topic->getLanguage(); ?>">
-                                <?= $topic->getTitle(); ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
+            <?php endforeach; ?>
         </p>
         <p>
-            <input type="file"
-                   placeholder="Image"
-                   name="media">
+            <?php
+            $checked = $isActive ? ' checked' : '';
+            ?>
+            <input type="checkbox"
+                   name="is_active"
+                   id="is_active"
+                   value="1"
+                <?= $checked ?>>
+            <label for="is_active">
+                Is Active
+            </label>
         </p>
         <p>
             <input type="submit" value="save">
         </p>
-
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
     </form>
 </div>

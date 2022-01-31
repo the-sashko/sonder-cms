@@ -31,17 +31,19 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <label for="name" class="label-input-wrapper">
+            <label for="title" class="label-input-wrapper">
                 <input type="text"
                        name="title"
+                       id="title"
                        placeholder="Title"
                        value="<?= $title; ?>">
             </label>
         </p>
         <p>
-            <label for="name" class="label-input-wrapper">
+            <label for="slug" class="label-input-wrapper">
                 <input type="text"
                        name="slug"
+                       id="slug"
                        placeholder="Slug"
                        value="<?= $slug; ?>">
             </label>
@@ -52,6 +54,7 @@ if (!empty($id)) {
             ?>
             <input type="checkbox"
                    name="is_active"
+                   id="is_active"
                    value="1"
                 <?= $checked ?>>
             <label for="is_active">

@@ -1,0 +1,156 @@
+<?php
+
+use Sonder\Models\Article\ArticleValuesObject;
+
+/* @var ArticleValuesObject $article */
+
+$tags = $article->getTags();
+
+if (!empty($tags)) {
+    $tags = implode('<br><br>', $tags);
+}
+
+?>
+<table>
+    <tr>
+        <th colspan="2">
+            Article &#xab;<?= $article->getTitle() ?>&#xbb;
+        </th>
+    </tr>
+    <tr>
+        <td>
+            ID
+        </td>
+        <td>
+            <?= $article->getId(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            <?= $article->getTitle(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Slug
+        </td>
+        <td>
+            <?= $article->getSlug(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Text
+        </td>
+        <td>
+            <?= $article->getText(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            HTML
+        </td>
+        <td>
+            <?= $article->getHtml(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Meta Title
+        </td>
+        <td>
+            <?= $article->getMetaTitle(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Meta Description
+        </td>
+        <td>
+            <?= $article->getMetaDescription(); ?>
+        </td>
+    </tr>
+    <?php if (!empty($article->getTopicVO())): ?>
+        <tr>
+            <td>
+                Topic
+            </td>
+            <td>
+                <a href="<?= $article->getTopicVO()->getAdminViewLink() ?>">
+                    <?= $article->getTopicVO()->getTitle() ?>
+                </a>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($tags)): ?>
+        <tr>
+            <td>
+                Tags
+            </td>
+            <td>
+                <?= $tags ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <tr>
+        <td>
+            Is Active
+        </td>
+        <td>
+            <?= $article->getIsActive() ? 'Yes' : 'No'; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            User
+        </td>
+        <td>
+            <a href="<?= $article->getUserVO()->getAdminViewLink(); ?>">
+                <?= $article->getUserVO()->getLogin(); ?>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Created At
+        </td>
+        <td>
+            <?= $article->getCdate('Y-m-d H:i:s'); ?>
+        </td>
+    </tr>
+    <?php if (!empty($article->getMdate())): ?>
+        <tr>
+            <td>
+                Updates At
+            </td>
+            <td>
+                <?= $article->getMdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($article->getDdate())): ?>
+        <tr>
+            <td>
+                Removed At
+            </td>
+            <td>
+                <?= $article->getDdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>
+<p>
+    <a href="<?= $article->getEditLink(); ?>">Edit</a>
+</p>
+<?php if ($article->isRemoved()): ?>
+    <p>
+        <a href="<?= $article->getRestoreLink(); ?>">Restore</a>
+    </p>
+<?php else: ?>
+    <p>
+        <a href="<?= $article->getRemoveLink(); ?>">Remove</a>
+    </p>
+<?php endif; ?>
