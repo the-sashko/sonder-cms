@@ -350,7 +350,7 @@ final class Topic extends CoreModel implements IModel
 
         if (empty($title)) {
             $topicForm->setStatusFail();
-            $topicForm->setError(TopicForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE);
+            $topicForm->setError(TopicForm::TITLE_EMPTY_ERROR_MESSAGE);
         }
 
         if (

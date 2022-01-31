@@ -35,7 +35,7 @@ final class TopicStore extends ModelStore implements IModelStore
             return null;
         }
 
-        $sqlWhere = sprintf('WHERE "id" = \'%d\'', $id);
+        $sqlWhere = sprintf('"id" = \'%d\'', $id);
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
@@ -51,7 +51,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             LIMIT 1;
         ';
 
@@ -72,12 +72,12 @@ final class TopicStore extends ModelStore implements IModelStore
             return null;
         }
 
-        $sqlWhere = sprintf('WHERE "slug" = \'%s\'', $slug);
+        $sqlWhere = sprintf('"slug" = \'%s\'', $slug);
 
         $sql = '
             SELECT "id"
             FROM "%s"
-            %s
+            WHERE %s
             LIMIT 1;
         ';
 
@@ -108,7 +108,7 @@ final class TopicStore extends ModelStore implements IModelStore
             return null;
         }
 
-        $sqlWhere = sprintf('WHERE "title" = \'%s\'', $title);
+        $sqlWhere = sprintf('"title" = \'%s\'', $title);
 
         if (!empty($excludeId)) {
             $sqlWhere = sprintf(
@@ -132,7 +132,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             LIMIT 1;
         ';
 
@@ -161,7 +161,7 @@ final class TopicStore extends ModelStore implements IModelStore
             return null;
         }
 
-        $sqlWhere = sprintf('WHERE "slug" = \'%s\'', $slug);
+        $sqlWhere = sprintf('"slug" = \'%s\'', $slug);
 
         if (!empty($excludeId)) {
             $sqlWhere = sprintf(
@@ -185,7 +185,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             LIMIT 1;
         ';
 
@@ -274,7 +274,7 @@ final class TopicStore extends ModelStore implements IModelStore
         bool $excludeInactive = false
     ): ?array
     {
-        $sqlWhere = 'WHERE true';
+        $sqlWhere = 'true';
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
@@ -292,7 +292,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             ORDER BY "cdate" DESC
             LIMIT %d
             OFFSET %d;
@@ -321,7 +321,7 @@ final class TopicStore extends ModelStore implements IModelStore
         bool $excludeInactive = false
     ): ?array
     {
-        $sqlWhere = 'WHERE true';
+        $sqlWhere = 'true';
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
@@ -337,7 +337,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             ORDER BY "cdate" DESC;
         ';
 
@@ -347,28 +347,43 @@ final class TopicStore extends ModelStore implements IModelStore
     }
 
     /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return int
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    final public function getTopicRowsCount(): int
+    final public function getTopicRowsCount(
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): int
     {
+        $sqlWhere = 'true';
+
+        if ($excludeRemoved) {
+            $sqlWhere = sprintf(
+                '%s AND ("ddate" IS NULL OR "ddate" < 1)',
+                $sqlWhere
+            );
+        }
+
+        if ($excludeInactive) {
+            $sqlWhere = sprintf('%s AND "is_active" = true', $sqlWhere);
+        }
+
         $sql = '
-            SELECT COUNT(*) AS "count"
-            FROM "%s";
+            SELECT COUNT("id") AS "count"
+            FROM "%s"
+            WHERE %s;
         ';
 
-        $sql = sprintf(
-            $sql,
-            TopicStore::TOPICS_TABLE,
-        );
+        $sql = sprintf($sql, TopicStore::TOPICS_TABLE, $sqlWhere);
 
         return (int)$this->getOne($sql);
     }
 
     /**
      * @param int|null $parentId
-     * @param int|null $excludeId
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
@@ -385,7 +400,7 @@ final class TopicStore extends ModelStore implements IModelStore
             return null;
         }
 
-        $sqlWhere = sprintf('WHERE "parent_id" = \'%d\'', $parentId);
+        $sqlWhere = sprintf('"parent_id" = \'%d\'', $parentId);
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
@@ -401,7 +416,7 @@ final class TopicStore extends ModelStore implements IModelStore
         $sql = '
             SELECT *
             FROM "%s"
-            %s
+            WHERE %s
             LIMIT 1;
         ';
 

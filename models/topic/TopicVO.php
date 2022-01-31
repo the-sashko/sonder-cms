@@ -30,7 +30,7 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $imageLinkPattern = '/images/topics/%s.png/';
+    protected ?string $imageLinkPattern = '/images/topics/%s.png';
 
     /**
      * @return string
@@ -42,7 +42,7 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return ?string
+     * @return string|null
      * @throws Exception
      */
     final public function getSlug(): ?string
@@ -80,7 +80,7 @@ final class TopicValuesObject extends ModelValuesObject
      * @return string
      * @throws Exception
      */
-    public function getAdminViewLink(): string
+    final public function getAdminViewLink(): string
     {
         return sprintf($this->adminViewLinkPattern, $this->getId());
     }
@@ -89,7 +89,7 @@ final class TopicValuesObject extends ModelValuesObject
      * @return string
      * @throws Exception
      */
-    public function getImageLink(): string
+    final public function getImageLink(): string
     {
         return sprintf($this->imageLinkPattern, $this->getSlug());
     }
