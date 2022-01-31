@@ -260,7 +260,7 @@ final class Tag extends CoreModel implements IModel
 
         if (empty($title)) {
             $tagForm->setStatusFail();
-            $tagForm->setError(TagForm::TITLE_EXISTS_ERROR_MESSAGE);
+            $tagForm->setError(TagForm::TITLE_EMPTY_ERROR_MESSAGE);
         }
 
         if (

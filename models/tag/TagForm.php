@@ -9,7 +9,9 @@ final class TagForm extends ModelFormObject
 {
     const TITLE_MIN_LENGTH = 3;
 
-    const TITLE_MAX_LENGTH = 128;
+    const TITLE_MAX_LENGTH = 64;
+
+    const SLUG_MAX_LENGTH = 128;
 
     const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
@@ -18,6 +20,8 @@ final class TagForm extends ModelFormObject
     const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
 
     const TITLE_EXISTS_ERROR_MESSAGE = 'Tag with this title already exists';
+
+    const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
 
     const TAG_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Tag can not have a ' .
     'circular dependencies';
@@ -32,6 +36,7 @@ final class TagForm extends ModelFormObject
         $this->setStatusSuccess();
 
         $this->_validateTitleValue();
+        $this->_validateSlugValue();
     }
 
     /**
@@ -152,6 +157,20 @@ final class TagForm extends ModelFormObject
 
         if (!empty($title) && mb_strlen($title) < TagForm::TITLE_MIN_LENGTH) {
             $this->setError(TagForm::TITLE_TOO_SHORT_ERROR_MESSAGE);
+            $this->setStatusFail();
+        }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function _validateSlugValue(): void
+    {
+        $slug = $this->getSlug();
+
+        if (!empty($slug) && mb_strlen($slug) > TagForm::SLUG_MAX_LENGTH) {
+            $this->setError(TagForm::SLUG_TOO_LONG_ERROR_MESSAGE);
             $this->setStatusFail();
         }
     }

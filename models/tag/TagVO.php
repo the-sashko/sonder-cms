@@ -37,7 +37,7 @@ final class TagValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return ?string
+     * @return string|null
      * @throws Exception
      */
     final public function getSlug(): ?string
@@ -53,7 +53,7 @@ final class TagValuesObject extends ModelValuesObject
      * @return string
      * @throws Exception
      */
-    public function getAdminViewLink(): string
+    final public function getAdminViewLink(): string
     {
         return sprintf($this->adminViewLinkPattern, $this->getId());
     }
