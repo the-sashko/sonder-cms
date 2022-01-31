@@ -1,5 +1,7 @@
 CREATE SEQUENCE "topics_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "tags_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "articles_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "tag2article_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 CREATE TABLE "topics"
 (
@@ -34,19 +36,52 @@ CREATE TABLE "tags"
     CONSTRAINT "tags_slug" UNIQUE ("slug")
 ) WITH (oids = false);
 
-CREATE INDEX "topics_is_active" ON "topics" USING btree ("is_active");
-CREATE INDEX "topics_cdate" ON "topics" USING btree ("cdate");
-CREATE INDEX "topics_mdate" ON "topics" USING btree ("mdate");
-CREATE INDEX "topics_ddate" ON "topics" USING btree ("ddate");
-CREATE INDEX "topics_id_title" ON "topics" USING btree ("id", "title");
-CREATE INDEX "topics_id_slug" ON "topics" USING btree ("id", "slug");
-CREATE INDEX "topics_is_active_ddate" ON "topics" USING btree ("is_active", "ddate");
-CREATE INDEX "topics_id_is_active" ON "topics" USING btree ("id", "is_active");
-CREATE INDEX "topics_id_is_active_ddate" ON "topics" USING btree ("id", "is_active", "ddate");
-CREATE INDEX "topics_slug_is_active" ON "topics" USING btree ("slug", "is_active");
-CREATE INDEX "topics_slug_is_active_ddate" ON "topics" USING btree ("slug", "is_active", "ddate");
-CREATE INDEX "topics_parent_id_is_active" ON "topics" USING btree ("parent_id", "is_active");
-CREATE INDEX "topics_parent_id_is_active_ddate" ON "topics" USING btree ("parent_id", "is_active", "ddate");
+CREATE TABLE "articles"
+(
+    "id"               integer DEFAULT nextval('articles_id_seq') NOT NULL,
+    "title"            character varying(64)                      NOT NULL,
+    "slug"             character varying(128)                     NOT NULL,
+    "image"            character varying(255),
+    "summary"          text,
+    "text"             text                                       NOT NULL,
+    "html"             text,
+    "topic_id"         integer,
+    "meta_title"       character varying(255),
+    "meta_description" character varying(512),
+    "user_id"          integer,
+    "is_active"        boolean DEFAULT true                       NOT NULL,
+    "cdate"            integer                                    NOT NULL,
+    "mdate"            integer,
+    "ddate"            integer,
+    CONSTRAINT "articles_id" PRIMARY KEY ("id"),
+    CONSTRAINT "articles_title" UNIQUE ("title"),
+    CONSTRAINT "articles_slug" UNIQUE ("slug"),
+    CONSTRAINT "articles_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topics" ("id")
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+        NOT DEFERRABLE,
+    CONSTRAINT "articles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id")
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+        NOT DEFERRABLE
+) WITH (oids = false);
+
+CREATE TABLE "tag2article"
+(
+    "id"         integer DEFAULT nextval('tag2article_id_seq') NOT NULL,
+    "tag_id"     integer                                       NOT NULL,
+    "article_id" integer                                       NOT NULL,
+    CONSTRAINT "tag2article_id" PRIMARY KEY ("id"),
+    CONSTRAINT "tag2article_tag_id_article_id" UNIQUE ("tag_id", "article_id"),
+    CONSTRAINT "tag2article_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id")
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    CONSTRAINT "tag2article_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles" ("id")
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+        NOT DEFERRABLE
+) WITH (oids = false);
 
 CREATE INDEX "tags_is_active" ON "tags" USING btree ("is_active");
 CREATE INDEX "tags_cdate" ON "tags" USING btree ("cdate");
@@ -59,6 +94,28 @@ CREATE INDEX "tags_id_is_active" ON "tags" USING btree ("id", "is_active");
 CREATE INDEX "tags_id_is_active_ddate" ON "tags" USING btree ("id", "is_active", "ddate");
 CREATE INDEX "tags_slug_is_active" ON "tags" USING btree ("slug", "is_active");
 CREATE INDEX "tags_slug_is_active_ddate" ON "tags" USING btree ("slug", "is_active", "ddate");
+
+CREATE INDEX "articles_topic_id" ON "articles" USING btree ("topic_id");
+CREATE INDEX "articles_user_id" ON "articles" USING btree ("user_id");
+CREATE INDEX "articles_is_active" ON "articles" USING btree ("is_active");
+CREATE INDEX "articles_cdate" ON "articles" USING btree ("cdate");
+CREATE INDEX "articles_mdate" ON "articles" USING btree ("mdate");
+CREATE INDEX "articles_ddate" ON "articles" USING btree ("ddate");
+CREATE INDEX "articles_id_title" ON "articles" USING btree ("id", "title");
+CREATE INDEX "articles_id_meta_title" ON "articles" USING btree ("id", "meta_title");
+CREATE INDEX "articles_id_slug" ON "articles" USING btree ("id", "slug");
+CREATE INDEX "articles_is_active_ddate" ON "articles" USING btree ("is_active", "ddate");
+CREATE INDEX "articles_id_is_active" ON "articles" USING btree ("id", "is_active");
+CREATE INDEX "articles_id_is_active_ddate" ON "articles" USING btree ("id", "is_active", "ddate");
+CREATE INDEX "articles_slug_is_active" ON "articles" USING btree ("slug", "is_active");
+CREATE INDEX "articles_slug_is_active_ddate" ON "articles" USING btree ("slug", "is_active", "ddate");
+CREATE INDEX "articles_topic_id_is_active" ON "articles" USING btree ("topic_id", "is_active");
+CREATE INDEX "articles_topic_id_is_active_ddate" ON "articles" USING btree ("topic_id", "is_active", "ddate");
+CREATE INDEX "articles_user_id_is_active" ON "articles" USING btree ("user_id", "is_active");
+CREATE INDEX "articles_user_id_is_active_ddate" ON "articles" USING btree ("user_id", "is_active", "ddate");
+
+CREATE INDEX "tag2article_tag_id" ON "tag2article" USING btree ("tag_id");
+CREATE INDEX "tag2article_article_id" ON "tag2article" USING btree ("article_id");
 
 INSERT INTO "role_actions" ("id", "name", "is_system", "is_active", "cdate", "mdate", "ddate")
 VALUES (1, 'read-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
