@@ -9,6 +9,7 @@ use Sonder\Core\ValuesObject;
 use Sonder\Models\Article\ArticleForm;
 use Sonder\Models\Article\ArticleStore;
 use Sonder\Models\Article\ArticleValuesObject;
+use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Models\User\UserValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
@@ -365,6 +366,7 @@ final class Article extends CoreModel implements IModel
         $articleVO = parent::getVO($row);
 
         $this->_setUserVOToVO($articleVO);
+        $this->_setTopicVOToVO($articleVO);
 
         return $articleVO;
     }
@@ -386,6 +388,26 @@ final class Article extends CoreModel implements IModel
 
         if (!empty($userVO)) {
             $articleVO->setUserVO($userVO);
+        }
+    }
+
+    /**
+     * @param ArticleValuesObject $articleVO
+     * @return void
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    private function _setTopicVOToVO(ArticleValuesObject $articleVO): void
+    {
+        /* @var $topicModel Topic */
+        $topicModel = $this->getModel('topic');
+
+        /* @var $topicVO TopicValuesObject */
+        $topicVO = $topicModel->getVOById($articleVO->getUserId());
+
+        if (!empty($topicVO)) {
+            $articleVO->setTopicVO($topicVO);
         }
     }
 
@@ -455,6 +477,7 @@ final class Article extends CoreModel implements IModel
         $articleVO->setText($articleForm->getText());
         $articleVO->setMetaTitle($articleForm->getMetaTitle());
         $articleVO->setMetaDescription($articleForm->getMetaDescription());
+        $articleVO->setUserId($articleForm->getUserId());
         $articleVO->setTopicId($articleForm->getTopicId());
         $articleVO->setIsActive($articleForm->getIsActive());
 

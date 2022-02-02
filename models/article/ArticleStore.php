@@ -10,11 +10,11 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
 final class ArticleStore extends ModelStore implements IModelStore
 {
-    const ARTICLES_TABLE = 'article';
+    const ARTICLES_TABLE = 'articles';
     const ARTICLE_TO_TAG_TABLE = 'article2tag';
     const TOPICS_TABLE = 'topics';
     const TAGS_TABLE = 'tags';
-    const USERS_TABLE = 'topics';
+    const USERS_TABLE = 'users';
 
     /**
      * @var string|null
@@ -568,7 +568,13 @@ final class ArticleStore extends ModelStore implements IModelStore
             WHERE %s;
         ';
 
-        $sql = sprintf($sql, ArticleStore::ARTICLES_TABLE, $sqlWhere);
+        $sql = sprintf(
+            $sql,
+            ArticleStore::ARTICLES_TABLE,
+            ArticleStore::TOPICS_TABLE,
+            ArticleStore::USERS_TABLE,
+            $sqlWhere
+        );
 
         return (int)$this->getOne($sql);
     }

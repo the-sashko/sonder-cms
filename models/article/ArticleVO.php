@@ -385,6 +385,10 @@ final class ArticleValuesObject extends ModelValuesObject
             unset($row['topic_vo']);
         }
 
+        if (array_key_exists('user_vo', $row)) {
+            unset($row['user_vo']);
+        }
+
         return $row;
     }
 }

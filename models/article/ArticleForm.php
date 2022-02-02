@@ -44,7 +44,13 @@ final class ArticleForm extends ModelFormObject
 
     const TOPIC_IS_NOT_SET_ERROR_MESSAGE = 'Topic is not set';
 
+    const TOPICS_ARE_NOT_EXISTS_ERROR_MESSAGE = 'Any active topics exists. ' .
+    'You need to add first one for creating articles';
+
     const TAGS_ARE_NOT_SET_ERROR_MESSAGE = 'Tags are not set';
+
+    const TAGS_ARE_NOT_EXISTS_ERROR_MESSAGE = 'Any active tags exists. You ' .
+    'need to add first one for creating articles';
 
     const TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" is not ' .
     'exists';
@@ -448,6 +454,20 @@ final class ArticleForm extends ModelFormObject
 
         if (empty($topicId)) {
             $this->setError(ArticleForm::TOPIC_IS_NOT_SET_ERROR_MESSAGE);
+            $this->setStatusFail();
+        }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function _validateTags(): void
+    {
+        $tags = $this->getTags();
+
+        if (empty($tags)) {
+            $this->setError(ArticleForm::TAGS_ARE_NOT_SET_ERROR_MESSAGE);
             $this->setStatusFail();
         }
     }

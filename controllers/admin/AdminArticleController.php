@@ -131,6 +131,7 @@ final class AdminArticleController extends AdminBaseController
         $metaTitle = null;
         $metaDescription = null;
         $topicId = null;
+        $checkedTags = null;
         $isActive = true;
 
         $articleVO = null;
@@ -158,12 +159,13 @@ final class AdminArticleController extends AdminBaseController
 
         if ($this->request->getHttpMethod() == 'post') {
             /* @var $articleForm ArticleForm|null */
-            $articleForm = $topicModel->getForm(
-                $this->request->getPostValues(),
-                'article'
+            $articleForm = $articleModel->getForm(
+                $this->request->getPostValues()
             );
 
-            $articleForm->setUserId($this->request->getUser()->getId());
+            if (!empty($articleForm)) {
+                $articleForm->setUserId($this->request->getUser()->getId());
+            }
 
             $articleModel->save($articleForm);
         }
@@ -202,6 +204,7 @@ final class AdminArticleController extends AdminBaseController
             $metaTitle = $articleForm->getMetaTitle();
             $metaDescription = $articleForm->getMetaDescription();
             $topicId = $articleForm->getTopicId();
+            $checkedTags = $articleForm->getTags();
             $isActive = $articleForm->getIsActive();
         }
 
@@ -214,6 +217,16 @@ final class AdminArticleController extends AdminBaseController
             '#' => $pageTitle
         ];
 
+        if (empty($topics)) {
+            $errors = is_array($errors) ? $errors : [];
+            $errors[] = ArticleForm::TOPICS_ARE_NOT_EXISTS_ERROR_MESSAGE;
+        }
+
+        if (empty($tags)) {
+            $errors = is_array($errors) ? $errors : [];
+            $errors[] = ArticleForm::TAGS_ARE_NOT_EXISTS_ERROR_MESSAGE;
+        }
+
         $this->assign([
             'id' => $id,
             'title' => $title,
@@ -223,6 +236,7 @@ final class AdminArticleController extends AdminBaseController
             'meta_title' => $metaTitle,
             'meta_description' => $metaDescription,
             'topic_id' => $topicId,
+            'checked_tags' => $checkedTags,
             'is_active' => $isActive,
             'errors' => $errors,
             'topics' => $topics,
