@@ -40,17 +40,17 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <label for="name" class="label-input-wrapper">
+            <label for="input-name" class="label-input-wrapper">
                 <input type="text"
                        name="name"
-                       id="name"
+                       id="input-name"
                        placeholder="Name"
                        value="<?= $name; ?>">
             </label>
         </p>
         <p>
-            <label for="parent_id" class="label-input-wrapper">
-                <select name="parent_id" id="parent_id">
+            <label for="input-parent-id" class="label-input-wrapper">
+                <select name="parent_id" id="input-parent-id">
                     <?php
                     $selected = empty($parentId) ? ' selected="selected"' : '';
                     ?>
@@ -94,9 +94,9 @@ if (!empty($id)) {
                     <input type="checkbox"
                            name="allowed_actions[]"
                            value="<?= $roleActionId; ?>"
-                           id="allowed-action-input-<?= $roleActionId; ?>"
+                           id="input-allowed-action-<?= $roleActionId; ?>"
                         <?= $checked; ?>>
-                    <label for="allowed-action-input-<?= $roleActionId; ?>">
+                    <label for="input-allowed-action-<?= $roleActionId; ?>">
                         <?= $roleActionName; ?>
                     </label>
                 </p>
@@ -121,9 +121,9 @@ if (!empty($id)) {
                     <input type="checkbox"
                            name="denied_actions[]"
                            value="<?= $roleActionId; ?>"
-                           id="denied-action-input-<?= $roleActionId; ?>"
+                           id="input-denied-action-<?= $roleActionId; ?>"
                         <?= $checked; ?>>
-                    <label for="denied-action-input-<?= $roleActionId; ?>">
+                    <label for="input-denied-action-<?= $roleActionId; ?>">
                         <?= $roleActionName; ?>
                     </label>
                 </p>
@@ -136,10 +136,10 @@ if (!empty($id)) {
             ?>
             <input type="checkbox"
                    name="is_active"
-                   id="is_active"
+                   id="input-is-active"
                    value="1"
                 <?= $checked ?>>
-            <label for="is_active">
+            <label for="input-is-active">
                 Is Active
             </label>
         </p>

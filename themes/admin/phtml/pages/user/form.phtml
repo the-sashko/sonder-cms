@@ -41,10 +41,10 @@ if (!empty($id)) {
           method="POST">
         <p>
             <?php if (empty($id)): ?>
-                <label for="login" class="label-input-wrapper">
+                <label for="input-login" class="label-input-wrapper">
                     <input type="text"
                            name="login"
-                           id="login"
+                           id="input-login"
                            placeholder="Login"
                            value="<?= $login; ?>">
                 </label>
@@ -54,17 +54,17 @@ if (!empty($id)) {
             <?php endif; ?>
         </p>
         <p>
-            <label for="email" class="label-input-wrapper">
+            <label for="input-email" class="label-input-wrapper">
                 <input type="text"
                        name="email"
-                       id="email"
+                       id="input-email"
                        placeholder="Email"
                        value="<?= $email; ?>">
             </label>
         </p>
         <p>
-            <label for="role_id" class="label-input-wrapper">
-                <select name="role_id" id="role_id">
+            <label for="input-role-id" class="label-input-wrapper">
+                <select name="role_id" id="input-role-id">
                     <?php
                     $selected = empty($parentId) ? ' selected="selected"' : '';
                     ?>
@@ -90,10 +90,10 @@ if (!empty($id)) {
         </p>
         <?php if (empty($id)): ?>
             <p>
-                <label for="password" class="label-input-wrapper">
+                <label for="input-password" class="label-input-wrapper">
                     <input type="text"
                            name="password"
-                           id="password"
+                           id="input-password"
                            placeholder="Password"
                            value="<?= $password; ?>">
                 </label>
@@ -104,10 +104,10 @@ if (!empty($id)) {
                 ?>
                 <input type="checkbox"
                        name="is_allow_access_by_api"
-                       id="is_allow_access_by_api"
+                       id="input-is-allow-access-by-api"
                        value="1"
                     <?= $checked ?>>
-                <label for="is_allow_access_by_api">
+                <label for="input-is-allow-access-by-api">
                     Is Allow Access By API
                 </label>
             </p>
@@ -122,10 +122,10 @@ if (!empty($id)) {
             ?>
             <input type="checkbox"
                    name="is_active"
-                   id="is_active"
+                   id="input-is-active"
                    value="1"
                 <?= $checked ?>>
-            <label for="is_active">
+            <label for="input-is-active">
                 Is Active
             </label>
         </p>

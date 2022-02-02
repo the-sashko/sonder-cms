@@ -8,6 +8,7 @@
 /* @var string|null $metaTitle */
 /* @var string|null $metaDescription */
 /* @var int|null $topicId */
+/* @var array|null $checkedTags */
 /* @var bool $isActive */
 /* @var array|null $topics */
 /* @var array|null $tags */
@@ -19,7 +20,7 @@ if (!empty($id)) {
     $formAction = sprintf('/admin/article/%d/', $id);
 }
 ?>
-<div class="form-wrapper">
+<div class="form-wrapper" xmlns="http://www.w3.org/1999/html">
     <?php if (empty($id)): ?>
         <h1>Add New Article</h1>
     <?php else: ?>
@@ -38,103 +39,135 @@ if (!empty($id)) {
           enctype="multipart/form-data"
           method="POST">
         <p>
-            <label for="title" class="label-input-wrapper">
+            <label for="input-title" class="label-input-wrapper">
                 <input type="text"
                        name="title"
-                       id="title"
+                       id="input-title"
                        placeholder="Title"
                        value="<?= $title; ?>">
             </label>
         </p>
         <p>
-            <label for="slug" class="label-input-wrapper">
+            <label for="input-slug" class="label-input-wrapper">
                 <input type="text"
                        name="slug"
-                       id="slug"
+                       id="input-slug"
                        placeholder="Slug"
                        value="<?= $slug; ?>">
             </label>
         </p>
         <p>
-            <label for="summary" class="label-input-wrapper">
-                <textarea name="summary"
-                          id="summary"
-                          placeholder="Summary">
-                    <?= $summary ?>
-                </textarea>
+            <span>Image</span>
+            <label for="input-image" class="label-input-wrapper">
+                <input type="file"
+                       name="image"
+                       id="input-image">
             </label>
         </p>
         <p>
-            <label for="text" class="label-input-wrapper">
+            <label for="input-summary" class="label-input-wrapper">
+                <textarea name="input-summary"
+                          id="input-summary"
+                          placeholder="Summary"
+                ><?= $summary ?></textarea>
+            </label>
+        </p>
+        <p>
+            <label for="input-text" class="label-input-wrapper">
                 <textarea name="text"
-                          id="text"
-                          placeholder="Text">
-                    <?= $text ?>
-                </textarea>
+                          id="input-text"
+                          placeholder="Text"
+                ><?= $text ?></textarea>
             </label>
         </p>
         <p>
-            <label for="meta-title" class="label-input-wrapper">
+            <label for="input-meta-title" class="label-input-wrapper">
                 <input type="text"
                        name="meta_title"
-                       id="meta-title"
+                       id="input-meta-title"
                        placeholder="Meta title"
                        value="<?= $metaTitle; ?>">
             </label>
         </p>
         <p>
-            <label for="meta-description" class="label-input-wrapper">
+            <label for="input-meta-description" class="label-input-wrapper">
                 <textarea name="meta_description"
-                          id="meta-description"
-                          placeholder="Meta Description">
-                    <?= $metaDescription ?>
-                </textarea>
+                          id="input-meta-description"
+                          placeholder="Meta Description"
+                ><?= $metaDescription ?></textarea>
             </label>
         </p>
         <p>
-            Topics
-            <?php foreach ($tags as $tag): ?>
-                <?php
-                /*
-                    <input type="checkbox"
-                       name="is_active"
-                       id="is_active"
-                       value="1"
-                    <?= $checked ?>>
-                <label for="is_active">
-                    Is Active
-                </label>
-                */
-                ?>
-            <?php endforeach; ?>
-        </p>
-        <p>
-            Tags
-            <?php foreach ($tags as $tag): ?>
-            <?php
-            /*
-                <input type="checkbox"
-                   name="is_active"
-                   id="is_active"
-                   value="1"
-                <?= $checked ?>>
-            <label for="is_active">
-                Is Active
+            <?php if (!empty($topics)): ?>
+            <label for="input-topic_id" class="label-input-wrapper">
+                <select name="topic_id" id="input-topic_id">
+                    <?php
+                    $selected = empty($topicId) ? ' selected="selected"' : '';
+                    ?>
+                    <option value="0" disabled<?= $selected; ?>>
+                        Topic
+                    </option>
+                        <?php foreach ($topics as $topic): ?>
+                            <?php
+                            $selected = '';
+                            if ($topic->getId() == $topicId) {
+                                $selected = ' selected';
+                            }
+                            ?>
+                            <option value="<?= $topic->getId(); ?>"
+                                <?= $selected; ?>>
+                                <?= $topic->getTitle(); ?>
+                            </option>
+                        <?php endforeach; ?>
+                </select>
             </label>
-            */
-            ?>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <a href="/admin/topic/">Add Topic</a>
+            <?php endif; ?>
         </p>
+        <div class="checkbox-list-wrapper">
+            <?php if (!empty($tags)): ?>
+                <p>
+                    Tags
+                </p>
+                <?php foreach ($tags as $tag): ?>
+                    <?php
+                    $tagId = $tag->getId();
+                    $tagTitle = $tag->getTitle();
+
+                    $checked = '';
+
+                    if (!empty($checkedTags) && in_array($tagId, $checkedTags)) {
+                        $checked = ' checked';
+                    }
+                    ?>
+                    <p>
+                        <input type="checkbox"
+                               name="tags[]"
+                               value="<?= $tagId; ?>"
+                               id="input-tag-<?= $tagId; ?>"
+                            <?= $checked; ?>>
+                        <label for="input-tag-<?= $tagId; ?>">
+                            <?= $tagTitle; ?>
+                        </label>
+                    </p>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>
+                    <a href="/admin/tag/">Add Tag</a>
+                </p>
+            <?php endif; ?>
+        </div>
         <p>
             <?php
             $checked = $isActive ? ' checked' : '';
             ?>
             <input type="checkbox"
                    name="is_active"
-                   id="is_active"
+                   id="input-is-active"
                    value="1"
                 <?= $checked ?>>
-            <label for="is_active">
+            <label for="input-is-active">
                 Is Active
             </label>
         </p>
