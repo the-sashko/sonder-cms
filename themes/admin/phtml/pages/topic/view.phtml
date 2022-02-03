@@ -55,6 +55,15 @@ use Sonder\Models\Topic\TopicValuesObject;
     <?php endif; ?>
     <tr>
         <td>
+            Image
+        </td>
+        <td>
+            <img src="<?= $topic->getImageLink(); ?>?token=<?= time(); ?>"
+                 alt="<?= $topic->getSlug(); ?>">
+        </td>
+    </tr>
+    <tr>
+        <td>
             Is Active
         </td>
         <td>
