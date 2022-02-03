@@ -309,11 +309,11 @@ final class Tag extends CoreModel implements IModel
             $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
         }
 
+        $slug = $translitPlugin->getSlug($slug);
+
         if (empty($slug)) {
             $slug = Tag::DEFAULT_SLUG;
         }
-
-        $slug = $translitPlugin->getSlug($slug);
 
         $slug = $this->_makeSlugUniq($slug, $tagVO->getId());
 

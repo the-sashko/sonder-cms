@@ -749,11 +749,11 @@ final class Article extends CoreModel implements IModel
             $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
         }
 
+        $slug = $translitPlugin->getSlug($slug);
+
         if (empty($slug)) {
             $slug = Article::DEFAULT_SLUG;
         }
-
-        $slug = $translitPlugin->getSlug($slug);
 
         $slug = $this->_makeSlugUniq($slug, $articleVO->getId());
 
@@ -796,4 +796,5 @@ final class Article extends CoreModel implements IModel
         return $this->_makeSlugUniq($slug, $id);
     }
 }
-//TODO: add language + id in error messages from form + format text form fields
+//TODO: add imag + language + id in error messages from form + format text
+// form fields
