@@ -1,0 +1,6 @@
+public/media
+protected/cache
+protected/config
+protected/logs
+protected/uploads
+
