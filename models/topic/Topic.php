@@ -3,6 +3,7 @@
 namespace Sonder\Models;
 
 use Exception;
+use ImagickException;
 use Sonder\Core\CoreModel;
 use Sonder\Core\Interfaces\IModel;
 use Sonder\Core\ValuesObject;
@@ -11,7 +12,11 @@ use Sonder\Models\Topic\TopicStore;
 use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Plugins\Image\Exceptions\ImagePluginException;
+use Sonder\Plugins\Image\Exceptions\ImageSizeException;
+use Sonder\Plugins\ImagePlugin;
 use Sonder\Plugins\TranslitPlugin;
+use Sonder\Plugins\UploadPlugin;
 use Throwable;
 
 /**
@@ -20,6 +25,10 @@ use Throwable;
 final class Topic extends CoreModel implements IModel
 {
     const DEFAULT_SLUG = 'topic';
+
+    const TOPICS_IMAGES_DIR_PATH = '%s/media/topics';
+
+    const UPLOADS_DIR_PATH = 'uploads/topics';
 
     /**
      * @var int
@@ -49,6 +58,7 @@ final class Topic extends CoreModel implements IModel
      * @return array|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     final public function getTopicsByPage(int $page): ?array
     {
@@ -152,19 +162,53 @@ final class Topic extends CoreModel implements IModel
 
         $topicVO = $this->_getVOFromTopicForm($topicForm, true);
 
+        $this->store->start();
+
         try {
             if (!$this->store->insertOrUpdateTopic($topicVO)) {
                 $topicForm->setStatusFail();
+
+                $this->store->rollback();
 
                 return false;
             }
 
             $id = $this->store->getTopicIdBySlug($topicVO->getSlug());
 
-            if (!empty($id)) {
-                $topicForm->setId($id);
+            if (empty($id)) {
+                $topicForm->setStatusFail();
+
+                $this->store->rollback();
+
+                return false;
             }
+
+            $topicForm->setId($id);
+
+            if (!$this->_uploadImageFile($topicVO->getSlug(), $topicForm)) {
+                $topicForm->setError(
+                    TopicForm::UPLOAD_IMAGE_FILE_ERROR_MESSAGE
+                );
+
+                $topicForm->setStatusFail();
+
+                $this->store->rollback();
+
+                return false;
+            }
+
+            if (!$topicForm->getStatus()) {
+                $this->store->rollback();
+
+                return false;
+            }
+
+            $this->store->commit();
+
+            return true;
         } catch (Throwable $exp) {
+            $this->store->rollback();
+
             $topicForm->setStatusFail();
             $topicForm->setError($exp->getMessage());
 
@@ -399,11 +443,11 @@ final class Topic extends CoreModel implements IModel
             $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
         }
 
+        $slug = $translitPlugin->getSlug($slug);
+
         if (empty($slug)) {
             $slug = Topic::DEFAULT_SLUG;
         }
-
-        $slug = $translitPlugin->getSlug($slug);
 
         $slug = $this->_makeSlugUniq($slug, $topicVO->getId());
 
@@ -445,5 +489,160 @@ final class Topic extends CoreModel implements IModel
 
         return $this->_makeSlugUniq($slug, $id);
     }
+
+    /**
+     * @param string $slug
+     * @param TopicForm $topicForm
+     * @return bool
+     * @throws ImagickException
+     * @throws ImagePluginException
+     * @throws ImageSizeException
+     * @throws Exception
+     */
+    private function _uploadImageFile(string $slug, TopicForm $topicForm): bool
+    {
+        $image = $topicForm->getImage();
+
+        if (empty($image)) {
+            return true;
+        }
+
+        /* @var $uploadPlugin UploadPlugin */
+        $uploadPlugin = $this->getPlugin('upload');
+
+        $topicsImageDirPath = $this->_getTopicsImagesDirPath();
+
+        $topicsImageFilePath = sprintf(
+            '%s/%s-topic.png',
+            $topicsImageDirPath,
+            $slug
+        );
+
+        $topicsImageFullFilePath = sprintf(
+            '%s/%s-full.png',
+            $topicsImageDirPath,
+            $slug
+        );
+
+        if (!file_exists($topicsImageDirPath) && !is_dir($topicsImageDirPath)) {
+            mkdir($topicsImageDirPath, 0755, true);
+        }
+
+        $uploadPlugin->upload(
+            TopicForm::IMAGE_EXTENSIONS,
+            TopicForm::IMAGE_FILE_MAX_SIZE,
+            Topic::UPLOADS_DIR_PATH
+        );
+
+        $error = $uploadPlugin->getError();
+
+        if (!empty($error)) {
+            throw new Exception($error);
+        }
+
+        $uploadedFiles = $uploadPlugin->getFiles();
+
+        if (
+            empty($uploadedFiles) ||
+            !array_key_exists('image', $uploadedFiles) ||
+            empty($uploadedFiles['image']) ||
+            !is_array($uploadedFiles['image'])
+        ) {
+            return false;
+        }
+
+        $uploadedFilePath = array_shift($uploadedFiles['image']);
+
+        if (!file_exists($uploadedFilePath) || !is_file($uploadedFilePath)) {
+            return false;
+        }
+
+        if (
+            file_exists($topicsImageFullFilePath) &&
+            is_file($topicsImageFullFilePath)
+        ) {
+            unlink($topicsImageFullFilePath);
+        }
+
+        if (
+            file_exists($topicsImageFilePath) &&
+            is_file($topicsImageFilePath)
+        ) {
+            unlink($topicsImageFilePath);
+        }
+
+        /* @var $imagePlugin ImagePlugin */
+        $imagePlugin = $this->getPlugin('image');
+
+        $imagePlugin->resize(
+            $uploadedFilePath,
+            $topicsImageDirPath,
+            $slug,
+            TopicValuesObject::IMAGE_FORMAT,
+            TopicValuesObject::IMAGE_SIZES
+        );
+
+        if (
+            file_exists($topicsImageFullFilePath) &&
+            is_file($topicsImageFullFilePath)
+        ) {
+            unlink($topicsImageFullFilePath);
+        }
+
+        unlink($uploadedFilePath);
+
+        return true;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    private function _getTopicsImagesDirPath(): string
+    {
+        $publicDirPath = $this->_getPublicDirPath();
+
+        return sprintf(Topic::TOPICS_IMAGES_DIR_PATH, $publicDirPath);
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    private function _getPublicDirPath(): string
+    {
+        if (defined('APP_PUBLIC_DIR_PATH')) {
+            return APP_PUBLIC_DIR_PATH;
+        }
+
+        $publicDirPath = realpath(__DIR__ . '/../../../../public');
+
+        if (empty($publicDirPath)) {
+            throw new Exception('Can not find public directory path');
+        }
+
+        return $publicDirPath;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    private function _getProtectedDirPath(): string
+    {
+        if (defined('APP_PROTECTED_DIR_PATH')) {
+            return APP_PROTECTED_DIR_PATH;
+        }
+
+        $protectedDirPath = realpath(__DIR__ . '/../../..');
+
+        if (empty($protectedDirPath)) {
+            throw new Exception(
+                'Can not find protected directory path'
+            );
+        }
+
+        return $protectedDirPath;
+    }
 }
-//TODO: add image and language + add parent in form.phtml
+//TODO: add language + add parent in form.phtml

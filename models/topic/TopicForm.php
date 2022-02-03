@@ -13,6 +13,10 @@ final class TopicForm extends ModelFormObject
 
     const SLUG_MAX_LENGTH = 128;
 
+    const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
+
+    const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
+
     const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
     const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
@@ -32,6 +36,13 @@ final class TopicForm extends ModelFormObject
     const PARENT_TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE = 'Parent Topic with id ' .
     '"%d" is not exists';
 
+    const IMAGE_FILE_TOO_LARGE_ERROR_MESSAGE = 'Image file in too large';
+
+    const IMAGE_FILE_HAS_BAD_EXTENSION_ERROR_MESSAGE = 'Image file has bad ' .
+    'extension';
+
+    const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
+
     /**
      * @throws Exception
      */
@@ -39,8 +50,11 @@ final class TopicForm extends ModelFormObject
     {
         $this->setStatusSuccess();
 
+        $this->_setImageFileFromRequest();
+
         $this->_validateTitleValue();
         $this->_validateSlugValue();
+        $this->_validateImage();
     }
 
     /**
@@ -121,6 +135,25 @@ final class TopicForm extends ModelFormObject
     }
 
     /**
+     * @return array|null
+     * @throws Exception
+     */
+    final public function getImage(): ?array
+    {
+        if (!$this->has('image')) {
+            return null;
+        }
+
+        $image = $this->get('image');
+
+        if (empty($image) || !is_array($image)) {
+            return null;
+        }
+
+        return $image;
+    }
+
+    /**
      * @param int|null $id
      * @return void
      * @throws Exception
@@ -161,6 +194,16 @@ final class TopicForm extends ModelFormObject
     }
 
     /**
+     * @param array|null $image
+     * @return void
+     * @throws Exception
+     */
+    final public function setImage(?array $image = null): void
+    {
+        $this->set('image', $image);
+    }
+
+    /**
      * @return void
      * @throws Exception
      */
@@ -196,5 +239,54 @@ final class TopicForm extends ModelFormObject
             $this->setError(TopicForm::SLUG_TOO_LONG_ERROR_MESSAGE);
             $this->setStatusFail();
         }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function _validateImage(): void
+    {
+        $image = $this->getImage();
+
+        $isImageSet = !empty($image) &&
+            array_key_exists('size', $image) &&
+            $image['size'] > 0;
+
+        if (!$isImageSet) {
+            $this->setImage();
+        }
+
+        if ($isImageSet && $image['error']) {
+            $this->setError(TopicForm::UPLOAD_IMAGE_FILE_ERROR_MESSAGE);
+            $this->setStatusFail();
+        }
+
+        if ($isImageSet && $image['size'] > TopicForm::IMAGE_FILE_MAX_SIZE) {
+            $this->setError(TopicForm::IMAGE_FILE_TOO_LARGE_ERROR_MESSAGE);
+            $this->setStatusFail();
+        }
+
+        if (
+            $isImageSet &&
+            !in_array($image['extension'], TopicForm::IMAGE_EXTENSIONS)
+        ) {
+            $this->setError(
+                TopicForm::IMAGE_FILE_HAS_BAD_EXTENSION_ERROR_MESSAGE
+            );
+
+            $this->setStatusFail();
+        }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function _setImageFileFromRequest(): void
+    {
+        $image = $this->getFileValueFromRequest('image');
+
+        $this->set('image', $image);
     }
 }

@@ -7,6 +7,16 @@ use Sonder\Core\ModelValuesObject;
 
 final class TopicValuesObject extends ModelValuesObject
 {
+    const IMAGE_SIZES = [
+        'topic' => [
+            'height' => 256,
+            'width' => 256,
+            'file_prefix' => 'topic'
+        ]
+    ];
+
+    const IMAGE_FORMAT = 'png';
+
     /**
      * @var string|null
      */
@@ -30,7 +40,7 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $imageLinkPattern = '/images/topics/%s.png';
+    protected ?string $imageLinkPattern = '/media/topics/%s-topic.png';
 
     /**
      * @return string
