@@ -126,6 +126,50 @@ final class Topic extends CoreModel implements IModel
     /**
      * @param int|null $id
      * @return bool
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function removeTopicImageById(?int $id): bool
+    {
+        if (empty($id)) {
+            return false;
+        }
+
+        $topicVO = $this->getVOById($id);
+
+        if (empty($topicVO)) {
+            return false;
+        }
+
+        $topicsImageDirPath = $this->_getTopicsImagesDirPath();
+
+        $topicsImageFilePath = sprintf(
+            '%s/%s-topic.png',
+            $topicsImageDirPath,
+            $topicVO->getSlug()
+        );
+
+        $defaultImageFilePath = sprintf(
+            '%s/assets/img/broken.png',
+            $this->_getPublicDirPath()
+        );
+
+        if (
+            file_exists($topicsImageFilePath) &&
+            is_file($topicsImageFilePath)
+        ) {
+            unlink($topicsImageFilePath);
+        }
+
+        copy($defaultImageFilePath, $topicsImageFilePath);
+
+        return true;
+    }
+
+    /**
+     * @param int|null $id
+     * @return bool
      * @throws DatabasePluginException
      */
     final public function restoreTopicById(?int $id): bool
@@ -361,7 +405,7 @@ final class Topic extends CoreModel implements IModel
         $parentVO = $this->getVO($row);
 
         while (!empty($parentVO)) {
-            if ($parentVO->getParentId() == $topicId) {
+            if ($parentVO->getId() == $topicId) {
                 $topicForm->setStatusFail();
 
                 $topicForm->setError(
@@ -501,12 +545,6 @@ final class Topic extends CoreModel implements IModel
      */
     private function _uploadImageFile(string $slug, TopicForm $topicForm): bool
     {
-        $image = $topicForm->getImage();
-
-        if (empty($image)) {
-            return true;
-        }
-
         /* @var $uploadPlugin UploadPlugin */
         $uploadPlugin = $this->getPlugin('upload');
 
@@ -523,6 +561,27 @@ final class Topic extends CoreModel implements IModel
             $topicsImageDirPath,
             $slug
         );
+
+        $defaultImageFilePath = sprintf(
+            '%s/assets/img/broken.png',
+            $this->_getPublicDirPath()
+        );
+
+        $image = $topicForm->getImage();
+
+        if (
+            empty($image) &&
+            (
+                !file_exists($topicsImageFilePath) ||
+                !is_file($topicsImageFilePath)
+            )
+        ) {
+            copy($defaultImageFilePath, $topicsImageFilePath);
+        }
+
+        if (empty($image)) {
+            return true;
+        }
 
         if (!file_exists($topicsImageDirPath) && !is_dir($topicsImageDirPath)) {
             mkdir($topicsImageDirPath, 0755, true);
