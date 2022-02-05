@@ -10,22 +10,22 @@ final class TagValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $editLinkPattern = '/admin/tag/%d/';
+    protected ?string $editLinkPattern = '/admin/taxonomy/tag/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $removeLinkPattern = '/admin/tags/remove/%d/';
+    protected ?string $removeLinkPattern = '/admin/taxonomy/tags/remove/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $restoreLinkPattern = '/admin/tags/restore/%d/';
+    protected ?string $restoreLinkPattern = '/admin/taxonomy/tags/restore/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $adminViewLinkPattern = '/admin/tags/view/%d/';
+    protected ?string $adminViewLinkPattern = '/admin/taxonomy/tags/view/%d/';
 
     /**
      * @return string
