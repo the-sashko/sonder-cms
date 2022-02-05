@@ -5,6 +5,11 @@ use Sonder\Models\Article\ArticleValuesObject;
 /* @var ArticleValuesObject[]|null $articles */
 ?>
 <p>
+    <span>Articles</span> /
+    <a href="/admin/articles/comments/">Comments</a> /
+    <a href="/admin/articles/hits/">Hits</a>
+</p>
+<p>
     <a href="/admin/article/" class="button">New Article</a>
 </p>
 <?php if (empty($articles)): ?>

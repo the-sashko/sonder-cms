@@ -2,8 +2,10 @@
 /* @var string|null $csrfToken */
 /* @var int|null $id */
 /* @var int|null $parentId */
+/* @var array $topics */
 /* @var string|null $title */
 /* @var string|null $slug */
+/* @var string|null $image */
 /* @var bool $isActive */
 /* @var array|null $errors */
 
@@ -31,12 +33,49 @@ if (!empty($id)) {
     <form action="<?= $formAction; ?>"
           enctype="multipart/form-data"
           method="POST">
+        <?php if (!empty($id) && !empty($image)): ?>
+            <p class="form-image-wrapper">
+                <img src="<?= $image; ?>?token=<?= time(); ?>"
+                     alt="<?= $slug; ?>">
+            </p>
+            <p>
+                <a href="/admin/topics/remove-image/<?= $id; ?>/">
+                    Remove image
+                </a>
+            </p>
+        <?php endif; ?>
         <p>
             <span>Image</span>
             <label for="input-image" class="label-input-wrapper">
                 <input type="file"
                        name="image"
                        id="input-image">
+            </label>
+        </p>
+        <p>
+            <label for="input-parent-id" class="label-input-wrapper">
+                <select name="parent_id" id="input-parent-id">
+                    <?php
+                    $selected = empty($parentId) ? ' selected="selected"' : '';
+                    ?>
+                    <option value="0" disabled<?= $selected; ?>>
+                        Parent
+                    </option>
+                    <?php if (!empty($topics)): ?>
+                        <?php foreach ($topics as $topic): ?>
+                            <?php
+                            $selected = '';
+                            if ($topic->getId() == $parentId) {
+                                $selected = ' selected';
+                            }
+                            ?>
+                            <option value="<?= $topic->getId(); ?>"
+                                <?= $selected; ?>>
+                                <?= $topic->getTitle(); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
             </label>
         </p>
         <p>
@@ -75,6 +114,5 @@ if (!empty($id)) {
         </p>
         <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
-        <input type="hidden" name="parent_id" value="<?= $parentId; ?>">
     </form>
 </div>

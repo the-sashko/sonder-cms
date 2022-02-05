@@ -17,17 +17,11 @@
         <?php endif; ?>
     </li>
     <li>
-        <?php if (preg_match('/^\/admin\/topic.*?$/su', $currentUrl)): ?>
-            <a href="/admin/topics/" class="main-menu-link-active">Topics</a>
+        <?php if (preg_match('/^\/admin\/taxonomy.*?$/su', $currentUrl)): ?>
+            <a href="/admin/taxonomy/"
+               class="main-menu-link-active">Taxonomy</a>
         <?php else: ?>
-            <a href="/admin/topics/">Topics</a>
-        <?php endif; ?>
-    </li>
-    <li>
-        <?php if (preg_match('/^\/admin\/tag.*?$/su', $currentUrl)): ?>
-            <a href="/admin/tags/" class="main-menu-link-active">Tags</a>
-        <?php else: ?>
-            <a href="/admin/tags/">Tags</a>
+            <a href="/admin/taxonomy/">Taxonomy</a>
         <?php endif; ?>
     </li>
     <li>
@@ -41,17 +35,10 @@
         <?php endif; ?>
     </li>
     <li>
-        <?php if ($currentUrl == '/admin/hits/'): ?>
-            <a href="/admin/hits/" class="main-menu-link-active">Hits</a>
+        <?php if (preg_match('/^\/admin\/settings.*?$/su', $currentUrl)): ?>
+            <a href="/admin/settings/" class="main-menu-link-active">Setting</a>
         <?php else: ?>
-            <a href="/admin/hits/">Hits</a>
-        <?php endif; ?>
-    </li>
-    <li>
-        <?php if ($currentUrl == '/admin/cron/'): ?>
-            <a href="/admin/cron/" class="main-menu-link-active">Cron</a>
-        <?php else: ?>
-            <a href="/admin/cron/">Cron</a>
+            <a href="/admin/settings/">Setting</a>
         <?php endif; ?>
     </li>
     <li>

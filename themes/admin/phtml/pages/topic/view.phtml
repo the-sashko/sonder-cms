@@ -38,7 +38,7 @@ use Sonder\Models\Topic\TopicValuesObject;
         <?php
         $parent = sprintf(
             '%s (ID: %d)',
-            $topic->getParentVO()->getName(),
+            $topic->getParentVO()->getTitle(),
             $topic->getParentVO()->getId()
         );
         ?>
