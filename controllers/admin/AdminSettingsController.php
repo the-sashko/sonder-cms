@@ -7,12 +7,11 @@ use Sonder\Core\ResponseObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
-final class AdminCommentController extends AdminBaseController
+final class AdminSettingsController extends AdminBaseController
 {
     /**
      * @area admin
-     * @route /admin/articles/comments((/page-([0-9]+)/)|/)
-     * @url_params page=$3
+     * @route /admin/settings/
      * @no_cache true
      *
      * @return ResponseObject
@@ -20,15 +19,20 @@ final class AdminCommentController extends AdminBaseController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayComments(): ResponseObject
+    final public function displaySettings(): ResponseObject
     {
-        //TODO
+        $this->assign([
+            'page_path' => [
+                '#' => 'Settings'
+            ]
+        ]);
+
+        return $this->render('settings/list');
     }
 
     /**
      * @area admin
-     * @route /admin/articles/comments/view/([0-9]+)/
-     * @url_params id=$1
+     * @route /admin/configs/
      * @no_cache true
      *
      * @return ResponseObject
@@ -36,15 +40,17 @@ final class AdminCommentController extends AdminBaseController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayComment(): ResponseObject
+    final public function displayConfigs(): ResponseObject
     {
         //TODO
+
+        return $this->render('settings/config/list');
     }
 
     /**
      * @area admin
-     * @route /admin/articles/comment((/([0-9]+)/)|/)
-     * @url_params id=$3
+     * @route /admin/configs/view/([a-z-_]+)/
+     * @url_params config_name=$1
      * @no_cache true
      *
      * @return ResponseObject
@@ -52,38 +58,28 @@ final class AdminCommentController extends AdminBaseController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayCommentForm(): ResponseObject
+    final public function displayConfig(): ResponseObject
     {
         //TODO
+
+        return $this->render('settings/config/list');
     }
 
     /**
      * @area admin
-     * @route /admin/articles/comments/remove/([0-9]+)/
-     * @url_params id=$1
+     * @route /admin/configs/edit/([a-z-_]+)/
+     * @url_params config_name=$1
      * @no_cache true
      *
      * @return ResponseObject
+     * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveComment(): ResponseObject
+    final public function displayEditConfig(): ResponseObject
     {
         //TODO
-    }
 
-    /**
-     * @area admin
-     * @route /admin/articles/comments/restore/([0-9]+)/
-     * @url_params id=$1
-     * @no_cache true
-     *
-     * @return ResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
-     */
-    final public function displayRestoreComment(): ResponseObject
-    {
-        //TODO
+        return $this->render('settings/config/form');
     }
 }

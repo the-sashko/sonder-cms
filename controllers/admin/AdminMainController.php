@@ -3,7 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\User\SignInForm;
 
@@ -14,11 +13,6 @@ final class AdminMainController extends AdminBaseController
     const ADMIN_INDEX_URL = '/admin/';
 
     const USER_ACTION_ADMIN = 'login-to-admin';
-
-    /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
 
     /**
      * @area admin

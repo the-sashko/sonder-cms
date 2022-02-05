@@ -15,11 +15,6 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminArticleController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
      * @route /admin/articles((/page-([0-9]+)/)|/)
      * @url_params page=$3
@@ -77,17 +72,15 @@ final class AdminArticleController extends AdminBaseController
      */
     final public function displayArticle(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
 
-        if (empty($id)) {
+        if (empty($this->id)) {
             return $this->redirect('/admin/articles/');
         }
 
         /* @var $articleVO ArticleValuesObject */
-        $articleVO = $articleModel->getVOById($id);
+        $articleVO = $articleModel->getVOById($this->id);
 
         if (empty($articleVO)) {
             return $this->redirect('/admin/articles/');
@@ -120,7 +113,7 @@ final class AdminArticleController extends AdminBaseController
      */
     final public function displayArticleForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
@@ -259,16 +252,14 @@ final class AdminArticleController extends AdminBaseController
      */
     final public function displayRemoveArticle(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
 
-        if (!$articleModel->removeArticleById($id)) {
+        if (!$articleModel->removeArticleById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Article With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
@@ -288,16 +279,14 @@ final class AdminArticleController extends AdminBaseController
      */
     final public function displayRestoreArticle(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
 
-        if (!$articleModel->restoreArticleById($id)) {
+        if (!$articleModel->restoreArticleById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Article With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }

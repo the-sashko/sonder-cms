@@ -14,11 +14,6 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminRoleController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
      * @route /admin/users/roles((/page-([0-9]+)/)|/)
      * @url_params page=$3
@@ -77,16 +72,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRole(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (empty($id)) {
+        if (empty($this->id)) {
             return $this->redirect('/admin/users/roles/');
         }
 
-        $roleVO = $roleModel->getRoleVOById($id);
+        $roleVO = $roleModel->getRoleVOById($this->id);
 
         if (empty($roleVO)) {
             return $this->redirect('/admin/users/roles/');
@@ -121,7 +114,7 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRoleForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
@@ -230,16 +223,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRemoveRole(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (!$roleModel->removeRoleById($id)) {
+        if (!$roleModel->removeRoleById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Role With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
@@ -259,16 +250,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRestoreRole(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (!$roleModel->restoreRoleById($id)) {
+        if (!$roleModel->restoreRoleById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Role With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
@@ -336,16 +325,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRoleAction(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (empty($id)) {
+        if (empty($this->id)) {
             return $this->redirect('/admin/users/roles/actions/');
         }
 
-        $roleActionVO = $roleModel->getRoleActionVOById($id);
+        $roleActionVO = $roleModel->getRoleActionVOById($this->id);
 
         if (empty($roleActionVO)) {
             return $this->redirect('/admin/users/roles/actions/');
@@ -381,7 +368,7 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRoleActionForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
@@ -469,16 +456,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRemoveRoleAction(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (!$roleModel->removeRoleActionById($id)) {
+        if (!$roleModel->removeRoleActionById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Role Action With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
@@ -498,16 +483,14 @@ final class AdminRoleController extends AdminBaseController
      */
     final public function displayRestoreRoleAction(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        if (!$roleModel->restoreRoleActionById($id)) {
+        if (!$roleModel->restoreRoleActionById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Role Action With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }

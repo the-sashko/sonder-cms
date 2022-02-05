@@ -13,13 +13,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminTagController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
-     * @route /admin/tags((/page-([0-9]+)/)|/)
+     * @route /admin/taxonomy/tags((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
      *
@@ -37,17 +32,17 @@ final class AdminTagController extends AdminBaseController
         $pageCount = $tagModel->getTagsPageCount();
 
         if (empty($tags) && $this->page > 1) {
-            return $this->redirect('/admin/tags/');
+            return $this->redirect('/admin/taxonomy/tags/');
         }
 
         if (($this->page > $pageCount) && $this->page > 1) {
-            return $this->redirect('/admin/tags/');
+            return $this->redirect('/admin/taxonomy/tags/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
             $this->page,
-            '/admin/tags/'
+            '/admin/taxonomy/tags/'
         );
 
         $this->assign([
@@ -55,6 +50,7 @@ final class AdminTagController extends AdminBaseController
             'pagination' => $pagination,
             'page_path' => [
                 '/admin/' => 'Admin',
+                '/admin/taxonomy/' => 'Taxonomy',
                 '#' => 'Tags'
             ]
         ]);
@@ -64,7 +60,7 @@ final class AdminTagController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/tags/view/([0-9]+)/
+     * @route /admin/taxonomy/tags/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -75,25 +71,24 @@ final class AdminTagController extends AdminBaseController
      */
     final public function displayTag(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
 
-        if (empty($id)) {
-            return $this->redirect('/admin/tags/');
+        if (empty($this->id)) {
+            return $this->redirect('/admin/taxonomy/tags/');
         }
 
         /* @var $tagVO TagValuesObject */
-        $tagVO = $tagModel->getVOById($id);
+        $tagVO = $tagModel->getVOById($this->id);
 
         if (empty($tagVO)) {
-            return $this->redirect('/admin/tags/');
+            return $this->redirect('/admin/taxonomy/tags/');
         }
 
         $pagePath = [
             '/admin/' => 'Admin',
-            '/admin/tags/' => 'Tags',
+            '/admin/taxonomy/' => 'Taxonomy',
+            '/admin/taxonomy/tags/' => 'Tags',
             '#' => $tagVO->getTitle()
         ];
 
@@ -108,7 +103,7 @@ final class AdminTagController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/tag((/([0-9]+)/)|/)
+     * @route /admin/taxonomy/tag((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
      *
@@ -119,7 +114,7 @@ final class AdminTagController extends AdminBaseController
      */
     final public function displayTagForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
@@ -142,7 +137,7 @@ final class AdminTagController extends AdminBaseController
         }
 
         if (!empty($id) && empty($tagVO)) {
-            return $this->redirect('/admin/tag/');
+            return $this->redirect('/admin/taxonomy/tag/');
         }
 
         if ($this->request->getHttpMethod() == 'post') {
@@ -158,8 +153,8 @@ final class AdminTagController extends AdminBaseController
         if (!empty($tagForm) && $tagForm->getStatus()) {
             $id = $tagForm->getId();
 
-            $urlPattern = '/admin/tags/view/%d/';
-            $url = '/admin/tags/';
+            $urlPattern = '/admin/taxonomy/tags/view/%d/';
+            $url = '/admin/taxonomy/tags/';
 
             $url = empty($id) ? $url : sprintf($urlPattern, $id);
 
@@ -184,7 +179,8 @@ final class AdminTagController extends AdminBaseController
 
         $pagePath = [
             '/admin/' => 'Admin',
-            '/admin/tags/' => 'Tags',
+            '/admin/taxonomy/' => 'Taxonomy',
+            '/admin/taxonomy/tags/' => 'Tags',
             '#' => $pageTitle
         ];
 
@@ -202,7 +198,7 @@ final class AdminTagController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/tags/remove/([0-9]+)/
+     * @route /admin/taxonomy/tags/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -212,26 +208,24 @@ final class AdminTagController extends AdminBaseController
      */
     final public function displayRemoveTag(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
 
-        if (!$tagModel->removeTagById($id)) {
+        if (!$tagModel->removeTagById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Tag With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
 
-        return $this->redirect('/admin/tags/');
+        return $this->redirect('/admin/taxonomy/tags/');
     }
 
     /**
      * @area admin
-     * @route /admin/tags/restore/([0-9]+)/
+     * @route /admin/taxonomy/tags/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -241,20 +235,18 @@ final class AdminTagController extends AdminBaseController
      */
     final public function displayRestoreTag(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
 
-        if (!$tagModel->restoreTagById($id)) {
+        if (!$tagModel->restoreTagById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Tag With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
 
-        return $this->redirect('/admin/tags/');
+        return $this->redirect('/admin/taxonomy/tags/');
     }
 }

@@ -10,13 +10,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminHitController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
-     * @route /admin/hits((/page-([0-9]+)/)|/)
+     * @route /admin/articles/hits((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
      *
@@ -32,7 +27,7 @@ final class AdminHitController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/hits/view/([0-9]+)/
+     * @route /admin/articles/hits/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -48,7 +43,7 @@ final class AdminHitController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/hit((/([0-9]+)/)|/)
+     * @route /admin/articles/hit((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
      *
@@ -64,7 +59,7 @@ final class AdminHitController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/hits/remove/([0-9]+)/
+     * @route /admin/articles/hits/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -79,7 +74,7 @@ final class AdminHitController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/hits/restore/([0-9]+)/
+     * @route /admin/articles/hits/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *

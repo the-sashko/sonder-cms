@@ -10,13 +10,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminCronController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
-     * @route /admin/cron/jobs((/page-([0-9]+)/)|/)
+     * @route /admin/settings/cron((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
      *
@@ -25,14 +20,14 @@ final class AdminCronController extends AdminBaseController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayCronJobs(): ResponseObject
+    final public function displayCron(): ResponseObject
     {
         //TODO
     }
 
     /**
      * @area admin
-     * @route /admin/cron/jobs/view/([0-9]+)/
+     * @route /admin/settings/cron/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -48,7 +43,7 @@ final class AdminCronController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/cron/job((/([0-9]+)/)|/)
+     * @route /admin/settings/cron((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
      *
@@ -64,7 +59,7 @@ final class AdminCronController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/cron/jobs/remove/([0-9]+)/
+     * @route /admin/settings/cron/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -79,7 +74,7 @@ final class AdminCronController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/cron/jobs/restore/([0-9]+)/
+     * @route /admin/settings/cron/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *

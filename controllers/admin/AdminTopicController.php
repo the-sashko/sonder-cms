@@ -3,9 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
-use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Topic;
 use Sonder\Models\Topic\TopicForm;
@@ -16,13 +13,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class AdminTopicController extends AdminBaseController
 {
     /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
-    /**
      * @area admin
-     * @route /admin/topics((/page-([0-9]+)/)|/)
+     * @route /admin/taxonomy/topics((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
      *
@@ -40,17 +32,17 @@ final class AdminTopicController extends AdminBaseController
         $pageCount = $topicModel->getTopicsPageCount();
 
         if (empty($topics) && $this->page > 1) {
-            return $this->redirect('/admin/topics/');
+            return $this->redirect('/admin/taxonomy/topics/');
         }
 
         if (($this->page > $pageCount) && $this->page > 1) {
-            return $this->redirect('/admin/topics/');
+            return $this->redirect('/admin/taxonomy/topics/');
         }
 
         $pagination = $this->getPlugin('paginator')->getPagination(
             $pageCount,
             $this->page,
-            '/admin/topics/'
+            '/admin/taxonomy/topics/'
         );
 
         $this->assign([
@@ -58,6 +50,7 @@ final class AdminTopicController extends AdminBaseController
             'pagination' => $pagination,
             'page_path' => [
                 '/admin/' => 'Admin',
+                '/admin/taxonomy/' => 'Taxonomy',
                 '#' => 'Topics'
             ]
         ]);
@@ -67,7 +60,7 @@ final class AdminTopicController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/topics/view/([0-9]+)/
+     * @route /admin/taxonomy/topics/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -78,25 +71,23 @@ final class AdminTopicController extends AdminBaseController
      */
     final public function displayTopic(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        if (empty($id)) {
-            return $this->redirect('/admin/topics/');
+        if (empty($this->id)) {
+            return $this->redirect('/admin/taxonomy/topics/');
         }
 
         /* @var $topicVO TopicValuesObject */
-        $topicVO = $topicModel->getVOById($id);
+        $topicVO = $topicModel->getVOById($this->id);
 
         if (empty($topicVO)) {
-            return $this->redirect('/admin/topics/');
+            return $this->redirect('/admin/taxonomy/topics/');
         }
 
         $pagePath = [
             '/admin/' => 'Admin',
-            '/admin/topics/' => 'Topics',
+            '/admin/taxonomy/topics/' => 'Topics',
             '#' => $topicVO->getTitle()
         ];
 
@@ -110,7 +101,7 @@ final class AdminTopicController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/topic((/([0-9]+)/)|/)
+     * @route /admin/taxonomy/topic((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
      *
@@ -121,13 +112,14 @@ final class AdminTopicController extends AdminBaseController
      */
     final public function displayTopicForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
         $title = null;
         $slug = null;
         $parentId = null;
+        $image = null;
         $isActive = true;
 
         $topicVO = null;
@@ -145,7 +137,7 @@ final class AdminTopicController extends AdminBaseController
         }
 
         if (!empty($id) && empty($topicVO)) {
-            return $this->redirect('/admin/topic/');
+            return $this->redirect('/admin/taxonomy/topic/');
         }
 
         if ($this->request->getHttpMethod() == 'post') {
@@ -161,8 +153,8 @@ final class AdminTopicController extends AdminBaseController
         if (!empty($topicForm) && $topicForm->getStatus()) {
             $id = $topicForm->getId();
 
-            $urlPattern = '/admin/topics/view/%d/';
-            $url = '/admin/topics/';
+            $urlPattern = '/admin/taxonomy/topics/view/%d/';
+            $url = '/admin/taxonomy/topics/';
 
             $url = empty($id) ? $url : sprintf($urlPattern, $id);
 
@@ -177,6 +169,7 @@ final class AdminTopicController extends AdminBaseController
             $title = $topicVO->getTitle();
             $slug = $topicVO->getSlug();
             $parentId = $topicVO->getParentId();
+            $image = $topicVO->getImageLink();
             $isActive = $topicVO->getIsActive();
         }
 
@@ -191,7 +184,8 @@ final class AdminTopicController extends AdminBaseController
 
         $pagePath = [
             '/admin/' => 'Admin',
-            '/admin/topics/' => 'Topics',
+            '/admin/taxonomy/' => 'Taxonomy',
+            '/admin/taxonomy/topics/' => 'Topics',
             '#' => $pageTitle
         ];
 
@@ -200,6 +194,7 @@ final class AdminTopicController extends AdminBaseController
             'title' => $title,
             'slug' => $slug,
             'parent_id' => $parentId,
+            'image' => $image,
             'is_active' => $isActive,
             'errors' => $errors,
             'topics' => $topics,
@@ -211,7 +206,7 @@ final class AdminTopicController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/topics/remove/([0-9]+)/
+     * @route /admin/taxonomy/topics/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -221,26 +216,24 @@ final class AdminTopicController extends AdminBaseController
      */
     final public function displayRemoveTopic(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        if (!$topicModel->removeTopicById($id)) {
+        if (!$topicModel->removeTopicById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove Topic With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
 
-        return $this->redirect('/admin/topics/');
+        return $this->redirect('/admin/taxonomy/topics/');
     }
 
     /**
      * @area admin
-     * @route /admin/topics/restore/([0-9]+)/
+     * @route /admin/taxonomy/topics/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
      *
@@ -250,20 +243,40 @@ final class AdminTopicController extends AdminBaseController
      */
     final public function displayRestoreTopic(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        if (!$topicModel->restoreTopicById($id)) {
+        if (!$topicModel->restoreTopicById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore Topic With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
 
-        return $this->redirect('/admin/topics/');
+        return $this->redirect('/admin/taxonomy/topics/');
+    }
+
+    /**
+     * @area admin
+     * @route /admin/taxonomy/topics/remove-image/([0-9]+)/
+     * @url_params id=$1
+     * @no_cache true
+     *
+     * @return ResponseObject
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function displayRemoveImage(): ResponseObject
+    {
+        /* @var $topicModel Topic */
+        $topicModel = $this->getModel('topic');
+
+        $topicModel->removeTopicImageById($this->id);
+
+        $url = sprintf('/admin/taxonomy/topic/%d/', $this->id);
+
+        return $this->redirect($url);
     }
 }

@@ -3,9 +3,6 @@
 namespace Sonder\Controllers;
 
 use Exception;
-use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
-use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Role;
 use Sonder\Models\User;
@@ -16,11 +13,6 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
 final class AdminUserController extends AdminBaseController
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $renderTheme = 'admin';
-
     /**
      * @area admin
      * @route /admin/users((/page-([0-9]+)/)|/)
@@ -79,16 +71,14 @@ final class AdminUserController extends AdminBaseController
      */
     final public function displayUser(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        if (empty($id)) {
+        if (empty($this->id)) {
             return $this->redirect('/admin/users/');
         }
 
-        $userVO = $userModel->getVOById($id);
+        $userVO = $userModel->getVOById($this->id);
 
         if (empty($userVO)) {
             return $this->redirect('/admin/users/');
@@ -122,7 +112,7 @@ final class AdminUserController extends AdminBaseController
      */
     final public function displayUserForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
+        $id = $this->id;
 
         $errors = [];
 
@@ -229,9 +219,7 @@ final class AdminUserController extends AdminBaseController
      */
     final public function displayUserCredentialsForm(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
-        if (empty($id)) {
+        if (empty($this->id)) {
             return $this->redirect('/admin/users/');
         }
 
@@ -244,7 +232,7 @@ final class AdminUserController extends AdminBaseController
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        $userVO = $userModel->getVOById($id);
+        $userVO = $userModel->getVOById($this->id);
 
         if (empty($userVO)) {
             return $this->redirect('/admin/users/');
@@ -267,7 +255,7 @@ final class AdminUserController extends AdminBaseController
         if (!empty($credentialsForm) && $credentialsForm->getStatus()) {
             return $this->redirect(sprintf(
                 '/admin/users/view/%d/',
-                $id
+                $this->id
             ));
         }
 
@@ -285,7 +273,7 @@ final class AdminUserController extends AdminBaseController
         ];
 
         $this->assign([
-            'id' => $id,
+            'id' => $this->id,
             'login' => $login,
             'password' => $password,
             'api_token' => $apiToken,
@@ -309,16 +297,14 @@ final class AdminUserController extends AdminBaseController
      */
     final public function displayRemoveUser(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        if (!$userModel->removeById($id)) {
+        if (!$userModel->removeById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Remove User With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
@@ -338,16 +324,14 @@ final class AdminUserController extends AdminBaseController
      */
     final public function displayRestoreUser(): ResponseObject
     {
-        $id = (int)$this->request->getUrlValue('id');
-
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        if (!$userModel->restoreById($id)) {
+        if (!$userModel->restoreById($this->id)) {
             $loggerPlugin = $this->getPlugin('logger');
 
             $errorMessage = 'Can Not Restore User With "%d"';
-            $errorMessage = sprintf($errorMessage, $id);
+            $errorMessage = sprintf($errorMessage, $this->id);
 
             $loggerPlugin->logError($errorMessage);
         }
