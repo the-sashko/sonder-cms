@@ -20,22 +20,22 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $editLinkPattern = '/admin/topic/%d/';
+    protected ?string $editLinkPattern = '/admin/taxonomy/topic/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $removeLinkPattern = '/admin/topics/remove/%d/';
+    protected ?string $removeLinkPattern = '/admin/taxonomy/topics/remove/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $restoreLinkPattern = '/admin/topics/restore/%d/';
+    protected ?string $restoreLinkPattern = '/admin/taxonomy/topics/restore/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $adminViewLinkPattern = '/admin/topics/view/%d/';
+    protected ?string $adminViewLinkPattern = '/admin/taxonomy/topics/view/%d/';
 
     /**
      * @var string|null

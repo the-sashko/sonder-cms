@@ -9,7 +9,7 @@ use Sonder\Models\Topic\TopicValuesObject;
     <span>Topics</span>
 </p>
 <p>
-    <a href="/admin/topic/" class="button">New Topic</a>
+    <a href="/admin/taxonomy/topic/" class="button">New Topic</a>
 </p>
 <?php if (empty($topics)): ?>
     <p>
@@ -22,7 +22,6 @@ use Sonder\Models\Topic\TopicValuesObject;
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Title</th>
             <th class="hide-on-mobile">Slug</th>
-            <th class="hide-on-mobile">Parent</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>
@@ -35,18 +34,8 @@ use Sonder\Models\Topic\TopicValuesObject;
 
             $topicCdate = $topic->getCdate('Y-m-d H:i:s');
 
-            $topicParent = '---';
-
             $topicMdate = '---';
             $topicDdate = '---';
-
-            if (!empty($topic->getParentVO())) {
-                $topicParent = sprintf(
-                    '%s (ID: %d)',
-                    $topic->getParentVO()->getTitle(),
-                    $topic->getParentVO()->getId()
-                );
-            }
 
             if (!empty($topic->getMdate())) {
                 $topicMdate = $topic->getMdate('Y-m-d H:i:s');
@@ -64,7 +53,6 @@ use Sonder\Models\Topic\TopicValuesObject;
             <td class="hide-on-mobile"><?= $topic->getId() ?></td>
             <td><?= $topic->getTitle() ?></td>
             <td class="hide-on-mobile"><?= $topic->getSlug() ?></td>
-            <td class="hide-on-mobile"><?= $topicParent ?></td>
             <td class="hide-on-tablet"><?= $topicIsActive ?></td>
             <td class="hide-on-mobile"><?= $topicCdate ?></td>
             <td class="hide-on-tablet"><?= $topicMdate ?></td>
@@ -96,7 +84,6 @@ use Sonder\Models\Topic\TopicValuesObject;
             <th class="fixed-cell hide-on-mobile">ID</th>
             <th>Title</th>
             <th class="hide-on-mobile">Slug</th>
-            <th class="hide-on-mobile">Parent</th>
             <th class="hide-on-tablet">Is Active</th>
             <th class="hide-on-mobile">Created At</th>
             <th class="hide-on-tablet">Updated At</th>

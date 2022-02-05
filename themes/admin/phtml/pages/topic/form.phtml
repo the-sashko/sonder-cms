@@ -9,10 +9,10 @@
 /* @var bool $isActive */
 /* @var array|null $errors */
 
-$formAction = '/admin/topic/';
+$formAction = '/admin/taxonomy/topic/';
 
 if (!empty($id)) {
-    $formAction = sprintf('/admin/topic/%d/', $id);
+    $formAction = sprintf('/admin/taxonomy/topic/%d/', $id);
 }
 ?>
 <div class="form-wrapper">
@@ -39,7 +39,7 @@ if (!empty($id)) {
                      alt="<?= $slug; ?>">
             </p>
             <p>
-                <a href="/admin/topics/remove-image/<?= $id; ?>/">
+                <a href="/admin/taxonomy/topics/remove-image/<?= $id; ?>/">
                     Remove image
                 </a>
             </p>
