@@ -6,5 +6,8 @@ use Sonder\Core\Interfaces\IController;
 
 abstract class AdminBaseController extends BaseController implements IController
 {
-    //TODO
+    /**
+     * @var string|null
+     */
+    protected ?string $renderTheme = 'admin';
 }
