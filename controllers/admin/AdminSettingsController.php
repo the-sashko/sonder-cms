@@ -4,8 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\Core\ResponseObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Config;
 
 final class AdminSettingsController extends AdminBaseController
 {
@@ -15,14 +14,13 @@ final class AdminSettingsController extends AdminBaseController
      * @no_cache true
      *
      * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displaySettings(): ResponseObject
     {
         $this->assign([
             'page_path' => [
+                '/admin/' => 'Admin',
                 '#' => 'Settings'
             ]
         ]);
@@ -32,53 +30,117 @@ final class AdminSettingsController extends AdminBaseController
 
     /**
      * @area admin
-     * @route /admin/configs/
+     * @route /admin/settings/configs/
      * @no_cache true
      *
      * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayConfigs(): ResponseObject
     {
-        //TODO
+        /* @var $configModel Config */
+        $configModel = $this->getModel('config');
+
+        $this->assign([
+            'configs' => $configModel->getConfigs(),
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '/admin/settings/' => 'Settings',
+                '#' => 'Configs'
+            ]
+        ]);
 
         return $this->render('settings/config/list');
     }
 
     /**
      * @area admin
-     * @route /admin/configs/view/([a-z-_]+)/
+     * @route /admin/settings/configs/view/([a-z-_]+)/
      * @url_params config_name=$1
      * @no_cache true
      *
      * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayConfig(): ResponseObject
     {
-        //TODO
+        $name = $this->request->getUrlValue('config_name');
 
-        return $this->render('settings/config/list');
+        if (empty($name)) {
+            return $this->redirect('/admin/settings/configs/');
+        }
+
+        /* @var $configModel Config */
+        $configModel = $this->getModel('config');
+
+        $configVO = $configModel->getConfig($name);
+
+        if (empty($configVO)) {
+            return $this->redirect('/admin/settings/configs/');
+        }
+
+        $this->assign([
+            'config' => $configVO,
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '/admin/settings/' => 'Settings',
+                '/admin/settings/configs/' => 'Configs',
+                '#' => 'View'
+            ]
+        ]);
+
+        return $this->render('settings/config/view');
     }
 
     /**
      * @area admin
-     * @route /admin/configs/edit/([a-z-_]+)/
+     * @route /admin/settings/configs/edit/([a-z-_]+)/
      * @url_params config_name=$1
      * @no_cache true
      *
      * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      * @throws Exception
      */
     final public function displayEditConfig(): ResponseObject
     {
-        //TODO
+        $errors = null;
+
+        $name = $this->request->getUrlValue('config_name');
+
+        if (empty($name)) {
+            return $this->redirect('/admin/settings/configs/');
+        }
+
+        /* @var $configModel Config */
+        $configModel = $this->getModel('config');
+
+        $configVO = $configModel->getConfig($name);
+
+        if (empty($configVO)) {
+            return $this->redirect('/admin/settings/configs/');
+        }
+
+        if ($this->request->getHttpMethod() == 'post') {
+            $errors = $configModel->updateConfig(
+                $name,
+                $this->request->getPostValues()
+            );
+
+            if (empty($errors)) {
+                return $this->redirect($configVO->getViewLink());
+            }
+        }
+
+        $this->assign([
+            'config' => $configVO,
+            'errors' => $errors,
+            'page_path' => [
+                '/admin/' => 'Admin',
+                '/admin/settings/' => 'Settings',
+                '/admin/settings/configs/' => 'Configs',
+                '#' => 'Edit'
+            ]
+        ]);
 
         return $this->render('settings/config/form');
     }
