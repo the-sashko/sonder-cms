@@ -1,2 +1,33 @@
 <?php
-//TODO
+
+use Sonder\Models\Config\ConfigValuesObject;
+
+/* @var ConfigValuesObject $config */
+
+$configValues = $config->getValues();
+?>
+<table>
+    <tr>
+        <th colspan="2">
+            Config &#xab;<?= $config->getName() ?>&#xbb;
+        </th>
+    </tr>
+    <?php foreach ($configValues as $name => $value): ?>
+        <tr>
+            <td>
+                <?= $name; ?>
+            </td>
+            <td>
+                <?php if (is_scalar($value)): ?>
+                    <?= htmlspecialchars($value); ?>
+                <?php else: ?>
+                    <?= json_encode($value); ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+<p>
+    <a href="<?= $config->getEditLink(); ?>">Edit</a>
+</p>
+

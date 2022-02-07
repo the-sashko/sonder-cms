@@ -1,2 +1,45 @@
 <?php
-//TODO
+/* @var string $csrfToken */
+/* @var ConfigValuesObject $config */
+
+/* @var array|null $errors */
+
+use Sonder\Models\Config\ConfigValuesObject;
+
+$configValues = $config->getValues();
+?>
+<div class="form-wrapper">
+    <h1>Edit Config &#xab;<?= $config->getName() ?>&#xbb;</h1>
+    <?php if (!empty($errors)): ?>
+        <div class="errors">
+            <?php foreach ($errors as $error): ?>
+                <p>
+                    <?= $error; ?>
+                </p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <form action="<?= $config->getEditLink(); ?>" method="POST">
+        <?php foreach ($configValues as $name => $value): ?>
+            <?php if (is_scalar($value)): ?>
+                <p>
+                    <label for="input-<?= $name; ?>"
+                           class="label-input-wrapper">
+                        <input type="text"
+                               name="<?= $name; ?>"
+                               id="input-<?= $name; ?>"
+                               placeholder="<?= mb_convert_case(
+                                   str_replace('_', ' ', $name),
+                                   MB_CASE_TITLE
+                               ); ?>"
+                               value="<?= $value; ?>">
+                    </label>
+                </p>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <p>
+            <input type="submit" value="save">
+        </p>
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+    </form>
+</div>

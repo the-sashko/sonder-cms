@@ -1,2 +1,43 @@
 <?php
-//TODO
+
+use Sonder\Models\Config\ConfigValuesObject;
+
+/* @var ConfigValuesObject[]|null $configs */
+?>
+<p>
+    <a href="/admin/settings/cache/">Cache</a> /
+    <a href="/admin/settings/cron/">Cron</a> /
+    <span>Configs</span>
+</p>
+<?php if (empty($configs)): ?>
+    <p>
+        Empty
+    </p>
+<?php else: ?>
+    <table>
+        <tbody>
+        <tr>
+            <th>Name</th>
+            <th colspan="2"></th>
+        </tr>
+        <?php foreach ($configs as $config): ?>
+            <td><?= $config->getName() ?></td>
+            <td>
+                <a href="<?= $config->getViewLink() ?>">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </td>
+            <td>
+                <a href="<?= $config->getEditLink() ?>">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th>Name</th>
+            <th colspan="2"></th>
+        </tr>
+        </tbody>
+    </table>
+<?php endif; ?>
