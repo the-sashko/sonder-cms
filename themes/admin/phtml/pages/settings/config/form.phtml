@@ -8,6 +8,11 @@ use Sonder\Models\Config\ConfigValuesObject;
 
 $configValues = $config->getValues();
 ?>
+<p>
+    <a href="/admin/settings/cache/">Cache</a> /
+    <a href="/admin/settings/cron/">Cron</a> /
+    <a href="/admin/settings/configs/">Configs</a>
+</p>
 <div class="form-wrapper">
     <h1>Edit Config &#xab;<?= $config->getName() ?>&#xbb;</h1>
     <?php if (!empty($errors)): ?>

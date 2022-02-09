@@ -12,6 +12,10 @@ if (!empty($id)) {
     $formAction = sprintf('/admin/taxonomy/tag/%d/', $id);
 }
 ?>
+<p>
+    <a href="/admin/taxonomy/tags/">Tags</a> /
+    <a href="/admin/taxonomy/topics/">Topics</a>
+</p>
 <div class="form-wrapper">
     <?php if (empty($id)): ?>
         <h1>Add New Tag</h1>
@@ -27,9 +31,7 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $formAction; ?>"
-          enctype="multipart/form-data"
-          method="POST">
+    <form action="<?= $formAction; ?>" method="POST">
         <p>
             <label for="input-title" class="label-input-wrapper">
                 <input type="text"

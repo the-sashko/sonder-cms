@@ -15,6 +15,10 @@ if (!empty($id)) {
     $formAction = sprintf('/admin/taxonomy/topic/%d/', $id);
 }
 ?>
+<p>
+    <a href="/admin/taxonomy/tags/">Tags</a> /
+    <a href="/admin/taxonomy/topics/">Topics</a>
+</p>
 <div class="form-wrapper">
     <?php if (empty($id)): ?>
         <h1>Add New Topic</h1>

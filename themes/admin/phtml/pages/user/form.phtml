@@ -36,9 +36,7 @@ if (!empty($id)) {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <form action="<?= $formAction; ?>"
-          enctype="multipart/form-data"
-          method="POST">
+    <form action="<?= $formAction; ?>" method="POST">
         <p>
             <?php if (empty($id)): ?>
                 <label for="input-login" class="label-input-wrapper">

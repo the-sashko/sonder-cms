@@ -1,2 +1,124 @@
 <?php
-//TODO
+
+use Sonder\Models\Cron\CronValuesObject;
+
+/* @var CronValuesObject $cronJob */
+?>
+<p>
+    <a href="/admin/settings/cache/">Cache</a> /
+    <a href="/admin/settings/cron/">Cron</a> /
+    <a href="/admin/settings/configs/">Configs</a>
+</p>
+<table>
+    <tr>
+        <th colspan="2">
+            Cron Job (ID: <?= $cronJob->getId() ?>)
+        </th>
+    </tr>
+    <tr>
+        <td>
+            ID
+        </td>
+        <td>
+            <?= $cronJob->getId(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Action
+        </td>
+        <td>
+            <?= $cronJob->getAction(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Interval
+        </td>
+        <td>
+            <?= $cronJob->getInterval(); ?>
+        </td>
+    </tr>
+    <?php if (!empty($cronJob->getTimeNextExec())): ?>
+        <tr>
+            <td>
+                Time Of Next Running
+            </td>
+            <td>
+                <?= $cronJob->getTimeNextExec('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                <?= $cronJob->getLastExecStatus() ? 'Ok' : 'Error'; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($cronJob->getErrorMessage())): ?>
+        <tr>
+            <td>
+                Error
+            </td>
+            <td>
+                <?= $cronJob->getErrorMessage(); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <tr>
+        <td>
+            Is Active
+        </td>
+        <td>
+            <?= $cronJob->getIsActive() ? 'Yes' : 'No'; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Created At
+        </td>
+        <td>
+            <?= $cronJob->getCdate('Y-m-d H:i:s'); ?>
+        </td>
+    </tr>
+    <?php if (!empty($cronJob->getMdate())): ?>
+        <tr>
+            <td>
+                Updates At
+            </td>
+            <td>
+                <?= $cronJob->getMdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if (!empty($cronJob->getDdate())): ?>
+        <tr>
+            <td>
+                Removed At
+            </td>
+            <td>
+                <?= $cronJob->getDdate('Y-m-d H:i:s'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>
+<p>
+    <a href="<?= $cronJob->getEditLink(); ?>">Edit</a>
+</p>
+<?php if ($cronJob->isRemoved()): ?>
+    <p>
+        <a href="<?= $cronJob->getRestoreLink(); ?>">Restore</a>
+    </p>
+<?php else: ?>
+    <p>
+        <a href="<?= $cronJob->getRemoveLink(); ?>">Remove</a>
+    </p>
+<?php endif; ?>
+<?php if (!$cronJob->isRemoved() && $cronJob->getIsActive()): ?>
+    <p>
+        <a href="<?= $cronJob->getAdminRunLink() ?>">Run</a>
+    </p>
+<?php endif; ?>
+

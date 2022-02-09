@@ -1,2 +1,115 @@
 <?php
-//TODO
+
+use Sonder\Models\Cron\CronValuesObject;
+
+/* @var CronValuesObject[]|null $cronJobs */
+?>
+<p>
+    <a href="/admin/settings/cache/">Cache</a> /
+    <span>Cron</span> /
+    <a href="/admin/settings/configs/">Configs</a>
+</p>
+<p>
+    <a href="/admin/settings/cron/job/" class="button">New cron job</a>
+</p>
+<?php if (empty($cronJobs)): ?>
+    <p>
+        Empty
+    </p>
+<?php else: ?>
+    <table>
+        <tbody>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Action</th>
+            <th class="hide-on-mobile">Interval</th>
+            <th class="hide-on-tablet">Next Running At</th>
+            <th>Status</th>
+            <th class="hide-on-mobile">Error</th>
+            <th class="hide-on-tablet">Is Active</th>
+            <th colspan="4"></th>
+        </tr>
+        <?php foreach ($cronJobs as $cronJob): ?>
+            <?php
+            $cronJobIsActive = $cronJob->getIsActive() ? 'Yes' : 'No';
+            $cronJobStatus = $cronJob->getLastExecStatus() ? 'Ok' : 'Error';
+
+            $cronJobTimeNextExec = '---';
+            $cronJobErrorMessage = '---';
+
+            if (!empty($cronJob->getTimeNextExec())) {
+                $cronJobTimeNextExec = $cronJob->getTimeNextExec(
+                    'Y-m-d H:i:s'
+                );
+            }
+
+            if (!empty($cronJob->getErrorMessage())) {
+                $cronJobErrorMessage = $cronJob->getErrorMessage();
+            }
+            ?>
+            <?php if ($cronJob->isRemoved()): ?>
+                <tr class="list-item-removed">
+            <?php else: ?>
+                <tr>
+            <?php endif; ?>
+            <td class="hide-on-mobile"><?= $cronJob->getId() ?></td>
+            <td><?= $cronJob->getAction() ?></td>
+            <td class="hide-on-mobile">
+                <?= $cronJob->getInterval(true) ?>
+            </td>
+            <td class="hide-on-tablet"><?= $cronJobTimeNextExec ?></td>
+            <td><?= $cronJobStatus ?></td>
+            <td class="hide-on-mobile"><?= $cronJobErrorMessage ?></td>
+            <td class="hide-on-tablet"><?= $cronJobIsActive ?></td>
+            <td>
+                <a href="<?= $cronJob->getAdminViewLink() ?>">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </td>
+            <td>
+                <a href="<?= $cronJob->getEditLink() ?>">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+            <td>
+                <?php if ($cronJob->isRemoved()): ?>
+                    <a href="<?= $cronJob->getRestoreLink() ?>">
+                        <i class="fas fa-reply"></i>
+                    </a>
+                <?php else: ?>
+                    <a href="<?= $cronJob->getRemoveLink() ?>">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                <?php endif; ?>
+            </td>
+            <?php if (!$cronJob->isRemoved() && $cronJob->getIsActive()): ?>
+                <td>
+                    <a href="<?= $cronJob->getAdminRunLink() ?>">
+                        <i class="fas fa-play"></i>
+                    </a>
+                </td>
+            <?php else: ?>
+                <td>
+                    <i class="fas fa-play"></i>
+                </td>
+            <?php endif; ?>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="fixed-cell hide-on-mobile">ID</th>
+            <th>Action</th>
+            <th class="hide-on-mobile">Interval</th>
+            <th class="hide-on-tablet">Next Running At</th>
+            <th>Status</th>
+            <th class="hide-on-mobile">Error</th>
+            <th class="hide-on-tablet">Is Active</th>
+            <th colspan="4"></th>
+        </tr>
+        </tbody>
+    </table>
+<?php endif; ?>
+<?php if (!empty($pagination)): ?>
+    <div class="pagination">
+        <?= $pagination ?>
+    </div>
+<?php endif; ?>
