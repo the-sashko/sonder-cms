@@ -314,9 +314,10 @@ final class Topic extends CoreModel implements IModel
         if (empty($topicVO)) {
             $topicForm->setStatusFail();
 
-            $topicForm->setError(
-                TopicForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE
-            );
+            $topicForm->setError(sprintf(
+                TopicForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE,
+                $id
+            ));
 
             return false;
         }
@@ -704,4 +705,4 @@ final class Topic extends CoreModel implements IModel
         return $protectedDirPath;
     }
 }
-//TODO: add language + add parent in form.phtml
+//TODO: add language
