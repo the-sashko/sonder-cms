@@ -430,9 +430,10 @@ final class Article extends CoreModel implements IModel
         if (empty($articleVO)) {
             $articleForm->setStatusFail();
 
-            $articleForm->setError(
-                ArticleForm::ARTICLE_IS_NOT_EXISTS_ERROR_MESSAGE
-            );
+            $articleForm->setError(sprintf(
+                ArticleForm::ARTICLE_IS_NOT_EXISTS_ERROR_MESSAGE,
+                $id
+            ));
 
             return false;
         }
@@ -610,7 +611,7 @@ final class Article extends CoreModel implements IModel
             $articleForm->setStatusFail();
 
             $articleForm->setError(
-                ArticleForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE
+                ArticleForm::TOPIC_IS_NOT_SET_ERROR_MESSAGE
             );
 
             return false;
@@ -622,9 +623,10 @@ final class Article extends CoreModel implements IModel
         if (empty($topicModel->getVOById($topicId))) {
             $articleForm->setStatusFail();
 
-            $articleForm->setError(
-                ArticleForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE
-            );
+            $articleForm->setError(sprintf(
+                ArticleForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE,
+                $topicId
+            ));
 
             return false;
         }
@@ -796,5 +798,4 @@ final class Article extends CoreModel implements IModel
         return $this->_makeSlugUniq($slug, $id);
     }
 }
-//TODO: add imag + language + id in error messages from form + format text
-// form fields
+//TODO: add imag + language + format text form fields
