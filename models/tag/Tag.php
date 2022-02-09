@@ -193,10 +193,10 @@ final class Tag extends CoreModel implements IModel
 
         if (empty($tagVO)) {
             $tagForm->setStatusFail();
-            //TODO: add id to error, here and in other models
-            $tagForm->setError(
-                TagForm::TAG_IS_NOT_EXISTS_ERROR_MESSAGE
-            );
+            $tagForm->setError(sprintf(
+                TagForm::TAG_IS_NOT_EXISTS_ERROR_MESSAGE,
+                $id
+            ));
 
             return false;
         }
