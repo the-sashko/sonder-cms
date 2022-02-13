@@ -315,7 +315,7 @@ final class Topic extends CoreModel implements IModel
             $topicForm->setStatusFail();
 
             $topicForm->setError(sprintf(
-                TopicForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE,
+                TopicForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
                 $id
             ));
 
@@ -390,7 +390,7 @@ final class Topic extends CoreModel implements IModel
             $topicForm->setStatusFail();
 
             $topicForm->setError(
-                TopicForm::PARENT_TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE
+                TopicForm::PARENT_TOPIC_NOT_EXISTS_ERROR_MESSAGE
             );
 
             return false;

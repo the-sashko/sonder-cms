@@ -30,11 +30,10 @@ final class TopicForm extends ModelFormObject
     const TOPIC_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Topic can not have ' .
     'a circular dependencies';
 
-    const TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" is not ' .
-    'exists';
+    const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
-    const PARENT_TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE = 'Parent Topic with id ' .
-    '"%d" is not exists';
+    const PARENT_TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Parent Topic with id "%d" ' .
+    'not exists';
 
     const IMAGE_FILE_TOO_LARGE_ERROR_MESSAGE = 'Image file in too large';
 
