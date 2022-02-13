@@ -38,8 +38,8 @@ final class PagePlugin
 
         if (!$this->_isTemplatePageExists($templateName, $templatePage)) {
             throw new PageException(
-                PageException::MESSAGE_PLUGIN_TEMPLATE_IS_NOT_EXIST,
-                PageException::CODE_PLUGIN_TEMPLATE_IS_NOT_EXIST
+                PageException::MESSAGE_PLUGIN_TEMPLATE_NOT_EXISTS,
+                PageException::CODE_PLUGIN_TEMPLATE_NOT_EXISTS
             );
         }
 
