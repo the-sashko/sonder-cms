@@ -2,6 +2,7 @@ CREATE SEQUENCE "topics_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775
 CREATE SEQUENCE "tags_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "articles_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "tag2article_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "demo_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 CREATE TABLE "topics"
 (
@@ -83,6 +84,19 @@ CREATE TABLE "tag2article"
         NOT DEFERRABLE
 ) WITH (oids = false);
 
+CREATE TABLE "demo"
+(
+    "id"        integer DEFAULT nextval('demo_id_seq') NOT NULL,
+    "foo"       character varying(8)                   NOT NULL,
+    "bar"       character varying(8)                   NOT NULL,
+    "is_active" boolean DEFAULT true                   NOT NULL,
+    "cdate"     integer                                NOT NULL,
+    "mdate"     integer,
+    "ddate"     integer,
+    CONSTRAINT "demo_id" PRIMARY KEY ("id"),
+    CONSTRAINT "demo_foo_bar" UNIQUE ("foo", "bar")
+) WITH (oids = false);
+
 CREATE INDEX "tags_is_active" ON "tags" USING btree ("is_active");
 CREATE INDEX "tags_cdate" ON "tags" USING btree ("cdate");
 CREATE INDEX "tags_mdate" ON "tags" USING btree ("mdate");
@@ -116,6 +130,17 @@ CREATE INDEX "articles_user_id_is_active_ddate" ON "articles" USING btree ("user
 
 CREATE INDEX "tag2article_tag_id" ON "tag2article" USING btree ("tag_id");
 CREATE INDEX "tag2article_article_id" ON "tag2article" USING btree ("article_id");
+
+CREATE INDEX "demo_foo" ON "demo" USING btree ("foo");
+CREATE INDEX "demo_bar" ON "demo" USING btree ("bar");
+CREATE INDEX "demo_is_active" ON "demo" USING btree ("is_active");
+CREATE INDEX "demo_cdate" ON "demo" USING btree ("cdate");
+CREATE INDEX "demo_mdate" ON "demo" USING btree ("mdate");
+CREATE INDEX "demo_ddate" ON "demo" USING btree ("ddate");
+CREATE INDEX "demo_id_foo_bar" ON "demo" USING btree ("id", "foo", "bar");
+CREATE INDEX "demo_is_active_ddate" ON "demo" USING btree ("is_active", "ddate");
+CREATE INDEX "demo_id_is_active" ON "demo" USING btree ("id", "is_active");
+CREATE INDEX "demo_id_is_active_ddate" ON "demo" USING btree ("id", "is_active", "ddate");
 
 INSERT INTO "role_actions" ("id", "name", "is_system", "is_active", "cdate", "mdate", "ddate")
 VALUES (1, 'read-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
@@ -200,9 +225,16 @@ VALUES (1, 1, 1, 't'),
 INSERT INTO "users" ("id", "login", "email", "role_id", "is_active", "cdate", "mdate", "ddate")
 VALUES (1, 'admin', 'admin@admin.admin', 10, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
 
+INSERT INTO "demo" ("id", "foo", "bar", "is_active", "cdate", "mdate", "ddate")
+VALUES (1, 'test', 'a b c', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
+       (2, 'qwerty', '123', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
+       (3, 'one', 'two', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+
 ALTER SEQUENCE "role_actions_id_seq" RESTART WITH 20;
 
 ALTER SEQUENCE "roles_id_seq" RESTART WITH 11;
 ALTER SEQUENCE "role2action_id_seq" RESTART WITH 47;
 
 ALTER SEQUENCE "users_id_seq" RESTART WITH 2;
+
+ALTER SEQUENCE "demo_id_seq" RESTART WITH 4;
