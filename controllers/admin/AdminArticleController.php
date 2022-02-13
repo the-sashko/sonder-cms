@@ -212,12 +212,12 @@ final class AdminArticleController extends AdminBaseController
 
         if (empty($topics)) {
             $errors = is_array($errors) ? $errors : [];
-            $errors[] = ArticleForm::TOPICS_ARE_NOT_EXISTS_ERROR_MESSAGE;
+            $errors[] = ArticleForm::TOPICS_ARE_NOT_EXIST_ERROR_MESSAGE;
         }
 
         if (empty($tags)) {
             $errors = is_array($errors) ? $errors : [];
-            $errors[] = ArticleForm::TAGS_ARE_NOT_EXISTS_ERROR_MESSAGE;
+            $errors[] = ArticleForm::TAGS_ARE_NOT_EXIST_ERROR_MESSAGE;
         }
 
         $this->assign([
