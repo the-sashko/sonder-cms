@@ -3,6 +3,7 @@
 namespace Sonder\Controllers;
 
 use Exception;
+use ReflectionException;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Cron;
 use Sonder\Models\Cron\CronForm;
@@ -23,7 +24,7 @@ final class AdminCronController extends AdminBaseController
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayCron(): ResponseObject
+    final public function displayCronJobs(): ResponseObject
     {
         /* @var $cronModel Cron */
         $cronModel = $this->getModel('cron');
@@ -109,6 +110,7 @@ final class AdminCronController extends AdminBaseController
      * @return ResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws ReflectionException
      * @throws Exception
      */
     final public function displayCronJobForm(): ResponseObject
@@ -117,6 +119,8 @@ final class AdminCronController extends AdminBaseController
 
         $errors = [];
 
+        $alias = null;
+        $controller = null;
         $action = null;
         $interval = null;
         $isActive = true;
@@ -162,18 +166,22 @@ final class AdminCronController extends AdminBaseController
         }
 
         if (!empty($cronVO)) {
+            $alias = $cronVO->getAlias();
+            $controller = $cronVO->getController();
             $action = $cronVO->getAction();
             $interval = $cronVO->getInterval();
             $isActive = $cronVO->getIsActive();
         }
 
         if (!empty($cronForm)) {
+            $alias = $cronForm->getAlias();
+            $controller = $cronForm->getController();
             $action = $cronForm->getAction();
             $interval = $cronForm->getInterval();
             $isActive = $cronForm->getIsActive();
         }
 
-        //TODO: get all available cron actions
+        $jobs = $cronModel->getAvailableJobs();
 
         $pagePath = [
             '/admin/' => 'Admin',
@@ -184,10 +192,13 @@ final class AdminCronController extends AdminBaseController
 
         $this->assign([
             'id' => $id,
+            'alias' => $alias,
+            'controller' => $controller,
             'action' => $action,
             'interval' => $interval,
             'is_active' => $isActive,
             'errors' => $errors,
+            'jobs' => $jobs,
             'page_path' => $pagePath
         ]);
 
