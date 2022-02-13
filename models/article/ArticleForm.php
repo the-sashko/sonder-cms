@@ -44,19 +44,17 @@ final class ArticleForm extends ModelFormObject
 
     const TOPIC_IS_NOT_SET_ERROR_MESSAGE = 'Topic is not set';
 
-    const TOPICS_ARE_NOT_EXISTS_ERROR_MESSAGE = 'Any active topics exists. ' .
+    const TOPICS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active topics exists. ' .
     'You need to add first one for creating articles';
 
     const TAGS_ARE_NOT_SET_ERROR_MESSAGE = 'Tags are not set';
 
-    const TAGS_ARE_NOT_EXISTS_ERROR_MESSAGE = 'Any active tags exists. You ' .
+    const TAGS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active tags exists. You ' .
     'need to add first one for creating articles';
 
-    const TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" is not ' .
-    'exists';
+    const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
-    const ARTICLE_IS_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" is not ' .
-    'exists';
+    const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
 
     /**
      * @throws Exception

@@ -431,7 +431,7 @@ final class Article extends CoreModel implements IModel
             $articleForm->setStatusFail();
 
             $articleForm->setError(sprintf(
-                ArticleForm::ARTICLE_IS_NOT_EXISTS_ERROR_MESSAGE,
+                ArticleForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
                 $id
             ));
 
@@ -624,7 +624,7 @@ final class Article extends CoreModel implements IModel
             $articleForm->setStatusFail();
 
             $articleForm->setError(sprintf(
-                ArticleForm::TOPIC_IS_NOT_EXISTS_ERROR_MESSAGE,
+                ArticleForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
                 $topicId
             ));
 
