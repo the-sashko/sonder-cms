@@ -25,6 +25,22 @@ use Sonder\Models\Cron\CronValuesObject;
     </tr>
     <tr>
         <td>
+            Alias
+        </td>
+        <td>
+            <?= $cronJob->getAlias(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Controller
+        </td>
+        <td>
+            <?= $cronJob->getController(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
             Action
         </td>
         <td>
@@ -36,7 +52,7 @@ use Sonder\Models\Cron\CronValuesObject;
             Interval
         </td>
         <td>
-            <?= $cronJob->getInterval(); ?>
+            <?= $cronJob->getInterval(true); ?>
         </td>
     </tr>
     <?php if (!empty($cronJob->getTimeNextExec())): ?>
@@ -53,7 +69,7 @@ use Sonder\Models\Cron\CronValuesObject;
                 Status
             </td>
             <td>
-                <?= $cronJob->getLastExecStatus() ? 'Ok' : 'Error'; ?>
+                <?= $cronJob->getStatus(); ?>
             </td>
         </tr>
     <?php endif; ?>

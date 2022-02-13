@@ -21,7 +21,7 @@ use Sonder\Models\Cron\CronValuesObject;
         <tbody>
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
-            <th>Action</th>
+            <th>Alias</th>
             <th class="hide-on-mobile">Interval</th>
             <th class="hide-on-tablet">Next Running At</th>
             <th>Status</th>
@@ -32,12 +32,14 @@ use Sonder\Models\Cron\CronValuesObject;
         <?php foreach ($cronJobs as $cronJob): ?>
             <?php
             $cronJobIsActive = $cronJob->getIsActive() ? 'Yes' : 'No';
-            $cronJobStatus = $cronJob->getLastExecStatus() ? 'Ok' : 'Error';
 
             $cronJobTimeNextExec = '---';
             $cronJobErrorMessage = '---';
 
-            if (!empty($cronJob->getTimeNextExec())) {
+            if (
+                !empty($cronJob->getTimeNextExec()) &&
+                $cronJob->getIsActive()
+            ) {
                 $cronJobTimeNextExec = $cronJob->getTimeNextExec(
                     'Y-m-d H:i:s'
                 );
@@ -53,12 +55,12 @@ use Sonder\Models\Cron\CronValuesObject;
                 <tr>
             <?php endif; ?>
             <td class="hide-on-mobile"><?= $cronJob->getId() ?></td>
-            <td><?= $cronJob->getAction() ?></td>
+            <td><?= $cronJob->getAlias() ?></td>
             <td class="hide-on-mobile">
                 <?= $cronJob->getInterval(true) ?>
             </td>
             <td class="hide-on-tablet"><?= $cronJobTimeNextExec ?></td>
-            <td><?= $cronJobStatus ?></td>
+            <td><?= $cronJob->getStatus(); ?></td>
             <td class="hide-on-mobile"><?= $cronJobErrorMessage ?></td>
             <td class="hide-on-tablet"><?= $cronJobIsActive ?></td>
             <td>
@@ -97,7 +99,7 @@ use Sonder\Models\Cron\CronValuesObject;
         <?php endforeach; ?>
         <tr>
             <th class="fixed-cell hide-on-mobile">ID</th>
-            <th>Action</th>
+            <th>Alias</th>
             <th class="hide-on-mobile">Interval</th>
             <th class="hide-on-tablet">Next Running At</th>
             <th>Status</th>

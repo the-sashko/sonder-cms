@@ -1,10 +1,13 @@
 <?php
 /* @var string|null $csrfToken */
 /* @var int|null $id */
+/* @var string|null $alias */
+/* @var string|null $controller */
 /* @var string|null $action */
 /* @var int|null $interval */
 /* @var bool $isActive */
 /* @var array|null $errors */
+/* @var array $jobs */
 
 $formAction = '/admin/settings/cron/job/';
 
@@ -17,57 +20,134 @@ if (!empty($id)) {
     <a href="/admin/settings/cron/">Cron</a> /
     <a href="/admin/settings/configs/">Configs</a>
 </p>
-<div class="form-wrapper">
-    <?php if (empty($id)): ?>
-        <h1>Add New Cron Job</h1>
-    <?php else: ?>
-        <h1>Edit Cron Job</h1>
-    <?php endif; ?>
-    <?php if (!empty($errors)): ?>
-        <div class="errors">
-            <?php foreach ($errors as $error): ?>
-                <p>
-                    <?= $error; ?>
-                </p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-    <form action="<?= $formAction; ?>" method="POST">
-        <p>
-            <label for="input-name" class="label-input-wrapper">
-                <input type="text"
-                       name="action"
-                       id="input-action"
-                       placeholder="Action"
-                       value="<?= $action; ?>">
-            </label>
-        </p>
-        <p>
-            <label for="input-interval" class="label-input-wrapper">
-                <input type="number"
-                       name="interval"
-                       id="input-interval"
-                       placeholder="Interval"
-                       value="<?= $interval; ?>">
-            </label>
-        </p>
-        <p>
-            <?php
-            $checked = $isActive ? ' checked' : '';
-            ?>
-            <input type="checkbox"
-                   name="is_active"
-                   id="input-is-active"
-                   value="1"
-                <?= $checked ?>>
-            <label for="input-is-active">
-                Is Active
-            </label>
-        </p>
-        <p>
-            <input type="submit" value="save">
-        </p>
-        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
-        <input type="hidden" name="id" value="<?= $id; ?>">
-    </form>
-</div>
+<?php if (empty($jobs)): ?>
+    <p>
+        No available Cron jobs
+    </p>
+<?php else: ?>
+    <div class="form-wrapper">
+        <?php if (empty($id)): ?>
+            <h1>Add New Cron Job</h1>
+        <?php else: ?>
+            <h1>Edit Cron Job</h1>
+        <?php endif; ?>
+        <?php if (!empty($errors)): ?>
+            <div class="errors">
+                <?php foreach ($errors as $error): ?>
+                    <p>
+                        <?= $error; ?>
+                    </p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <form action="<?= $formAction; ?>" method="POST">
+            <p>
+                <label for="input-alias" class="label-input-wrapper">
+                    <input type="text"
+                           name="alias"
+                           id="input-alias"
+                           placeholder="Alias"
+                           value="<?= $alias; ?>">
+                </label>
+            </p>
+            <p>
+                <label for="input-controller" class="label-input-wrapper">
+                    <select name="controller" id="input-controller">
+                        <?php
+                        $controllers = array_keys($jobs);
+
+                        $selected = '';
+
+                        if (empty($controller)) {
+                            $selected = ' selected="selected"';
+                        }
+                        ?>
+                        <option value="" disabled<?= $selected; ?>>
+                            Controller
+                        </option>
+                        <?php foreach ($controllers as $controllerValue): ?>
+                            <?php
+                            $selected = '';
+                            if ($controllerValue == $controller) {
+                                $selected = ' selected';
+                            }
+                            ?>
+                            <option value="<?= $controllerValue; ?>"
+                                <?= $selected; ?>>
+                                <?= $controllerValue; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            </p>
+            <p>
+                <label for="input-action" class="label-input-wrapper">
+                    <select name="action" id="input-action">
+                        <?php
+                        $selected = '';
+
+                        if (empty($actions)) {
+                            $selected = ' selected="selected"';
+                        }
+                        ?>
+                        <option value="" disabled<?= $selected; ?>>
+                            Action
+                        </option>
+                        <?php
+                        foreach ($jobs as $controllerValue => $actions):
+                            foreach ($actions as $actionValue):
+                                ?>
+                                <?php
+                                $selected = '';
+
+                                if ($actionValue == $action) {
+                                    $selected = ' selected';
+                                }
+
+                                $actionClass = sprintf(
+                                    'input-action-%s',
+                                    $controllerValue
+                                );
+                                ?>
+                                <option value="<?= $actionValue; ?>"
+                                        class="<?= $actionClass; ?>"
+                                    <?= $selected; ?>>
+                                    <?= $actionValue; ?>
+                                </option>
+                            <?php
+                            endforeach;
+                        endforeach;
+                        ?>
+                    </select>
+                </label>
+            </p>
+            <p>
+                <label for="input-interval" class="label-input-wrapper">
+                    <input type="number"
+                           name="interval"
+                           id="input-interval"
+                           placeholder="Interval"
+                           value="<?= $interval; ?>">
+                </label>
+            </p>
+            <p>
+                <?php
+                $checked = $isActive ? ' checked' : '';
+                ?>
+                <input type="checkbox"
+                       name="is_active"
+                       id="input-is-active"
+                       value="1"
+                    <?= $checked ?>>
+                <label for="input-is-active">
+                    Is Active
+                </label>
+            </p>
+            <p>
+                <input type="submit" value="save">
+            </p>
+            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+            <input type="hidden" name="id" value="<?= $id; ?>">
+        </form>
+    </div>
+<?php endif; ?>
