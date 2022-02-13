@@ -26,7 +26,7 @@ final class TagForm extends ModelFormObject
     const TAG_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Tag can not have a ' .
     'circular dependencies';
 
-    const TAG_IS_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" is not exists';
+    const TAG_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" not exists';
 
     /**
      * @throws Exception
