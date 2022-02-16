@@ -53,14 +53,25 @@ final class Topic extends BaseModel
 
     /**
      * @param int $page
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return array|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function getTopicsByPage(int $page): ?array
+    final public function getTopicsByPage(
+        int  $page,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?array
     {
-        $rows = $this->store->getTopicRowsByPage($page, $this->itemsOnPage);
+        $rows = $this->store->getTopicRowsByPage(
+            $page,
+            $this->itemsOnPage,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (empty($rows)) {
             return null;
@@ -356,7 +367,7 @@ final class Topic extends BaseModel
         $topicVO->setParentId($topicForm->getParentId());
         $topicVO->setTitle($topicForm->getTitle());
         $topicVO->setSlug($topicForm->getSlug());
-        $topicVO->setIsActive($topicForm->getIsActive());
+        $topicVO->setIsActive($topicForm->isActive());
 
         $this->_setUniqSlugToVO($topicVO);
 

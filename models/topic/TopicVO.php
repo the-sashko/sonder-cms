@@ -17,6 +17,8 @@ final class TopicValuesObject extends ModelValuesObject
 
     const IMAGE_FORMAT = 'png';
 
+    const TOPICS_LINK = '/topics/';
+
     /**
      * @var string|null
      */
