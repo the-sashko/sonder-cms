@@ -5,7 +5,7 @@ namespace Sonder\Controllers;
 final class CronShareController extends CronBaseController
 {
     /**
-     * @no_cache true
+     * @return void
      */
     final public function jobSend(): void
     {

@@ -5,7 +5,7 @@ namespace Sonder\Controllers;
 final class CronHitController extends CronBaseController
 {
     /**
-     * @no_cache true
+     * @return void
      */
     final public function jobAggregate(): void
     {
