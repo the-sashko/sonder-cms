@@ -186,7 +186,7 @@ final class AdminArticleController extends AdminBaseController
             $metaTitle = $articleVO->getMetaTitle();
             $metaDescription = $articleVO->getMetaDescription();
             $topicId = $articleVO->getTopicId();
-            $isActive = $articleVO->getIsActive();
+            $isActive = $articleVO->isActive();
         }
 
         if (!empty($articleForm)) {
@@ -198,7 +198,7 @@ final class AdminArticleController extends AdminBaseController
             $metaDescription = $articleForm->getMetaDescription();
             $topicId = $articleForm->getTopicId();
             $checkedTags = $articleForm->getTags();
-            $isActive = $articleForm->getIsActive();
+            $isActive = $articleForm->isActive();
         }
 
         $topics = $topicModel->getAllTopics();

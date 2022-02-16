@@ -170,7 +170,7 @@ final class AdminCronController extends AdminBaseController
             $controller = $cronVO->getController();
             $method = $cronVO->getMethod();
             $interval = $cronVO->getInterval();
-            $isActive = $cronVO->getIsActive();
+            $isActive = $cronVO->isActive();
         }
 
         if (!empty($cronForm)) {
@@ -178,7 +178,7 @@ final class AdminCronController extends AdminBaseController
             $controller = $cronForm->getController();
             $method = $cronForm->getMethod();
             $interval = $cronForm->getInterval();
-            $isActive = $cronForm->getIsActive();
+            $isActive = $cronForm->isActive();
         }
 
         $jobs = $cronModel->getAvailableJobs();
@@ -271,6 +271,16 @@ final class AdminCronController extends AdminBaseController
      */
     final public function displayRunCronJob(): ResponseObject
     {
-        //TODO
+        /* @var $cronModel Cron */
+        $cronModel = $this->getModel('cron');
+
+        /* @var $cronJob CronValuesObject */
+        $cronJob = $cronModel->getVOById($this->id);
+
+        if ($cronJob->isActive() && !$cronJob->isRemoved()) {
+            $cronModel->runJob($cronJob);
+        }
+
+        return $this->redirect('/admin/settings/cron/');
     }
 }

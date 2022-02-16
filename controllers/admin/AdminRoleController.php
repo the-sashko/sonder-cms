@@ -174,7 +174,7 @@ final class AdminRoleController extends AdminBaseController
             $parentId = $roleVO->getParentId();
             $allowedActions = $roleModel->getAllowedActionsByRoleId($roleId);
             $deniedActions = $roleModel->getDeniedActionsByRoleId($roleId);
-            $isActive = $roleVO->getIsActive();
+            $isActive = $roleVO->isActive();
         }
 
         if (!empty($roleForm)) {
@@ -182,7 +182,7 @@ final class AdminRoleController extends AdminBaseController
             $parentId = $roleForm->getParentId();
             $allowedActions = $roleForm->getAllowedActions();
             $deniedActions = $roleForm->getDeniedActions();
-            $isActive = $roleForm->getIsActive();
+            $isActive = $roleForm->isActive();
         }
 
         $roles = $roleModel->getAllRoles();
@@ -394,7 +394,7 @@ final class AdminRoleController extends AdminBaseController
 
         if (!empty($roleActionVO)) {
             $name = $roleActionVO->getName();
-            $isActive = $roleActionVO->getIsActive();
+            $isActive = $roleActionVO->isActive();
         }
 
         if ($this->request->getHttpMethod() == 'post') {
@@ -420,7 +420,7 @@ final class AdminRoleController extends AdminBaseController
 
         if (!empty($roleActionForm)) {
             $name = $roleActionForm->getName();
-            $isActive = $roleActionForm->getIsActive();
+            $isActive = $roleActionForm->isActive();
             $errors = $roleActionForm->getErrors();
         }
 

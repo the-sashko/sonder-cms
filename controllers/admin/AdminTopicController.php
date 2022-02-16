@@ -170,14 +170,14 @@ final class AdminTopicController extends AdminBaseController
             $slug = $topicVO->getSlug();
             $parentId = $topicVO->getParentId();
             $image = $topicVO->getImageLink();
-            $isActive = $topicVO->getIsActive();
+            $isActive = $topicVO->isActive();
         }
 
         if (!empty($topicForm)) {
             $title = $topicForm->getTitle();
             $slug = $topicForm->getSlug();
             $parentId = $topicForm->getParentId();
-            $isActive = $topicForm->getIsActive();
+            $isActive = $topicForm->isActive();
         }
 
         $topics = $topicModel->getAllTopics();

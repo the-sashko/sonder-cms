@@ -148,7 +148,7 @@ final class AdminUserController extends AdminBaseController
             $email = $userVO->getEmail();
             $roleId = $userVO->getRoleId();
             $isAllowAccessByApi = !empty($userVO->getApiToken());
-            $isActive = $userVO->getIsActive();
+            $isActive = $userVO->isActive();
         }
 
         if ($this->request->getHttpMethod() == 'post') {
@@ -177,8 +177,8 @@ final class AdminUserController extends AdminBaseController
             $email = $userForm->getEmail();
             $password = $userForm->getPassword();
             $roleId = $userForm->getRoleId();
-            $isAllowAccessByApi = $userForm->getIsAllowAccessByApi();
-            $isActive = $userForm->getIsActive();
+            $isAllowAccessByApi = $userForm->isAllowAccessByApi();
+            $isActive = $userForm->isActive();
             $errors = $userForm->getErrors();
         }
 
@@ -262,7 +262,7 @@ final class AdminUserController extends AdminBaseController
         if (!empty($credentialsForm)) {
             $login = $credentialsForm->getLogin();
             $password = $credentialsForm->getPassword();
-            $isAllowAccessByApi = $credentialsForm->getIsAllowAccessByApi();
+            $isAllowAccessByApi = $credentialsForm->isAllowAccessByApi();
             $errors = $credentialsForm->getErrors();
         }
 

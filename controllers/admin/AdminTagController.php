@@ -168,13 +168,13 @@ final class AdminTagController extends AdminBaseController
         if (!empty($tagVO)) {
             $title = $tagVO->getTitle();
             $slug = $tagVO->getSlug();
-            $isActive = $tagVO->getIsActive();
+            $isActive = $tagVO->isActive();
         }
 
         if (!empty($tagForm)) {
             $title = $tagForm->getTitle();
             $slug = $tagForm->getSlug();
-            $isActive = $tagForm->getIsActive();
+            $isActive = $tagForm->isActive();
         }
 
         $pagePath = [
