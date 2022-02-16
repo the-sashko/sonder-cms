@@ -3,8 +3,6 @@
 namespace Sonder\Models;
 
 use Exception;
-use Sonder\Core\CoreModel;
-use Sonder\Core\Interfaces\IModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Tag\TagForm;
 use Sonder\Models\Tag\TagStore;
@@ -17,7 +15,7 @@ use Throwable;
 /**
  * @property TagStore $store
  */
-final class Tag extends CoreModel implements IModel
+final class Tag extends BaseModel
 {
     const DEFAULT_SLUG = 'tag';
 
