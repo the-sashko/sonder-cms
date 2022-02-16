@@ -142,38 +142,38 @@ CREATE INDEX "demo_is_active_ddate" ON "demo" USING btree ("is_active", "ddate")
 CREATE INDEX "demo_id_is_active" ON "demo" USING btree ("id", "is_active");
 CREATE INDEX "demo_id_is_active_ddate" ON "demo" USING btree ("id", "is_active", "ddate");
 
-INSERT INTO "role_actions" ("id", "name", "is_system", "is_active", "cdate", "mdate", "ddate")
-VALUES (1, 'read-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (2, 'read-comments', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (3, 'write-comments', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (4, 'vote-for-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (5, 'write-private-messages', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (6, 'login-to-admin', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (7, 'write-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (8, 'manage-comments', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (9, 'manage-articles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (10, 'manage-taxonomy', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (11, 'ban-users', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (12, 'manage-private-messages', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (13, 'manage-users', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (14, 'login-as-user', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (15, 'manage-role-actions', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (16, 'manage-roles', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (17, 'manage-cache', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (18, 'manage-settings', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (19, 'manage-cron', 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+INSERT INTO "role_actions" ("id", "name", "is_system", "cdate")
+VALUES (1, 'read-articles', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (2, 'read-comments', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (3, 'write-comments', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (4, 'vote-for-articles', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (5, 'write-private-messages', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (6, 'login-to-admin', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (7, 'write-articles', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (8, 'manage-comments', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (9, 'manage-articles', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (10, 'manage-taxonomy', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (11, 'ban-users', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (12, 'manage-private-messages', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (13, 'manage-users', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (14, 'login-as-user', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (15, 'manage-role-actions', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (16, 'manage-roles', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (17, 'manage-cache', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (18, 'manage-settings', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (19, 'manage-cron', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
-INSERT INTO "roles" ("id", "name", "parent_id", "is_system", "is_active", "cdate", "mdate", "ddate")
-VALUES (1, 'guest', NULL, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (2, 'banned', 1, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (3, 'bot', 2, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (4, 'user', 1, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (5, 'author', 4, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (6, 'editor', 5, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (7, 'moderator', 6, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (8, 'webmaster', 4, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (9, 'admin', 7, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (10, 'root', NULL, 't', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+INSERT INTO "roles" ("id", "name", "parent_id", "is_system", "cdate")
+VALUES (1, 'guest', NULL, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (2, 'banned', 1, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (3, 'bot', 2, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (4, 'user', 1, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (5, 'author', 4, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (6, 'editor', 5, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (7, 'moderator', 6, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (8, 'webmaster', 4, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (9, 'admin', 7, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (10, 'root', NULL, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
 INSERT INTO "role2action" ("id", "role_id", "action_id", "is_allowed")
 VALUES (1, 1, 1, 't'),
@@ -222,13 +222,19 @@ VALUES (1, 1, 1, 't'),
        (45, 10, 18, 't'),
        (46, 10, 19, 't');
 
-INSERT INTO "users" ("id", "login", "email", "role_id", "is_active", "cdate", "mdate", "ddate")
-VALUES (1, 'admin', 'admin@admin.admin', 10, 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+INSERT INTO "users" ("id", "login", "email", "role_id", "cdate")
+VALUES (1, 'admin', 'admin@admin.admin', 10, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
-INSERT INTO "demo" ("id", "foo", "bar", "is_active", "cdate", "mdate", "ddate")
-VALUES (1, 'test', 'a b c', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (2, 'qwerty', '123', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL),
-       (3, 'one', 'two', 't', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER), NULL, NULL);
+INSERT INTO "cron_jobs" ("id", "alias", "controller", "method", "interval", "cdate")
+VALUES (3, 'RSS', 'cron_rss', 'generate', 60 * 30, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (4, 'Hits', 'cron_hit', 'aggregate', 60 * 60 * 24, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (5, 'Share', 'cron_share', 'send', 60 * 15, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (6, 'Sitemap', 'cron_sitemap', 'generate', 60 * 30, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
+
+INSERT INTO "demo" ("id", "foo", "bar", "cdate")
+VALUES (1, 'test', 'a b c', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (2, 'qwerty', '123', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (3, 'one', 'two', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
 ALTER SEQUENCE "role_actions_id_seq" RESTART WITH 20;
 
