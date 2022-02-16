@@ -51,6 +51,7 @@ if (!defined('APP_SOURCE_PATHS')) {
                 APP_PROTECTED_DIR_PATH . '/controllers',
                 APP_CMS_DIR_PATH . '/controllers',
                 APP_CMS_DIR_PATH . '/controllers/admin',
+                APP_CMS_DIR_PATH . '/controllers/cron',
                 APP_FRAMEWORK_DIR_PATH . '/controllers'
             ],
 
