@@ -48,14 +48,25 @@ final class Article extends BaseModel
 
     /**
      * @param int $page
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return array|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function getArticlesByPage(int $page): ?array
+    final public function getArticlesByPage(
+        int  $page,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?array
     {
-        $rows = $this->store->getArticleRowsByPage($page, $this->itemsOnPage);
+        $rows = $this->store->getArticleRowsByPage(
+            $page,
+            $this->itemsOnPage,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (empty($rows)) {
             return null;
@@ -478,7 +489,7 @@ final class Article extends BaseModel
         $articleVO->setMetaDescription($articleForm->getMetaDescription());
         $articleVO->setUserId($articleForm->getUserId());
         $articleVO->setTopicId($articleForm->getTopicId());
-        $articleVO->setIsActive($articleForm->getIsActive());
+        $articleVO->setIsActive($articleForm->isActive());
 
         if (empty($articleVO->getUserId())) {
             $articleVO->setUserId($articleForm->getUserId());
