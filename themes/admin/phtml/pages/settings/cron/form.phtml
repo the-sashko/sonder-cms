@@ -3,7 +3,7 @@
 /* @var int|null $id */
 /* @var string|null $alias */
 /* @var string|null $controller */
-/* @var string|null $action */
+/* @var string|null $method */
 /* @var int|null $interval */
 /* @var bool $isActive */
 /* @var array|null $errors */
@@ -81,38 +81,38 @@ if (!empty($id)) {
                 </label>
             </p>
             <p>
-                <label for="input-action" class="label-input-wrapper">
-                    <select name="action" id="input-action">
+                <label for="input-method" class="label-input-wrapper">
+                    <select name="method" id="input-method">
                         <?php
                         $selected = '';
 
-                        if (empty($actions)) {
+                        if (empty($methods)) {
                             $selected = ' selected="selected"';
                         }
                         ?>
                         <option value="" disabled<?= $selected; ?>>
-                            Action
+                            Method
                         </option>
                         <?php
-                        foreach ($jobs as $controllerValue => $actions):
-                            foreach ($actions as $actionValue):
+                        foreach ($jobs as $controllerValue => $methods):
+                            foreach ($methods as $methodValue):
                                 ?>
                                 <?php
                                 $selected = '';
 
-                                if ($actionValue == $action) {
+                                if ($methodValue == $method) {
                                     $selected = ' selected';
                                 }
 
-                                $actionClass = sprintf(
-                                    'input-action-%s',
+                                $methodClass = sprintf(
+                                    'input-method-%s',
                                     $controllerValue
                                 );
                                 ?>
-                                <option value="<?= $actionValue; ?>"
-                                        class="<?= $actionClass; ?>"
+                                <option value="<?= $methodValue; ?>"
+                                        class="<?= $methodClass; ?>"
                                     <?= $selected; ?>>
-                                    <?= $actionValue; ?>
+                                    <?= $methodValue; ?>
                                 </option>
                             <?php
                             endforeach;

@@ -25,7 +25,6 @@ use Sonder\Models\Cron\CronValuesObject;
             <th class="hide-on-mobile">Interval</th>
             <th class="hide-on-tablet">Next Running At</th>
             <th>Status</th>
-            <th class="hide-on-mobile">Error</th>
             <th class="hide-on-tablet">Is Active</th>
             <th colspan="4"></th>
         </tr>
@@ -34,7 +33,6 @@ use Sonder\Models\Cron\CronValuesObject;
             $cronJobIsActive = $cronJob->getIsActive() ? 'Yes' : 'No';
 
             $cronJobTimeNextExec = '---';
-            $cronJobErrorMessage = '---';
 
             if (
                 !empty($cronJob->getTimeNextExec()) &&
@@ -43,10 +41,6 @@ use Sonder\Models\Cron\CronValuesObject;
                 $cronJobTimeNextExec = $cronJob->getTimeNextExec(
                     'Y-m-d H:i:s'
                 );
-            }
-
-            if (!empty($cronJob->getErrorMessage())) {
-                $cronJobErrorMessage = $cronJob->getErrorMessage();
             }
             ?>
             <?php if ($cronJob->isRemoved()): ?>
@@ -61,7 +55,6 @@ use Sonder\Models\Cron\CronValuesObject;
             </td>
             <td class="hide-on-tablet"><?= $cronJobTimeNextExec ?></td>
             <td><?= $cronJob->getStatus(); ?></td>
-            <td class="hide-on-mobile"><?= $cronJobErrorMessage ?></td>
             <td class="hide-on-tablet"><?= $cronJobIsActive ?></td>
             <td>
                 <a href="<?= $cronJob->getAdminViewLink() ?>">
@@ -103,7 +96,6 @@ use Sonder\Models\Cron\CronValuesObject;
             <th class="hide-on-mobile">Interval</th>
             <th class="hide-on-tablet">Next Running At</th>
             <th>Status</th>
-            <th class="hide-on-mobile">Error</th>
             <th class="hide-on-tablet">Is Active</th>
             <th colspan="4"></th>
         </tr>
