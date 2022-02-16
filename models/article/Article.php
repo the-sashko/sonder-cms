@@ -3,8 +3,6 @@
 namespace Sonder\Models;
 
 use Exception;
-use Sonder\Core\CoreModel;
-use Sonder\Core\Interfaces\IModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Article\ArticleForm;
 use Sonder\Models\Article\ArticleStore;
@@ -21,7 +19,7 @@ use Throwable;
 /**
  * @property ArticleStore $store
  */
-final class Article extends CoreModel implements IModel
+final class Article extends BaseModel
 {
     const DEFAULT_SLUG = 'article';
 
