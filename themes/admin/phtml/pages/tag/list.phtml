@@ -30,7 +30,7 @@ use Sonder\Models\Tag\TagValuesObject;
         </tr>
         <?php foreach ($tags as $tag): ?>
             <?php
-            $tagIsActive = $tag->getIsActive() ? 'Yes' : 'No';
+            $tagIsActive = $tag->isActive() ? 'Yes' : 'No';
 
             $tagCdate = $tag->getCdate('Y-m-d H:i:s');
 

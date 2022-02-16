@@ -54,7 +54,7 @@ use Sonder\Models\User\UserValuesObject;
                 Is Active
             </td>
             <td>
-                <?= $user->getIsActive() ? 'Yes' : 'No'; ?>
+                <?= $user->isActive() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
         <?php if (!empty($user->getLastLoginDate())): ?>

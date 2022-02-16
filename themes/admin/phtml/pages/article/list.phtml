@@ -32,7 +32,7 @@ use Sonder\Models\Article\ArticleValuesObject;
         </tr>
         <?php foreach ($articles as $article): ?>
             <?php
-            $articleIsActive = $article->getIsActive() ? 'Yes' : 'No';
+            $articleIsActive = $article->isActive() ? 'Yes' : 'No';
 
             $articleCdate = $article->getCdate('Y-m-d H:i:s');
 

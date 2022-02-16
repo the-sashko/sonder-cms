@@ -30,13 +30,13 @@ use Sonder\Models\Cron\CronValuesObject;
         </tr>
         <?php foreach ($cronJobs as $cronJob): ?>
             <?php
-            $cronJobIsActive = $cronJob->getIsActive() ? 'Yes' : 'No';
+            $cronJobIsActive = $cronJob->isActive() ? 'Yes' : 'No';
 
             $cronJobTimeNextExec = '---';
 
             if (
                 !empty($cronJob->getTimeNextExec()) &&
-                $cronJob->getIsActive()
+                $cronJob->isActive()
             ) {
                 $cronJobTimeNextExec = $cronJob->getTimeNextExec(
                     'Y-m-d H:i:s'
@@ -77,7 +77,7 @@ use Sonder\Models\Cron\CronValuesObject;
                     </a>
                 <?php endif; ?>
             </td>
-            <?php if (!$cronJob->isRemoved() && $cronJob->getIsActive()): ?>
+            <?php if (!$cronJob->isRemoved() && $cronJob->isActive()): ?>
                 <td>
                     <a href="<?= $cronJob->getAdminRunLink() ?>">
                         <i class="fas fa-play"></i>

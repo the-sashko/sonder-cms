@@ -30,7 +30,7 @@ use Sonder\Models\Topic\TopicValuesObject;
         </tr>
         <?php foreach ($topics as $topic): ?>
             <?php
-            $topicIsActive = $topic->getIsActive() ? 'Yes' : 'No';
+            $topicIsActive = $topic->isActive() ? 'Yes' : 'No';
 
             $topicCdate = $topic->getCdate('Y-m-d H:i:s');
 

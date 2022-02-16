@@ -86,7 +86,7 @@ if (!empty($deniedActions)) {
                 Is System
             </td>
             <td>
-                <?= $role->getIsSystem() ? 'Yes' : 'No'; ?>
+                <?= $role->isSystem() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
         <tr>
@@ -94,7 +94,7 @@ if (!empty($deniedActions)) {
                 Is Active
             </td>
             <td>
-                <?= $role->getIsActive() ? 'Yes' : 'No'; ?>
+                <?= $role->isActive() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
         <tr>
@@ -126,7 +126,7 @@ if (!empty($deniedActions)) {
             </tr>
         <?php endif; ?>
     </table>
-<?php if (!$role->getIsSystem()): ?>
+<?php if (!$role->isSystem()): ?>
     <p>
         <a href="<?= $role->getEditLink(); ?>">Edit</a>
     </p>

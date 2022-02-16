@@ -32,9 +32,9 @@ use Sonder\Models\Role\RoleValuesObject;
         </tr>
         <?php foreach ($roles as $role): ?>
             <?php
-            $roleIsActive = $role->getIsActive() ? 'Yes' : 'No';
+            $roleIsActive = $role->isActive() ? 'Yes' : 'No';
 
-            $roleIsSystem = $role->getIsSystem() ? 'Yes' : 'No';
+            $roleIsSystem = $role->isSystem() ? 'Yes' : 'No';
 
             $roleCdate = $role->getCdate('Y-m-d H:i:s');
 
@@ -72,7 +72,7 @@ use Sonder\Models\Role\RoleValuesObject;
             <td class="hide-on-mobile"><?= $roleCdate ?></td>
             <td class="hide-on-tablet"><?= $roleMdate ?></td>
             <td class="hide-on-tablet"><?= $roleDdate ?></td>
-            <?php if ($role->getIsSystem()): ?>
+            <?php if ($role->isSystem()): ?>
                 <td colspan="3">
                     <a href="<?= $role->getAdminViewLink() ?>">
                         <i class="fas fa-eye"></i>

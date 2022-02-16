@@ -31,7 +31,7 @@ use Sonder\Models\User\UserValuesObject;
         </tr>
         <?php foreach ($users as $user): ?>
             <?php
-            $userIsActive = $user->getIsActive() ? 'Yes' : 'No';
+            $userIsActive = $user->isActive() ? 'Yes' : 'No';
 
             $userCdate = $user->getCdate('Y-m-d H:i:s');
 

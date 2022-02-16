@@ -36,7 +36,7 @@ use Sonder\Models\Role\RoleActionValuesObject;
                 Is System
             </td>
             <td>
-                <?= $roleAction->getIsSystem() ? 'Yes' : 'No'; ?>
+                <?= $roleAction->isSystem() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
         <tr>
@@ -44,7 +44,7 @@ use Sonder\Models\Role\RoleActionValuesObject;
                 Is Active
             </td>
             <td>
-                <?= $roleAction->getIsActive() ? 'Yes' : 'No'; ?>
+                <?= $roleAction->isActive() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
         <tr>
@@ -76,7 +76,7 @@ use Sonder\Models\Role\RoleActionValuesObject;
             </tr>
         <?php endif; ?>
     </table>
-<?php if (!$roleAction->getIsSystem()): ?>
+<?php if (!$roleAction->isSystem()): ?>
     <p>
         <a href="<?= $roleAction->getEditLink(); ?>">Edit</a>
     </p>

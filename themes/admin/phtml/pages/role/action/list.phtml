@@ -31,9 +31,9 @@ use Sonder\Models\Role\RoleActionValuesObject;
         </tr>
         <?php foreach ($roleActions as $roleAction): ?>
             <?php
-            $roleActionIsActive = $roleAction->getIsActive() ? 'Yes' : 'No';
+            $roleActionIsActive = $roleAction->isActive() ? 'Yes' : 'No';
 
-            $roleActionIsSystem = $roleAction->getIsSystem() ? 'Yes' : 'No';
+            $roleActionIsSystem = $roleAction->isSystem() ? 'Yes' : 'No';
 
             $roleActionCdate = $roleAction->getCdate('Y-m-d H:i:s');
 
@@ -60,7 +60,7 @@ use Sonder\Models\Role\RoleActionValuesObject;
             <td class="hide-on-mobile"><?= $roleActionCdate ?></td>
             <td class="hide-on-tablet"><?= $roleActionMdate ?></td>
             <td class="hide-on-tablet"><?= $roleActionDdate ?></td>
-            <?php if ($roleAction->getIsSystem()): ?>
+            <?php if ($roleAction->isSystem()): ?>
                 <td colspan="3">
                     <a href="<?= $roleAction->getAdminViewLink() ?>">
                         <i class="fas fa-eye"></i>
