@@ -4,8 +4,6 @@ namespace Sonder\Models;
 
 use Exception;
 use ImagickException;
-use Sonder\Core\CoreModel;
-use Sonder\Core\Interfaces\IModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Topic\TopicForm;
 use Sonder\Models\Topic\TopicStore;
@@ -22,7 +20,7 @@ use Throwable;
 /**
  * @property TopicStore $store
  */
-final class Topic extends CoreModel implements IModel
+final class Topic extends BaseModel
 {
     const DEFAULT_SLUG = 'topic';
 
