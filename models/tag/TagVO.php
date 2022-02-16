@@ -7,6 +7,8 @@ use Sonder\Core\ModelValuesObject;
 
 final class TagValuesObject extends ModelValuesObject
 {
+    const TAGS_LINK = '/tags/';
+
     /**
      * @var string|null
      */

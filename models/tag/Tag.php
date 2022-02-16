@@ -44,14 +44,25 @@ final class Tag extends BaseModel
 
     /**
      * @param int $page
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return array|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function getTagsByPage(int $page): ?array
+    final public function getTagsByPage(
+        int  $page,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?array
     {
-        $rows = $this->store->getTagRowsByPage($page, $this->itemsOnPage);
+        $rows = $this->store->getTagRowsByPage(
+            $page,
+            $this->itemsOnPage,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (empty($rows)) {
             return null;
@@ -208,6 +219,7 @@ final class Tag extends BaseModel
      * @return TagValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     private function _getVOFromTagForm(
         TagForm $tagForm,
@@ -234,7 +246,7 @@ final class Tag extends BaseModel
 
         $tagVO->setTitle($tagForm->getTitle());
         $tagVO->setSlug($tagForm->getSlug());
-        $tagVO->setIsActive($tagForm->getIsActive());
+        $tagVO->setIsActive($tagForm->isActive());
 
         $this->_setUniqSlugToVO($tagVO);
 
@@ -289,6 +301,7 @@ final class Tag extends BaseModel
      * @return void
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     private function _setUniqSlugToVO(TagValuesObject $tagVO): void
     {
