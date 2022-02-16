@@ -2,10 +2,9 @@
 
 namespace Sonder\Controllers;
 
-use Sonder\Core\Interfaces\IController;
 use Sonder\Core\RequestObject;
 
-abstract class CronBaseController extends BaseController implements IController
+abstract class CronBaseController extends BaseController
 {
     public function __construct(RequestObject $request)
     {
