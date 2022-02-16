@@ -121,7 +121,7 @@ final class AdminCronController extends AdminBaseController
 
         $alias = null;
         $controller = null;
-        $action = null;
+        $method = null;
         $interval = null;
         $isActive = true;
 
@@ -168,7 +168,7 @@ final class AdminCronController extends AdminBaseController
         if (!empty($cronVO)) {
             $alias = $cronVO->getAlias();
             $controller = $cronVO->getController();
-            $action = $cronVO->getAction();
+            $method = $cronVO->getMethod();
             $interval = $cronVO->getInterval();
             $isActive = $cronVO->getIsActive();
         }
@@ -176,7 +176,7 @@ final class AdminCronController extends AdminBaseController
         if (!empty($cronForm)) {
             $alias = $cronForm->getAlias();
             $controller = $cronForm->getController();
-            $action = $cronForm->getAction();
+            $method = $cronForm->getMethod();
             $interval = $cronForm->getInterval();
             $isActive = $cronForm->getIsActive();
         }
@@ -194,7 +194,7 @@ final class AdminCronController extends AdminBaseController
             'id' => $id,
             'alias' => $alias,
             'controller' => $controller,
-            'action' => $action,
+            'method' => $method,
             'interval' => $interval,
             'is_active' => $isActive,
             'errors' => $errors,
