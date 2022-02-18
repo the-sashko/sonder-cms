@@ -3,6 +3,7 @@
 namespace Sonder\Controllers;
 
 use Exception;
+use Sonder\CMS\Essentials\BaseController;
 use Sonder\Core\ResponseObject;
 
 final class MainController extends BaseController

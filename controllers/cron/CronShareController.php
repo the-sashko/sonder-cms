@@ -2,6 +2,8 @@
 
 namespace Sonder\Controllers;
 
+use Sonder\CMS\Essentials\CronBaseController;
+
 final class CronShareController extends CronBaseController
 {
     /**

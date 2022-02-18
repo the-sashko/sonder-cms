@@ -3,6 +3,7 @@
 namespace Sonder\Controllers;
 
 use Exception;
+use Sonder\CMS\Essentials\CronBaseController;
 
 final class CronRssController extends CronBaseController
 {

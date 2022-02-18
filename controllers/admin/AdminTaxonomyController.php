@@ -3,6 +3,7 @@
 namespace Sonder\Controllers;
 
 use Exception;
+use Sonder\CMS\Essentials\AdminBaseController;
 use Sonder\Core\ResponseObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;

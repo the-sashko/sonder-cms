@@ -3,6 +3,7 @@
 namespace Sonder\Controllers;
 
 use Exception;
+use Sonder\CMS\Essentials\CronBaseController;
 use Sonder\Core\RequestObject;
 use Sonder\Models\Article;
 use Sonder\Models\Article\ArticleValuesObject;

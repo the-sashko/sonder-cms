@@ -4,6 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use ReflectionException;
+use Sonder\CMS\Essentials\AdminBaseController;
 use Sonder\Core\ResponseObject;
 use Sonder\Models\Cron;
 use Sonder\Models\Cron\CronForm;
