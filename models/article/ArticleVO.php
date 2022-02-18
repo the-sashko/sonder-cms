@@ -3,7 +3,7 @@
 namespace Sonder\Models\Article;
 
 use Exception;
-use Sonder\Core\ModelValuesObject;
+use Sonder\CMS\Essentials\ModelValuesObject;
 use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Models\User\UserValuesObject;
 
@@ -191,15 +191,6 @@ final class ArticleValuesObject extends ModelValuesObject
         $tags = $this->get('tags');
 
         return !empty($tags) && is_array($tags) ? $tags : null;
-    }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    final public function getAdminViewLink(): string
-    {
-        return sprintf($this->adminViewLinkPattern, $this->getId());
     }
 
     /**

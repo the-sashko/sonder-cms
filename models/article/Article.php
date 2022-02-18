@@ -3,6 +3,7 @@
 namespace Sonder\Models;
 
 use Exception;
+use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Article\ArticleForm;
 use Sonder\Models\Article\ArticleStore;

@@ -3,7 +3,7 @@
 namespace Sonder\Models\Topic;
 
 use Exception;
-use Sonder\Core\ModelValuesObject;
+use Sonder\CMS\Essentials\ModelValuesObject;
 
 final class TopicValuesObject extends ModelValuesObject
 {
@@ -86,15 +86,6 @@ final class TopicValuesObject extends ModelValuesObject
         }
 
         return $this->get('parent_vo');
-    }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    final public function getAdminViewLink(): string
-    {
-        return sprintf($this->adminViewLinkPattern, $this->getId());
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Sonder\Models;
 
 use Exception;
 use ImagickException;
+use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Topic\TopicForm;
 use Sonder\Models\Topic\TopicStore;

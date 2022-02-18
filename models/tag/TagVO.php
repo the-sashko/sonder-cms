@@ -3,7 +3,7 @@
 namespace Sonder\Models\Tag;
 
 use Exception;
-use Sonder\Core\ModelValuesObject;
+use Sonder\CMS\Essentials\ModelValuesObject;
 
 final class TagValuesObject extends ModelValuesObject
 {
@@ -49,15 +49,6 @@ final class TagValuesObject extends ModelValuesObject
         }
 
         return (string)$this->get('slug');
-    }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    final public function getAdminViewLink(): string
-    {
-        return sprintf($this->adminViewLinkPattern, $this->getId());
     }
 
     /**
