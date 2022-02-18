@@ -1,6 +1,6 @@
 <?php
 
-namespace Sonder\Controllers;
+namespace Sonder\CMS\Essentials;
 
 use Sonder\Core\RequestObject;
 

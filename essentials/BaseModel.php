@@ -1,6 +1,6 @@
 <?php
 
-namespace Sonder\Models;
+namespace Sonder\CMS\Essentials;
 
 use Sonder\Core\CoreModel;
 use Sonder\Core\Interfaces\IModel;

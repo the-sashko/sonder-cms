@@ -1,6 +1,6 @@
 <?php
 
-namespace Sonder\Controllers;
+namespace Sonder\CMS\Essentials;
 
 abstract class AdminBaseController extends BaseController
 {
