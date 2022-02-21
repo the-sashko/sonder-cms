@@ -55,9 +55,8 @@ final class CommentApi extends ModelApiCore implements IModelApi
      */
     final public function actionGet(): ResponseObject
     {
-        $id = $this->request->getApiValue('id');
-        $articleId = $this->request->getApiValue('article_id');
-        $userId = $this->request->getApiValue('user_id');
+        $sessionToken = $this->request->getApiValue('session_token');
+        $userId = $this->request->getApiValue('additional_info');
 
         if (empty($id) && empty($articleId) && empty($userId)) {
             throw new ApiException(
