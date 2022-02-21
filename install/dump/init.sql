@@ -7,6 +7,7 @@ CREATE SEQUENCE "hits_by_day_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 92233720368
 CREATE SEQUENCE "hits_by_month_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "hits_by_year_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "comments_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "shortener_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "demo_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 CREATE TABLE "topics"
@@ -227,6 +228,18 @@ CREATE TABLE "comments"
         NOT DEFERRABLE
 ) WITH (oids = false);
 
+CREATE TABLE "shortener"
+(
+    "id"        integer DEFAULT nextval('shortener_id_seq') NOT NULL,
+    "code"      character varying(8),
+    "url"       character varying(512)                      NOT NULL,
+    "is_active" boolean DEFAULT true                        NOT NULL,
+    "cdate"     integer                                     NOT NULL,
+    "mdate"     integer,
+    "ddate"     integer,
+    CONSTRAINT "shortener_id" PRIMARY KEY ("id")
+) WITH (oids = false);
+
 CREATE TABLE "demo"
 (
     "id"        integer DEFAULT nextval('demo_id_seq') NOT NULL,
@@ -369,6 +382,14 @@ CREATE INDEX "comments_parent_id_is_active_ddate" ON "comments" USING btree ("pa
 CREATE INDEX "comments_article_id_is_active_ddate" ON "comments" USING btree ("article_id", "is_active", "ddate");
 CREATE INDEX "comments_user_id_is_active_ddate" ON "comments" USING btree ("user_id", "is_active", "ddate");
 CREATE INDEX "comments_user_ip_is_active_ddate" ON "comments" USING btree ("user_ip", "is_active", "ddate");
+
+CREATE INDEX "shortener_code" ON "shortener" USING btree ("code");
+CREATE INDEX "shortener_is_active" ON "shortener" USING btree ("is_active");
+CREATE INDEX "shortener_cdate" ON "shortener" USING btree ("cdate");
+CREATE INDEX "shortener_mdate" ON "shortener" USING btree ("mdate");
+CREATE INDEX "shortener_ddate" ON "shortener" USING btree ("ddate");
+CREATE INDEX "shortener_is_active_ddate" ON "shortener" USING btree ("is_active", "ddate");
+CREATE INDEX "shortener_code_is_active_ddate" ON "shortener" USING btree ("code", "is_active", "ddate");
 
 CREATE INDEX "demo_foo" ON "demo" USING btree ("foo");
 CREATE INDEX "demo_bar" ON "demo" USING btree ("bar");
