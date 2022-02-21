@@ -27,14 +27,24 @@ final class Tag extends BaseModel
 
     /**
      * @param int|null $id
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return ValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function getVOById(?int $id = null): ?ValuesObject
+    final public function getVOById(
+        ?int $id = null,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?ValuesObject
     {
-        $row = $this->store->getTagRowById($id);
+        $row = $this->store->getTagRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (!empty($row)) {
             return $this->getVO($row);
@@ -115,7 +125,7 @@ final class Tag extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function removeTagById(?int $id): bool
+    final public function removeTagById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -129,7 +139,7 @@ final class Tag extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function restoreTagById(?int $id): bool
+    final public function restoreTagById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -290,7 +300,7 @@ final class Tag extends BaseModel
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    private function _isTitleUniq(?string $title, ?int $id): bool
+    private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
         $row = $this->store->getTagRowByTitle($title, $id);
 
