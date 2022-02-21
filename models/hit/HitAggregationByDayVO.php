@@ -5,27 +5,27 @@ namespace Sonder\Models\Hit;
 use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
 
-final class HitValuesObject extends ModelValuesObject
+final class HitAggregationByDayValuesObject extends ModelValuesObject
 {
     /**
      * @var string|null
      */
-    protected ?string $editLinkPattern = '/admin/hit/%d/';
+    protected ?string $editLinkPattern = '/admin/hits/day/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $removeLinkPattern = '/admin/hit/remove/%d/';
+    protected ?string $removeLinkPattern = '/admin/hits/day/remove/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $restoreLinkPattern = '/admin/hit/restore/%d/';
+    protected ?string $restoreLinkPattern = '/admin/hits/day/restore/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $adminViewLinkPattern = '/admin/hit/view/%d/';
+    protected ?string $adminViewLinkPattern = '/admin/hits/day/view/%d/';
 
     /**
      * @return int|null
@@ -73,12 +73,32 @@ final class HitValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return string
+     * @return int
      * @throws Exception
      */
-    final public function getIp(): string
+    final public function getCount(): int
     {
-        return (string)$this->get('ip');
+        return (int)$this->get('count');
+    }
+
+    /**
+     * @param string|null $format
+     * @return string|int|null
+     * @throws Exception
+     */
+    final public function getDay(?string $format = null): string|int|null
+    {
+        $day = (string)$this->get('day');
+
+        if (empty($day)) {
+            return null;
+        }
+
+        if (empty($format)) {
+            return $day;
+        }
+
+        return date($format, sprintf('%s 00:00:00', strtotime($day)));
     }
 
     /**
@@ -118,33 +138,26 @@ final class HitValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param string|null $ip
+     * @param int|null $count
      * @return void
      * @throws Exception
      */
-    final public function setIp(?string $ip = null): void
+    final public function setCount(?int $count = null): void
     {
-        if (!empty($ip)) {
-            $this->set('ip', $ip);
+        if (!empty($count)) {
+            $this->set('count', $count);
         }
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @param string|null $day
+     * @return void
+     * @throws Exception
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function setDay(?string $day = null): void
     {
-        $row = parent::exportRow($params);
-
-        if (empty($row)) {
-            return null;
+        if (!empty($day)) {
+            $this->set('day', $day);
         }
-
-        if (array_key_exists('ip', $row)) {
-            unset($row['ip']);
-        }
-
-        return $row;
     }
 }

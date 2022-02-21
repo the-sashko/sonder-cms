@@ -5,27 +5,27 @@ namespace Sonder\Models\Hit;
 use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
 
-final class HitValuesObject extends ModelValuesObject
+final class HitAggregationByMonthValuesObject extends ModelValuesObject
 {
     /**
      * @var string|null
      */
-    protected ?string $editLinkPattern = '/admin/hit/%d/';
+    protected ?string $editLinkPattern = '/admin/hits/month/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $removeLinkPattern = '/admin/hit/remove/%d/';
+    protected ?string $removeLinkPattern = '/admin/hits/month/remove/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $restoreLinkPattern = '/admin/hit/restore/%d/';
+    protected ?string $restoreLinkPattern = '/admin/hits/month/restore/%d/';
 
     /**
      * @var string|null
      */
-    protected ?string $adminViewLinkPattern = '/admin/hit/view/%d/';
+    protected ?string $adminViewLinkPattern = '/admin/hits/month/view/%d/';
 
     /**
      * @return int|null
@@ -73,12 +73,42 @@ final class HitValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return string
+     * @return int
      * @throws Exception
      */
-    final public function getIp(): string
+    final public function getCount(): int
     {
-        return (string)$this->get('ip');
+        return (int)$this->get('count');
+    }
+
+    /**
+     * @return int|null
+     * @throws Exception
+     */
+    final public function getMonth(): ?int
+    {
+        $month = $this->get('month');
+
+        if (empty($month)) {
+            return null;
+        }
+
+        return (int)$month;
+    }
+
+    /**
+     * @return int|null
+     * @throws Exception
+     */
+    final public function getYear(): ?int
+    {
+        $year = $this->get('year');
+
+        if (empty($year)) {
+            return null;
+        }
+
+        return (int)$year;
     }
 
     /**
@@ -118,33 +148,38 @@ final class HitValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param string|null $ip
+     * @param int|null $count
      * @return void
      * @throws Exception
      */
-    final public function setIp(?string $ip = null): void
+    final public function setCount(?int $count = null): void
     {
-        if (!empty($ip)) {
-            $this->set('ip', $ip);
+        if (!empty($count)) {
+            $this->set('count', $count);
         }
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @param int|null $month
+     * @return void
+     * @throws Exception
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function setMonth(?int $month = null): void
     {
-        $row = parent::exportRow($params);
-
-        if (empty($row)) {
-            return null;
+        if (!empty($month)) {
+            $this->set('month', $month);
         }
+    }
 
-        if (array_key_exists('ip', $row)) {
-            unset($row['ip']);
+    /**
+     * @param int|null $year
+     * @return void
+     * @throws Exception
+     */
+    final public function setYear(?int $year = null): void
+    {
+        if (!empty($year)) {
+            $this->set('year', $year);
         }
-
-        return $row;
     }
 }
