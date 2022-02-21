@@ -31,14 +31,23 @@ final class Article extends BaseModel
 
     /**
      * @param int|null $id
-     * @return ArticleValuesObject|null
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
      */
-    final public function getVOById(?int $id = null): ?ValuesObject
+    final public function getVOById(
+        ?int $id = null,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?ValuesObject
     {
-        $row = $this->store->getArticleRowById($id);
+        $row = $this->store->getArticleRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (!empty($row)) {
             return $this->getVO($row);
@@ -77,33 +86,21 @@ final class Article extends BaseModel
     }
 
     /**
-     * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
-     */
-    final public function getAllArticles(): ?array
-    {
-        $rows = $this->store->getAllArticleRows(
-            true,
-            true
-        );
-
-        if (empty($rows)) {
-            return null;
-        }
-
-        return $this->getVOArray($rows);
-    }
-
-    /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return int
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    final public function getArticlesPageCount(): int
+    final public function getArticlesPageCount(
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): int
     {
-        $rowsCount = $this->store->getArticleRowsCount();
+        $rowsCount = $this->store->getArticleRowsCount(
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         $pageCount = (int)($rowsCount / $this->itemsOnPage);
 
@@ -264,7 +261,7 @@ final class Article extends BaseModel
             return 0;
         }
 
-        $rowsCount = $this->store->getArticleRowsCountByTopicId($userId);
+        $rowsCount = $this->store->getArticleRowsCountByUserId($userId);
 
         $pageCount = (int)($rowsCount / $this->itemsOnPage);
 
@@ -280,7 +277,7 @@ final class Article extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function removeArticleById(?int $id): bool
+    final public function removeArticleById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -294,7 +291,7 @@ final class Article extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function restoreArticleById(?int $id): bool
+    final public function restoreArticleById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -680,7 +677,7 @@ final class Article extends BaseModel
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    private function _isTitleUniq(?string $title, ?int $id): bool
+    private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
         $row = $this->store->getArticleRowByTitle($title, $id);
 
@@ -730,7 +727,10 @@ final class Article extends BaseModel
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    private function _isMetaTitleUniq(?string $title, ?int $id): bool
+    private function _isMetaTitleUniq(
+        ?string $title = null,
+        ?int    $id = null
+    ): bool
     {
         $row = $this->store->getArticleRowByMetaTitle($title, $id);
 

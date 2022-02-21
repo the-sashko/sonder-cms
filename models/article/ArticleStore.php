@@ -61,7 +61,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -162,7 +163,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -235,7 +237,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -308,7 +311,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -437,7 +441,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $offset = $itemsOnPage * ($page - 1);
@@ -461,63 +466,6 @@ final class ArticleStore extends ModelStore implements IModelStore
             $sqlWhere,
             $itemsOnPage,
             $offset
-        );
-
-        return $this->getRows($sql);
-    }
-
-    /**
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     */
-    final public function getAllArticleRows(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
-    ): ?array
-    {
-        $sqlWhere = 'true';
-
-        if ($excludeRemoved) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                ("articles"."ddate" IS NULL OR "articles"."ddate" < 1) AND
-                ("topics"."ddate" IS NULL OR "topics"."ddate" < 1) AND
-                ("users"."ddate" IS NULL OR "users"."ddate" < 1)
-                ',
-                $sqlWhere
-            );
-        }
-
-        if ($excludeInactive) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                "articles"."is_active" = true AND
-                "topics"."is_active" = true AND
-                "users"."is_active" = true
-                ',
-                $sqlWhere);
-        }
-
-        $sql = '
-            SELECT COUNT("articles"."id") AS "count"
-            FROM "%s" AS "articles"
-            LEFT JOIN "%s" AS "topics" ON "topics"."id" = "articles"."topic_id"
-            LEFT JOIN "%s" AS "users" ON "users"."id" = "articles"."user_id"
-            WHERE %s
-            ORDER BY "articles"."cdate" DESC;
-        ';
-
-        $sql = sprintf(
-            $sql,
-            ArticleStore::ARTICLES_TABLE,
-            ArticleStore::TOPICS_TABLE,
-            ArticleStore::USERS_TABLE,
-            $sqlWhere
         );
 
         return $this->getRows($sql);
@@ -557,7 +505,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -626,7 +575,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $offset = $itemsOnPage * ($page - 1);
@@ -698,7 +648,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -766,7 +717,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
 
@@ -843,7 +795,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
@@ -917,7 +870,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $offset = $itemsOnPage * ($page - 1);
@@ -989,7 +943,8 @@ final class ArticleStore extends ModelStore implements IModelStore
                 "topics"."is_active" = true AND
                 "users"."is_active" = true
                 ',
-                $sqlWhere);
+                $sqlWhere
+            );
         }
 
         $sql = '
