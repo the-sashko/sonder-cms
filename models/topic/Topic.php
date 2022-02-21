@@ -36,14 +36,24 @@ final class Topic extends BaseModel
 
     /**
      * @param int|null $id
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return TopicValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function getVOById(?int $id = null): ?TopicValuesObject
+    final public function getVOById(
+        ?int $id = null,
+        bool $excludeRemoved = false,
+        bool $excludeInactive = false
+    ): ?TopicValuesObject
     {
-        $row = $this->store->getTopicRowById($id);
+        $row = $this->store->getTopicRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         if (!empty($row)) {
             return $this->getVO($row);
@@ -124,7 +134,7 @@ final class Topic extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function removeTopicById(?int $id): bool
+    final public function removeTopicById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -140,7 +150,7 @@ final class Topic extends BaseModel
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function removeTopicImageById(?int $id): bool
+    final public function removeTopicImageById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -182,7 +192,7 @@ final class Topic extends BaseModel
      * @return bool
      * @throws DatabasePluginException
      */
-    final public function restoreTopicById(?int $id): bool
+    final public function restoreTopicById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -468,7 +478,7 @@ final class Topic extends BaseModel
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    private function _isTitleUniq(?string $title, ?int $id): bool
+    private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
         $row = $this->store->getTopicRowByTitle($title, $id);
 
