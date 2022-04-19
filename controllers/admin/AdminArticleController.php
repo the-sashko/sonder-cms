@@ -120,12 +120,14 @@ final class AdminArticleController extends AdminBaseController
 
         $title = null;
         $slug = null;
+        $image = null;
+        $imageDir = null;
         $summary = null;
         $text = null;
         $metaTitle = null;
         $metaDescription = null;
         $topicId = null;
-        $checkedTags = null;
+        $selectedTags = null;
         $isActive = true;
 
         $articleVO = null;
@@ -142,12 +144,12 @@ final class AdminArticleController extends AdminBaseController
         $tagModel = $this->getModel('tag');
 
         if (!empty($id)) {
-            /* @var $articlesVO ArticleValuesObject|null */
-            $articlesVO = $articleModel->getVOById($id);
+            /* @var $articleVO ArticleValuesObject|null */
+            $articleVO = $articleModel->getVOById($id);
             $pageTitle = 'Edit';
         }
 
-        if (!empty($id) && empty($articlesVO)) {
+        if (!empty($id) && empty($articleVO)) {
             return $this->redirect('/admin/article/');
         }
 
@@ -182,11 +184,14 @@ final class AdminArticleController extends AdminBaseController
         if (!empty($articleVO)) {
             $title = $articleVO->getTitle();
             $slug = $articleVO->getSlug();
+            $image = $articleVO->getImageLink('single_view');
+            $imageDir = $articleVO->getImageDir();
             $text = $articleVO->getText();
             $summary = $articleVO->getSummary();
             $metaTitle = $articleVO->getMetaTitle();
             $metaDescription = $articleVO->getMetaDescription();
             $topicId = $articleVO->getTopicId();
+            $selectedTags = $articleVO->getTagIds();
             $isActive = $articleVO->isActive();
         }
 
@@ -198,7 +203,7 @@ final class AdminArticleController extends AdminBaseController
             $metaTitle = $articleForm->getMetaTitle();
             $metaDescription = $articleForm->getMetaDescription();
             $topicId = $articleForm->getTopicId();
-            $checkedTags = $articleForm->getTags();
+            $selectedTags = $articleForm->getTags();
             $isActive = $articleForm->isActive();
         }
 
@@ -225,12 +230,14 @@ final class AdminArticleController extends AdminBaseController
             'id' => $id,
             'title' => $title,
             'slug' => $slug,
+            'image' => $image,
+            'image_dir' => $imageDir,
             'text' => $text,
             'summary' => $summary,
             'meta_title' => $metaTitle,
             'meta_description' => $metaDescription,
             'topic_id' => $topicId,
-            'checked_tags' => $checkedTags,
+            'selected_tags' => $selectedTags,
             'is_active' => $isActive,
             'errors' => $errors,
             'topics' => $topics,

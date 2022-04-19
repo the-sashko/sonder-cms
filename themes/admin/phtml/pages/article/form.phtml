@@ -3,12 +3,14 @@
 /* @var int|null $id */
 /* @var string|null $title */
 /* @var string|null $slug */
+/* @var string|null $image */
+/* @var string|null $imageDir */
 /* @var string|null $text */
 /* @var string|null $summary */
 /* @var string|null $metaTitle */
 /* @var string|null $metaDescription */
 /* @var int|null $topicId */
-/* @var array|null $checkedTags */
+/* @var array|null $selectedTags */
 /* @var bool $isActive */
 /* @var array|null $topics */
 /* @var array|null $tags */
@@ -43,6 +45,25 @@ if (!empty($id)) {
     <form action="<?= $formAction; ?>"
           enctype="multipart/form-data"
           method="POST">
+        <?php if (!empty($id) && !empty($image)): ?>
+            <p class="form-image-wrapper">
+                <img src="<?= $image; ?>?token=<?= time(); ?>"
+                     alt="<?= $slug; ?>">
+            </p>
+            <p>
+                <a href="/admin/article/remove-image/<?= $id; ?>/">
+                    Remove image
+                </a>
+            </p>
+        <?php endif; ?>
+        <p>
+            <span>Image</span>
+            <label for="input-image" class="label-input-wrapper">
+                <input type="file"
+                       name="image"
+                       id="input-image">
+            </label>
+        </p>
         <p>
             <label for="input-title" class="label-input-wrapper">
                 <input type="text"
@@ -62,16 +83,8 @@ if (!empty($id)) {
             </label>
         </p>
         <p>
-            <span>Image</span>
-            <label for="input-image" class="label-input-wrapper">
-                <input type="file"
-                       name="image"
-                       id="input-image">
-            </label>
-        </p>
-        <p>
             <label for="input-summary" class="label-input-wrapper">
-             kjjkj   <textarea name="input-summary"
+                <textarea name="input-summary"
                           id="input-summary"
                           placeholder="Summary"
                 ><?= $summary ?></textarea>
@@ -104,14 +117,14 @@ if (!empty($id)) {
         </p>
         <p>
             <?php if (!empty($topics)): ?>
-            <label for="input-topic_id" class="label-input-wrapper">
-                <select name="topic_id" id="input-topic_id">
-                    <?php
-                    $selected = empty($topicId) ? ' selected="selected"' : '';
-                    ?>
-                    <option value="0" disabled<?= $selected; ?>>
-                        Topic
-                    </option>
+                <label for="input-topic_id" class="label-input-wrapper">
+                    <select name="topic_id" id="input-topic_id">
+                        <?php
+                        $selected = empty($topicId) ? ' selected="selected"' : '';
+                        ?>
+                        <option value="0" disabled<?= $selected; ?>>
+                            Topic
+                        </option>
                         <?php foreach ($topics as $topic): ?>
                             <?php
                             $selected = '';
@@ -124,10 +137,10 @@ if (!empty($id)) {
                                 <?= $topic->getTitle(); ?>
                             </option>
                         <?php endforeach; ?>
-                </select>
-            </label>
+                    </select>
+                </label>
             <?php else: ?>
-                <a href="/admin/topic/">Add Topic</a>
+                <a href="/admin/taxonomy/topic/">Add Topic</a>
             <?php endif; ?>
         </p>
         <div class="checkbox-list-wrapper">
@@ -142,7 +155,7 @@ if (!empty($id)) {
 
                     $checked = '';
 
-                    if (!empty($checkedTags) && in_array($tagId, $checkedTags)) {
+                    if (!empty($selectedTags) && in_array($tagId, $selectedTags)) {
                         $checked = ' checked';
                     }
                     ?>
@@ -159,7 +172,7 @@ if (!empty($id)) {
                 <?php endforeach; ?>
             <?php else: ?>
                 <p>
-                    <a href="/admin/tag/">Add Tag</a>
+                    <a href="/admin/taxonomy/tag/">Add Tag</a>
                 </p>
             <?php endif; ?>
         </div>
@@ -179,7 +192,8 @@ if (!empty($id)) {
         <p>
             <input type="submit" value="save">
         </p>
-        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
         <input type="hidden" name="id" value="<?= $id; ?>">
+        <input type="hidden" name="image_dir" value="<?= $imageDir; ?>">
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
     </form>
 </div>

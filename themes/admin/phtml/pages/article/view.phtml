@@ -7,9 +7,16 @@ use Sonder\Models\Article\ArticleValuesObject;
 $tags = $article->getTags();
 
 if (!empty($tags)) {
+    foreach ($tags as $tagKey => $tag) {
+        $tags[$tagKey] = sprintf(
+            '<a href="%s" target="_blank">%s</a>',
+            $tag->getAdminViewLink(),
+            $tag->getTitle()
+        );
+    }
+
     $tags = implode('<br><br>', $tags);
 }
-
 ?>
 <p>
     <a href="/admin/articles/">Articles</a> /
@@ -44,6 +51,15 @@ if (!empty($tags)) {
         </td>
         <td>
             <?= $article->getSlug(); ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Image
+        </td>
+        <td>
+            <img src="<?= $article->getImageLink('single_view'); ?>?token=<?= time(); ?>"
+                 alt="<?= $article->getSlug(); ?>">
         </td>
     </tr>
     <tr>
@@ -96,7 +112,7 @@ if (!empty($tags)) {
                 Tags
             </td>
             <td>
-                <?= $tags ?>
+                <?= $tags; ?>
             </td>
         </tr>
     <?php endif; ?>
