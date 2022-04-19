@@ -52,6 +52,19 @@ final class TagValuesObject extends ModelValuesObject
     }
 
     /**
+     * @return int
+     * @throws Exception
+     */
+    final public function getViewsCount(): int
+    {
+        if (!$this->has('views_count')) {
+            return 0;
+        }
+
+        return (int)$this->get('views_count');
+    }
+
+    /**
      * @param string|null $title
      * @return void
      * @throws Exception
@@ -73,5 +86,18 @@ final class TagValuesObject extends ModelValuesObject
         if (!empty($slug)) {
             $this->set('slug', $slug);
         }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    final public function setViewsCount(): void
+    {
+        $viewsCount = $this->getViewsCount();
+
+        $viewsCount++;
+
+        $this->set('views_count', $viewsCount);
     }
 }

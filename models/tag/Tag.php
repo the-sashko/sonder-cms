@@ -121,6 +121,28 @@ final class Tag extends BaseModel
     }
 
     /**
+     * @param int|null $articleId
+     * @return array|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function getTagsByArticleId(?int $articleId = null): ?array
+    {
+        if (empty($articleId)) {
+            return null;
+        }
+
+        $rows = $this->store->getTagsByArticleId($articleId);
+
+        if (empty($rows)) {
+            return null;
+        }
+
+        return $this->getVOArray($rows);
+    }
+
+    /**
      * @param int|null $id
      * @return bool
      * @throws DatabasePluginException
@@ -184,9 +206,9 @@ final class Tag extends BaseModel
             if (!empty($id)) {
                 $tagForm->setId($id);
             }
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $tagForm->setStatusFail();
-            $tagForm->setError($exp->getMessage());
+            $tagForm->setError($thr->getMessage());
 
             return false;
         }

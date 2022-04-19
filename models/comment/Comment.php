@@ -289,9 +289,9 @@ final class Comment extends BaseModel
 
                 return false;
             }
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $commentForm->setStatusFail();
-            $commentForm->setError($exp->getMessage());
+            $commentForm->setError($thr->getMessage());
 
             return false;
         }

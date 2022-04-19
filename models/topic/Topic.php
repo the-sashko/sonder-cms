@@ -25,7 +25,7 @@ final class Topic extends BaseModel
 {
     const DEFAULT_SLUG = 'topic';
 
-    const TOPICS_IMAGES_DIR_PATH = '%s/media/topics';
+    const IMAGES_DIR_PATH = '%s/media/topics';
 
     const UPLOADS_DIR_PATH = 'uploads/topics';
 
@@ -162,7 +162,7 @@ final class Topic extends BaseModel
             return false;
         }
 
-        $topicsImageDirPath = $this->_getTopicsImagesDirPath();
+        $topicsImageDirPath = $this->_getImagesDirPath();
 
         $topicsImageFilePath = sprintf(
             '%s/%s-topic.png',
@@ -270,16 +270,14 @@ final class Topic extends BaseModel
             $this->store->commit();
 
             return true;
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $this->store->rollback();
 
             $topicForm->setStatusFail();
-            $topicForm->setError($exp->getMessage());
+            $topicForm->setError($thr->getMessage());
 
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -351,6 +349,7 @@ final class Topic extends BaseModel
      * @return TopicValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     private function _getVOFromTopicForm(
         TopicForm $topicForm,
@@ -490,6 +489,7 @@ final class Topic extends BaseModel
      * @return void
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     private function _setUniqSlugToVO(TopicValuesObject $topicVO): void
     {
@@ -542,7 +542,7 @@ final class Topic extends BaseModel
             );
 
             $slug = preg_match(
-                '/^(.*?)\-([0-9]+)$/su',
+                '/^(.*?)-([0-9]+)$/su',
                 '$1',
                 $slug
             );
@@ -569,17 +569,13 @@ final class Topic extends BaseModel
         /* @var $uploadPlugin UploadPlugin */
         $uploadPlugin = $this->getPlugin('upload');
 
-        $topicsImageDirPath = $this->_getTopicsImagesDirPath();
+        $imageDirPath = $this->_getImagesDirPath();
 
-        $topicsImageFilePath = sprintf(
-            '%s/%s-topic.png',
-            $topicsImageDirPath,
-            $slug
-        );
+        $imageFilePath = sprintf('%s/%s-topic.png', $imageDirPath, $slug);
 
-        $topicsImageFullFilePath = sprintf(
+        $imageFullFilePath = sprintf(
             '%s/%s-full.png',
-            $topicsImageDirPath,
+            $imageDirPath,
             $slug
         );
 
@@ -593,19 +589,19 @@ final class Topic extends BaseModel
         if (
             empty($image) &&
             (
-                !file_exists($topicsImageFilePath) ||
-                !is_file($topicsImageFilePath)
+                !file_exists($imageFilePath) ||
+                !is_file($imageFilePath)
             )
         ) {
-            copy($defaultImageFilePath, $topicsImageFilePath);
+            copy($defaultImageFilePath, $imageFilePath);
         }
 
         if (empty($image)) {
             return true;
         }
 
-        if (!file_exists($topicsImageDirPath) && !is_dir($topicsImageDirPath)) {
-            mkdir($topicsImageDirPath, 0755, true);
+        if (!file_exists($imageDirPath) && !is_dir($imageDirPath)) {
+            mkdir($imageDirPath, 0755, true);
         }
 
         $uploadPlugin->upload(
@@ -637,18 +633,12 @@ final class Topic extends BaseModel
             return false;
         }
 
-        if (
-            file_exists($topicsImageFullFilePath) &&
-            is_file($topicsImageFullFilePath)
-        ) {
-            unlink($topicsImageFullFilePath);
+        if (file_exists($imageFullFilePath) && is_file($imageFullFilePath)) {
+            unlink($imageFullFilePath);
         }
 
-        if (
-            file_exists($topicsImageFilePath) &&
-            is_file($topicsImageFilePath)
-        ) {
-            unlink($topicsImageFilePath);
+        if (file_exists($imageFilePath) && is_file($imageFilePath)) {
+            unlink($imageFilePath);
         }
 
         /* @var $imagePlugin ImagePlugin */
@@ -656,17 +646,14 @@ final class Topic extends BaseModel
 
         $imagePlugin->resize(
             $uploadedFilePath,
-            $topicsImageDirPath,
+            $imageDirPath,
             $slug,
             TopicValuesObject::IMAGE_FORMAT,
             TopicValuesObject::IMAGE_SIZES
         );
 
-        if (
-            file_exists($topicsImageFullFilePath) &&
-            is_file($topicsImageFullFilePath)
-        ) {
-            unlink($topicsImageFullFilePath);
+        if (file_exists($imageFullFilePath) && is_file($imageFullFilePath)) {
+            unlink($imageFullFilePath);
         }
 
         unlink($uploadedFilePath);
@@ -678,11 +665,11 @@ final class Topic extends BaseModel
      * @return string
      * @throws Exception
      */
-    private function _getTopicsImagesDirPath(): string
+    private function _getImagesDirPath(): string
     {
         $publicDirPath = $this->_getPublicDirPath();
 
-        return sprintf(Topic::TOPICS_IMAGES_DIR_PATH, $publicDirPath);
+        return sprintf(Topic::IMAGES_DIR_PATH, $publicDirPath);
     }
 
     /**
@@ -703,26 +690,6 @@ final class Topic extends BaseModel
 
         return $publicDirPath;
     }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    private function _getProtectedDirPath(): string
-    {
-        if (defined('APP_PROTECTED_DIR_PATH')) {
-            return APP_PROTECTED_DIR_PATH;
-        }
-
-        $protectedDirPath = realpath(__DIR__ . '/../../..');
-
-        if (empty($protectedDirPath)) {
-            throw new Exception(
-                'Can not find protected directory path'
-            );
-        }
-
-        return $protectedDirPath;
-    }
 }
 //TODO: add language
+//TODO: missing image when changed slug

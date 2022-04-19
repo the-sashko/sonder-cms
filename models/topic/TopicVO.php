@@ -89,6 +89,19 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
+     * @return int
+     * @throws Exception
+     */
+    final public function getViewsCount(): int
+    {
+        if (!$this->has('views_count')) {
+            return 0;
+        }
+
+        return (int)$this->get('views_count');
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
@@ -143,6 +156,19 @@ final class TopicValuesObject extends ModelValuesObject
         if (!empty($parentVO)) {
             $this->set('parent_vo', $parentVO);
         }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    final public function setViewsCount(): void
+    {
+        $viewsCount = $this->getViewsCount();
+
+        $viewsCount++;
+
+        $this->set('views_count', $viewsCount);
     }
 
     /**

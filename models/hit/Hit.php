@@ -373,9 +373,9 @@ final class Hit extends BaseModel
 
                 return false;
             }
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $hitForm->setStatusFail();
-            $hitForm->setError($exp->getMessage());
+            $hitForm->setError($thr->getMessage());
 
             return false;
         }
@@ -427,9 +427,9 @@ final class Hit extends BaseModel
 
                 return false;
             }
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $hitForm->setStatusFail();
-            $hitForm->setError($exp->getMessage());
+            $hitForm->setError($thr->getMessage());
 
             return false;
         }

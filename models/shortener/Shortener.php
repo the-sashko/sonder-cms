@@ -210,11 +210,11 @@ final class Shortener extends BaseModel
 
             $shortenerForm->setId($shortenerVO->getId());
             $shortenerForm->setCode($shortenerVO->getCode());
-        } catch (Throwable $exp) {
+        } catch (Throwable $thr) {
             $this->store->rollback();
 
             $shortenerForm->setStatusFail();
-            $shortenerForm->setError($exp->getMessage());
+            $shortenerForm->setError($thr->getMessage());
 
             return false;
         }

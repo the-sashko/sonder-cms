@@ -11,6 +11,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class TagStore extends ModelStore implements IModelStore
 {
     const TAGS_TABLE = 'tags';
+    const TAG_TO_ARTICLE_TABLE = 'tag2article';
+    const ARTICLES_TABLE = 'articles';
 
     /**
      * @var string|null
@@ -342,6 +344,53 @@ final class TagStore extends ModelStore implements IModelStore
         ';
 
         $sql = sprintf($sql, TagStore::TAGS_TABLE, $sqlWhere);
+
+        return $this->getRows($sql);
+    }
+
+    /**
+     * @param int|null $articleId
+     * @return array|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getTagsByArticleId(?int $articleId = null): ?array
+    {
+        if (empty($articleId)) {
+            return null;
+        }
+
+        $this->scope = 'article';
+
+        $sql = '
+            SELECT "tags".*
+            FROM "%s" AS "tags"
+            LEFT JOIN "%s" AS "article2tag"
+                ON "article2tag"."tag_id" = "tags"."id"
+            LEFT JOIN "%s" AS "articles"
+                ON "articles"."id" = "article2tag"."article_id"
+            WHERE
+                (
+                    "tags"."ddate" IS NULL OR
+                    "tags"."ddate" < 1
+                ) AND
+                "tags"."is_active" = true AND
+                (
+                    "articles"."ddate" IS NULL OR
+                    "articles"."ddate" < 1
+                ) AND
+                "articles"."is_active" = true AND
+                "articles"."id" = %d
+            ORDER BY "tags"."title" DESC;
+        ';
+
+        $sql = sprintf(
+            $sql,
+            TagStore::TAGS_TABLE,
+            TagStore::TAG_TO_ARTICLE_TABLE,
+            TagStore::ARTICLES_TABLE,
+            $articleId
+        );
 
         return $this->getRows($sql);
     }
