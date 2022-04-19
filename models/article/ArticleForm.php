@@ -21,6 +21,10 @@ final class ArticleForm extends ModelFormObject
 
     const META_DESCRIPTION_MAX_LENGTH = 512;
 
+    const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
+
+    const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
+
     const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
     const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
@@ -35,7 +39,7 @@ final class ArticleForm extends ModelFormObject
 
     const SUMMARY_TOO_LONG_ERROR_MESSAGE = 'Summary is too long';
 
-    const META_TITLE_TOO_LONG_ERROR_MESSAGE = 'Meta Title is too long';
+    const META_TITLE_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
 
     const META_TITLE_EXISTS_ERROR_MESSAGE = 'Article with this meta title ' .
     'already exists';
@@ -52,9 +56,13 @@ final class ArticleForm extends ModelFormObject
     const TAGS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active tags exists. You ' .
     'need to add first one for creating articles';
 
+    const TAGS_SAVING_ERROR_MESSAGE = 'Can not save article tags';
+
     const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
     const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
+
+    const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
 
     /**
      * @throws Exception
@@ -62,6 +70,8 @@ final class ArticleForm extends ModelFormObject
     final public function checkInputValues(): void
     {
         $this->setStatusSuccess();
+
+        $this->_setImageFileFromRequest();
 
         $this->_validateTitleValue();
         $this->_validateTextValue();
@@ -119,16 +129,35 @@ final class ArticleForm extends ModelFormObject
     }
 
     /**
+     * @return array|null
+     * @throws Exception
+     */
+    final public function getImage(): ?array
+    {
+        if (!$this->has('image')) {
+            return null;
+        }
+
+        $image = $this->get('image');
+
+        if (empty($image) || !is_array($image)) {
+            return null;
+        }
+
+        return $image;
+    }
+
+    /**
      * @return string|null
      * @throws Exception
      */
-    final public function getImage(): ?string
+    final public function getImageDir(): ?string
     {
-        if ($this->has('image')) {
-            return $this->get('image');
+        if (!$this->has('image_dir')) {
+            return null;
         }
 
-        return null;
+        return (string)$this->get('image_dir');
     }
 
     /**
@@ -281,16 +310,6 @@ final class ArticleForm extends ModelFormObject
     final public function setSlug(?string $slug = null): void
     {
         $this->set('slug', $slug);
-    }
-
-    /**
-     * @param string|null $image
-     * @return void
-     * @throws Exception
-     */
-    final public function setImage(?string $image = null): void
-    {
-        $this->set('image', $image);
     }
 
     /**
@@ -527,5 +546,16 @@ final class ArticleForm extends ModelFormObject
 
             $this->setStatusFail();
         }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function _setImageFileFromRequest(): void
+    {
+        $image = $this->getFileValueFromRequest('image');
+
+        $this->set('image', $image);
     }
 }

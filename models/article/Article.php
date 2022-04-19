@@ -3,6 +3,7 @@
 namespace Sonder\Models;
 
 use Exception;
+use ImagickException;
 use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Article\ArticleForm;
@@ -12,9 +13,13 @@ use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Models\User\UserValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Plugins\Image\Exceptions\ImagePluginException;
+use Sonder\Plugins\Image\Exceptions\ImageSizeException;
+use Sonder\Plugins\ImagePlugin;
 use Sonder\Plugins\LinkPlugin;
 use Sonder\Plugins\MarkupPlugin;
 use Sonder\Plugins\TranslitPlugin;
+use Sonder\Plugins\UploadPlugin;
 use Throwable;
 
 /**
@@ -23,6 +28,10 @@ use Throwable;
 final class Article extends BaseModel
 {
     const DEFAULT_SLUG = 'article';
+
+    const IMAGES_DIR_PATH = '%s/media/articles/%s';
+
+    const UPLOADS_DIR_PATH = 'uploads/articles';
 
     /**
      * @var int
@@ -326,8 +335,6 @@ final class Article extends BaseModel
 
         $articleVO = $this->_getVOFromArticleForm($articleForm, true);
 
-        $this->store->start();
-
         try {
             if (!$this->store->insertOrUpdateArticle($articleVO)) {
                 $this->store->rollback();
@@ -336,7 +343,7 @@ final class Article extends BaseModel
                 return false;
             }
 
-            $id = $this->store->getArticleIdBySlug($articleForm->getSlug());
+            $id = $this->store->getArticleIdBySlug($articleVO->getSlug());
 
             if (empty($id)) {
                 $this->store->rollback();
@@ -346,11 +353,35 @@ final class Article extends BaseModel
             }
 
             $articleForm->setId($id);
-        } catch (Throwable $exp) {
+
+            if (!$this->_uploadImageFile($articleVO, $articleForm)) {
+                $articleForm->setError(
+                    ArticleForm::UPLOAD_IMAGE_FILE_ERROR_MESSAGE
+                );
+
+                $articleForm->setStatusFail();
+
+                $this->store->rollback();
+
+                return false;
+            }
+
+            if (!$this->_saveSelectedTags($articleForm)) {
+                $articleForm->setError(
+                    ArticleForm::TAGS_SAVING_ERROR_MESSAGE
+                );
+
+                $articleForm->setStatusFail();
+
+                $this->store->rollback();
+
+                return false;
+            }
+        } catch (Throwable $thr) {
             $this->store->rollback();
 
             $articleForm->setStatusFail();
-            $articleForm->setError($exp->getMessage());
+            $articleForm->setError($thr->getMessage());
 
             return false;
         }
@@ -374,6 +405,7 @@ final class Article extends BaseModel
 
         $this->_setUserVOToVO($articleVO);
         $this->_setTopicVOToVO($articleVO);
+        $this->_setTagsToVO($articleVO);
 
         return $articleVO;
     }
@@ -415,6 +447,24 @@ final class Article extends BaseModel
 
         if (!empty($topicVO)) {
             $articleVO->setTopicVO($topicVO);
+        }
+    }
+
+    /**
+     * @param ArticleValuesObject $articleVO
+     * @return void
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    private function _setTagsToVO(ArticleValuesObject $articleVO): void
+    {
+        /* @var $tagModel Tag */
+        $tagModel = $this->getModel('tag');
+
+        $tagVOs = $tagModel->getTagsByArticleId($articleVO->getId());
+
+        if (!empty($tagVOs)) {
+            $articleVO->setTags($tagVOs);
         }
     }
 
@@ -807,5 +857,164 @@ final class Article extends BaseModel
 
         return $this->_makeSlugUniq($slug, $id);
     }
+
+    /**
+     * @param ArticleValuesObject $articleVO
+     * @param ArticleForm $articleForm
+     * @return bool
+     * @throws DatabasePluginException
+     * @throws ImagePluginException
+     * @throws ImageSizeException
+     * @throws ImagickException
+     * @throws Exception
+     */
+    private function _uploadImageFile(
+        ArticleValuesObject $articleVO,
+        ArticleForm         $articleForm
+    ): bool
+    {
+        $image = $articleForm->getImage();
+
+        if (empty($image)) {
+            $articleVO->setImageDir($articleForm->getImageDir());
+
+            //TODO: remove image dir
+
+            $this->store->updateArticleById(
+                $articleVO->exportRow(),
+                $articleVO->getId()
+            );
+
+            return true;
+        }
+
+        /* @var $uploadPlugin UploadPlugin */
+        $uploadPlugin = $this->getPlugin('upload');
+
+        $imageDirName = $this->_getImagesDirName($articleVO->getSlug());
+
+        $imageDirPath = $this->_getImagesDirPath($imageDirName);
+
+        if (!file_exists($imageDirPath) && !is_dir($imageDirPath)) {
+            mkdir($imageDirPath, 0755, true);
+        }
+
+        $uploadPlugin->upload(
+            ArticleForm::IMAGE_EXTENSIONS,
+            ArticleForm::IMAGE_FILE_MAX_SIZE,
+            Article::UPLOADS_DIR_PATH
+        );
+
+        $error = $uploadPlugin->getError();
+
+        if (!empty($error)) {
+            throw new Exception($error);
+        }
+
+        $uploadedFiles = $uploadPlugin->getFiles();
+
+        if (
+            empty($uploadedFiles) ||
+            !array_key_exists('image', $uploadedFiles) ||
+            empty($uploadedFiles['image']) ||
+            !is_array($uploadedFiles['image'])
+        ) {
+            return false;
+        }
+
+        $uploadedFilePath = array_shift($uploadedFiles['image']);
+
+        if (!file_exists($uploadedFilePath) || !is_file($uploadedFilePath)) {
+            return false;
+        }
+
+        /* @var $imagePlugin ImagePlugin */
+        $imagePlugin = $this->getPlugin('image');
+
+        $imagePlugin->resize(
+            $uploadedFilePath,
+            $imageDirPath,
+            $articleVO->getSlug(),
+            ArticleValuesObject::IMAGE_FORMAT,
+            ArticleValuesObject::IMAGE_SIZES
+        );
+
+        unlink($uploadedFilePath);
+
+        $articleVO->setImageDir($imageDirName);
+
+        $this->store->updateArticleById(
+            $articleVO->exportRow(),
+            $articleVO->getId()
+        );
+
+        return true;
+    }
+
+    private function _getImagesDirName(string $slug): string
+    {
+        return sprintf('%s/%s', date('Y/m/d/h/i/s'), $slug);
+    }
+
+    /**
+     * @param string $imageDirName
+     * @return string
+     * @throws Exception
+     */
+    private function _getImagesDirPath(string $imageDirName): string
+    {
+        $publicDirPath = $this->_getPublicDirPath();
+
+        return sprintf(
+            Article::IMAGES_DIR_PATH,
+            $publicDirPath,
+            $imageDirName
+        );
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    private function _getPublicDirPath(): string
+    {
+        if (defined('APP_PUBLIC_DIR_PATH')) {
+            return APP_PUBLIC_DIR_PATH;
+        }
+
+        $publicDirPath = realpath(__DIR__ . '/../../../../public');
+
+        if (empty($publicDirPath)) {
+            throw new Exception('Can not find public directory path');
+        }
+
+        return $publicDirPath;
+    }
+
+    /**
+     * @param ArticleForm $articleForm
+     * @return bool
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    private function _saveSelectedTags(ArticleForm $articleForm): bool
+    {
+        $this->store->deleteArticle2TagRelationsByArticleId(
+            $articleForm->getId()
+        );
+
+        foreach ($articleForm->getTags() as $tagId) {
+            $this->store->insertArticle2TagRelation(
+                (int)$tagId,
+                $articleForm->getId()
+            );
+        }
+
+        return true;
+    }
 }
-//TODO: add imag + language + format text form fields
+//TODO: language
+//TODO: format text form fields
+//TODO: missing image when created
+//TODO: missing image when changed slug
+

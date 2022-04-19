@@ -11,8 +11,8 @@ use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 final class ArticleStore extends ModelStore implements IModelStore
 {
     const ARTICLES_TABLE = 'articles';
-    const ARTICLE_TO_TAG_TABLE = 'article2tag';
     const TOPICS_TABLE = 'topics';
+    const TAG_TO_ARTICLE_TABLE = 'tag2article';
     const TAGS_TABLE = 'tags';
     const USERS_TABLE = 'users';
 
@@ -381,6 +381,8 @@ final class ArticleStore extends ModelStore implements IModelStore
             return $this->updateArticleById($row, $id);
         }
 
+        $this->deleteArticle2TagRelationsByArticleId($id);
+
         return $this->deleteRowById(ArticleStore::ARTICLES_TABLE, $id);
     }
 
@@ -741,7 +743,7 @@ final class ArticleStore extends ModelStore implements IModelStore
         $sql = sprintf(
             $sql,
             ArticleStore::ARTICLES_TABLE,
-            ArticleStore::ARTICLE_TO_TAG_TABLE,
+            ArticleStore::TAG_TO_ARTICLE_TABLE,
             ArticleStore::TAGS_TABLE,
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
@@ -813,7 +815,7 @@ final class ArticleStore extends ModelStore implements IModelStore
         $sql = sprintf(
             $sql,
             ArticleStore::ARTICLES_TABLE,
-            ArticleStore::ARTICLE_TO_TAG_TABLE,
+            ArticleStore::TAG_TO_ARTICLE_TABLE,
             ArticleStore::TAGS_TABLE,
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
@@ -1001,5 +1003,49 @@ final class ArticleStore extends ModelStore implements IModelStore
         }
 
         return $this->addRow(ArticleStore::ARTICLES_TABLE, $row);
+    }
+
+    /**
+     * @param int|null $tagId
+     * @param int|null $articleId
+     * @return bool
+     * @throws DatabasePluginException
+     */
+    final public function insertArticle2TagRelation(
+        ?int $tagId = null,
+        ?int $articleId = null
+    ): bool
+    {
+        if (empty($articleId) || empty($tagId)) {
+            return false;
+        }
+
+        $row = [
+            'article_id' => $articleId,
+            'tag_id' => $tagId,
+        ];
+
+        return $this->addRow(ArticleStore::TAG_TO_ARTICLE_TABLE, $row);
+    }
+
+    /**
+     * @param int|null $articleId
+     * @return bool
+     * @throws DatabasePluginException
+     */
+    final public function deleteArticle2TagRelationsByArticleId(
+        ?int $articleId = null
+    ): bool
+    {
+        if (empty($articleId)) {
+            return false;
+        }
+
+        $condition = sprintf('article_id = %d', $articleId);
+
+        return $this->deleteRows(
+            ArticleStore::TAG_TO_ARTICLE_TABLE,
+            $condition
+        );
     }
 }

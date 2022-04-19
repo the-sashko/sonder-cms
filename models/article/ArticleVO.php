@@ -9,6 +9,28 @@ use Sonder\Models\User\UserValuesObject;
 
 final class ArticleValuesObject extends ModelValuesObject
 {
+    const IMAGE_SIZES = [
+        'thumbnail' => [
+            'height' => 64,
+            'width' => 64,
+            'file_prefix' => 'thumb'
+        ],
+
+        'list' => [
+            'height' => null,
+            'width' => 256,
+            'file_prefix' => 'l'
+        ],
+
+        'single_view' => [
+            'height' => null,
+            'width' => 512,
+            'file_prefix' => 'a'
+        ]
+    ];
+
+    const IMAGE_FORMAT = 'png';
+
     /**
      * @var string|null
      */
@@ -25,14 +47,19 @@ final class ArticleValuesObject extends ModelValuesObject
     protected ?string $restoreLinkPattern = '/admin/article/restore/%d/';
 
     /**
-     * @var string|null
+     * @var string
      */
-    protected ?string $adminViewLinkPattern = '/admin/articles/view/%d/';
+    protected string $adminViewLinkPattern = '/admin/articles/view/%d/';
 
     /**
-     * @var string|null
+     * @var string
      */
-    protected ?string $imageLinkPattern = '/images/articles/%s/%s.png';
+    protected string $imageLinkPattern = '/media/articles/%s/%s-%s.png';
+
+    /**
+     * @var string
+     */
+    protected string $missingImageLink = '/assets/img/broken.png';
 
     /**
      * @return string
@@ -60,13 +87,13 @@ final class ArticleValuesObject extends ModelValuesObject
      * @return string|null
      * @throws Exception
      */
-    final public function getImage(): ?string
+    final public function getImageDir(): ?string
     {
-        if (!$this->has('image')) {
+        if (!$this->has('image_dir')) {
             return null;
         }
 
-        return (string)$this->get('image');
+        return (string)$this->get('image_dir');
     }
 
     /**
@@ -179,10 +206,10 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return string|null
+     * @return array|null
      * @throws Exception
      */
-    final public function getTags(): ?string
+    final public function getTags(): ?array
     {
         if (!$this->has('tags')) {
             return null;
@@ -194,12 +221,68 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
+     * @return array|null
+     * @throws Exception
+     */
+    final public function getTagIds(): ?array
+    {
+        $tags = $this->getTags();
+
+        if (empty($tags)) {
+            return null;
+        }
+
+        $tagIds = [];
+
+        foreach ($tags as $tag) {
+            $tagIds[] = $tag->getId();
+        }
+
+        return $tagIds;
+    }
+
+    /**
+     * @param string $size
      * @return string
      * @throws Exception
      */
-    final public function getImageLink(): string
+    final public function getImageLink(string $size): string
     {
-        return sprintf($this->imageLinkPattern, $this->getSlug());
+        $imageDir = $this->getImageDir();
+
+        if (empty($imageDir)) {
+            return $this->missingImageLink;
+        }
+
+        if (!array_key_exists($size, ArticleValuesObject::IMAGE_SIZES)) {
+            return $this->missingImageLink;
+        }
+
+        $size = ArticleValuesObject::IMAGE_SIZES[$size];
+
+        if (!array_key_exists('file_prefix', $size)) {
+            return $this->missingImageLink;
+        }
+
+        return sprintf(
+            $this->imageLinkPattern,
+            $imageDir,
+            $this->getSlug(),
+            $size['file_prefix']
+        );
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    final public function getViewsCount(): int
+    {
+        if (!$this->has('views_count')) {
+            return 0;
+        }
+
+        return (int)$this->get('views_count');
     }
 
     /**
@@ -227,15 +310,13 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param string|null $image
+     * @param string|null $imageDir
      * @return void
      * @throws Exception
      */
-    final public function setImage(?string $image = null): void
+    final public function setImageDir(?string $imageDir = null): void
     {
-        if (!empty($image)) {
-            $this->set('image', $image);
-        }
+        $this->set('image_dir', $imageDir);
     }
 
     /**
@@ -358,6 +439,19 @@ final class ArticleValuesObject extends ModelValuesObject
         if (!empty($tags)) {
             $this->set('tags', $tags);
         }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    final public function setViewsCount(): void
+    {
+        $viewsCount = $this->getViewsCount();
+
+        $viewsCount++;
+
+        $this->set('views_count', $viewsCount);
     }
 
     /**
