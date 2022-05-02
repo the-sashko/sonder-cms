@@ -18,7 +18,7 @@ final class MainController extends BaseController
      */
     final public function displayIndex(): ResponseObject
     {
-        return $this->render('index');
+        return $this->render('demo');
 
         //TODO
     }
