@@ -1,0 +1,173 @@
+@media (min-width: @screen-mobile-small) {
+    blockquote {
+        line-height: @line-height-normal;
+        padding: @space-big @space-max;
+    }
+
+    form {
+        padding: @space-max @space-max 0 @space-max;
+        border: @border;
+        width: @form-width-mobile-small;
+        border-radius: @border-radius-alt;
+    }
+
+    input {
+        &[type="text"], &[type="password"] {
+            margin-right: @space-max;
+            padding: @space-big;
+        }
+
+        &[type="submit"] {
+            line-height: @line-height-big;
+        }
+    }
+
+    select {
+        padding: @space-big;
+    }
+
+    textarea {
+        height: @textarea-height;
+        padding: @space-big;
+        line-height: @line-height-normal;
+    }
+
+    html {
+        font-size: @main-font-size;
+
+        body {
+            font-size: @main-font-size;
+            background: @background-wrapper-color;
+
+            .wrapper {
+                min-height: 100%;
+
+                .header {
+                    padding-bottom: @space-max;
+
+                    .site-title-wrapper {
+                        background-image: url(@header-background-image);
+                        background-size: cover;
+                        padding: @site-title-wrapper-padding-mobile;
+
+                        .site-title {
+                            font-size: @site-title-font-size-mobile;
+                            letter-spacing: @site-title-letter-spacing;
+                        }
+                    }
+
+                    .mobile-menu-wrapper {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+
+                        .mobile-menu-button {
+                            padding: @space-mobile-small-header-button @space-big;
+                            width: auto;
+                            font-size: @font-size-bigger;
+                            opacity: @transparent;
+
+                            &:hover {
+                                color: @link-color;
+                            }
+                        }
+                    }
+
+                    .mobile-menu {
+                        padding: 0 @space-max;
+
+                        .mobile-menu-search {
+                            display: block;
+
+                            form {
+                                margin: 0;
+                                padding: 0;
+                                border: none;
+                                display: inline;
+                                width: 100%;
+                            }
+
+                            input {
+                                margin: 0;
+                                border: @border;
+                                background: @background-color;
+                                outline: none;
+                                width: 100%;
+                            }
+                        }
+
+                        .mobile-menu-language {
+                            border: none;
+
+                            a {
+                                padding: 0 @space-big;
+                            }
+                        }
+                    }
+                }
+
+                .main {
+                    margin: 0 @space-max;
+                    padding: 0 0 @footer-height 0;
+
+                    .post-title, .topic-title, .page-title {
+                        font-size: @font-size-big;
+                    }
+
+                    .main-content {
+                        margin-top: @space-max;
+
+                        p {
+                            margin: 0 0 @space-max 0;
+
+                            .article-meta {
+                                text-align: center;
+
+                                .article-meta-date, .article-meta-topic {
+                                    line-height: @line-height-big;
+                                }
+                            }
+                        }
+
+                        .post {
+                            p {
+                                margin: 0 0 @space-max 0;
+
+                                .article-meta {
+                                    text-align: center;
+
+                                    .article-meta-date, .article-meta-topic {
+                                        line-height: @line-height-big;
+                                    }
+                                }
+                            }
+
+                            .post-list-item-title {
+                                font-size: @font-size-big;
+                                margin: @space-max 0;
+                            }
+                        }
+
+                        .form-wrapper {
+                            margin-bottom: @space-max;
+                        }
+                    }
+                }
+
+                .footer {
+                    display: block;
+                    margin: 0 @space-max;
+                    border-top: @border;
+                    font-weight: bold;
+                    line-height: @footer-height;
+                    position: absolute;
+                    text-align: center;
+                    text-transform: uppercase;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                }
+            }
+        }
+    }
+}

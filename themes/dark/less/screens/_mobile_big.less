@@ -1,0 +1,165 @@
+@media (min-width: @screen-mobile-big) {
+    form {
+        width: auto;
+    }
+
+    html {
+        body {
+            .wrapper {
+                .header {
+                    .main-menu {
+                        margin: @space-max 0 0 0;
+                        padding: 0;
+                        display: inline-block;
+
+                        li {
+                            margin: 0;
+                            font-size: @font-size-smaller;
+                            font-weight: bold;
+                            line-height: @space-max;
+                            padding: 0 @space-middle;
+                            display: block;
+                            float: left;
+                            text-transform: uppercase;
+                            list-style-type: none;
+                        }
+                    }
+
+                    .language-selector {
+                        display: block;
+                        font-size: @font-size-bigger;
+                        font-weight: bold;
+                        cursor: pointer;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        padding: @space-header-button;
+                        text-align: center;
+                        opacity: @transparent;
+                        text-transform: uppercase;
+
+                        span {
+                            &:hover {
+                                color: @link-color;
+                            }
+                        }
+
+                        .language-selector-list {
+                            display: none;
+                            margin: 0;
+                            padding: 0;
+                            position: absolute;
+                            top: 0;
+
+                            li {
+                                list-style-type: none;
+                                margin: 0;
+                                padding: 0;
+                                line-height: @font-size-max;
+
+                                &:hover {
+                                    color: @link-color;
+                                }
+                            }
+                        }
+                    }
+
+                    .search-form-wrapper {
+                        display: block;
+                        font-size: @font-size-bigger;
+                        font-weight: bold;
+                        cursor: pointer;
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        padding: @space-header-button;
+                        text-align: center;
+                        opacity: @transparent;
+
+                        span {
+                            &:hover {
+                                color: @link-color;
+                            }
+                        }
+                    }
+
+                    .search-form {
+                        display: none;
+                        margin: 0;
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        height: auto;
+                        padding: @space-mobile-big-search-form @space-max;
+                        width: calc((100% - (2rem * 9)) / 2);
+                        border: none;
+                        opacity: @transparent;
+                        text-align: right;
+
+                        input {
+                            font-size: @font-size-smaller;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            border: 1px solid @text-color;
+                            outline: none;
+                            max-width: @screen-mobile-small;
+                        }
+                    }
+
+                    .mobile-menu-wrapper {
+                        display: none;
+                    }
+                }
+
+                .main {
+                    .main-content {
+                        p {
+                            .article-meta {
+                                float: right;
+                                width: @article-meta-width-mobile;
+                                text-align: center;
+                                margin: 0 0 0 @space-max;
+                                display: inline-block;
+
+                                .article-meta-image-wrapper {
+                                    border: @border;
+                                }
+
+                                .article-meta-date, .article-meta-topic {
+                                    line-height: @line-height-big;
+                                }
+                            }
+                        }
+
+                        .post {
+                            p {
+                                .article-meta {
+                                    float: right;
+                                    width: @article-meta-width-mobile;
+                                    text-align: center;
+                                    margin: 0 0 0 @space-max;
+                                    display: inline-block;
+
+                                    .article-meta-image-wrapper {
+                                        border: @border;
+                                    }
+
+                                    .article-meta-date, .article-meta-topic {
+                                        line-height: @line-height-big;
+                                    }
+                                }
+                            }
+
+                            .post-list-item-title {
+                                float: left;
+                                width: calc(100% - @article-meta-width-mobile);
+                                margin: 0 -@space-max 0 0;
+                                font-size: @font-size-bigger;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

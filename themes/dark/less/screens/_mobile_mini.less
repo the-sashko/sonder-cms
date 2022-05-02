@@ -1,0 +1,102 @@
+@media (min-width: @screen-mobile-mini) {
+    html {
+        font-size: @main-font-size-mobile;
+
+        body {
+            font-size: @main-font-size-mobile;
+
+            .wrapper {
+                .header {
+                    .site-title-wrapper {
+                        .site-title {
+                            font-size: @site-title-font-size-mobile-small;
+                            text-shadow: @chromatic-aberration;
+                        }
+                    }
+
+                    .mobile-menu {
+                        text-transform: uppercase;
+                        font-size: @font-size-normal;
+                        display: none;
+
+
+                        li {
+                            margin: @space-middle 0;
+                            padding: @space-middle 0;
+                        }
+
+                        .mobile-menu-language {
+                            text-transform: uppercase;
+
+                            a {
+                                padding: 0 @space-middle;
+                            }
+                        }
+                    }
+                }
+
+                .main {
+                    padding: 0 @space-middle;
+
+                    .main-content {
+                        p {
+                            .article-meta {
+                                margin: 0 0 @space-middle 0;
+
+                                .article-meta-image-wrapper {
+                                    display: inline-block;
+                                    border-radius: @border-radius;
+
+                                    img {
+                                        width: 100%;
+                                        height: auto;
+                                        max-width: none;
+                                        border-radius: @border-radius;
+                                        border: none;
+                                    }
+                                }
+
+                                .article-meta-date, .article-meta-topic {
+                                    display: inline-block;
+                                }
+                            }
+                        }
+
+                        .post {
+                            margin-top: 0;
+
+                            p {
+                                .article-meta {
+                                    margin: 0 0 @space-middle 0;
+
+                                    .article-meta-image-wrapper {
+                                        display: inline-block;
+                                        border-radius: @border-radius;
+
+                                        img {
+                                            width: 100%;
+                                            height: auto;
+                                            max-width: none;
+                                            border-radius: @border-radius;
+                                            border: none;
+                                        }
+                                    }
+
+                                    .article-meta-date, .article-meta-topic {
+                                        display: inline-block;
+                                    }
+                                }
+                            }
+
+                            .post-list-item-title {
+                                text-align: left;
+                                line-height: @line-height-normal;
+                                margin: @space-big 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

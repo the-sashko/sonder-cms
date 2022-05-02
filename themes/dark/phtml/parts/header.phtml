@@ -1,1 +1,55 @@
-<!-- TODO -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Test site</title>
+    <?php __part('meta'); ?>
+    <?php __part('rss'); ?>
+    <?php __part('css'); ?>
+    <!--[if lt IE 9]>
+    <script src="/assets/js/libs/html5shiv.min.js"></script>
+    <![endif]-->
+</head>
+<body itemscope itemtype="https://schema.org/WebPage">
+<div class="wrapper">
+    <div class="header">
+        <div itemscope itemtype="https://schema.org/WebSite">
+            <meta itemprop="image" content="/assets/img/logo.png"/>
+            <meta itemprop="thumbnailUrl" content="/assets/img/logo.png"/>
+            <link itemprop="url" href="#"/>
+            <div class="site-title-wrapper">
+                <h1 itemprop="headline" id="site-title" class="site-title">
+                    Test site
+                </h1>
+            </div>
+            <ul class="main-menu">
+                <?php __part('menu'); ?>
+            </ul>
+            <div class="clear"></div>
+            <div id="language-selector" class="language-selector">
+                <span id="language-selector-current">en</span>
+                <ul id="language-selector-list" class="language-selector-list">
+                    <li><a href="/language/ua/">ua</a></li>
+                    <li><span>en</span></li>
+                    <li><a href="/language/ru/">ru</a></li>
+                </ul>
+            </div>
+            <div id="search-form-wrapper" class="search-form-wrapper">
+                <span>
+                    <i id="search-button"
+                       class="fas fa-search search-form-icon">
+                    </i>
+                </span>
+            </div>
+            <?php __part('search'); ?>
+            <div class="mobile-menu-wrapper">
+                <div id="mobile-menu-button" class="mobile-menu-button">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+            <ul id="mobile-menu" class="mobile-menu">
+                <?php __part('menu'); ?>
+            </ul>
+        </div>
+    </div>
+    <div class="main">
+        <div class="main-content">

@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: left;
+    line-height: @line-height-normal;
+    padding: 0 @space-max;
+}
+
+h1, h2 {
+    text-transform: uppercase;
+}
+
+h1, h2, h3 {
+    font-weight: bold;
+}
+
+h4, h5, h6 {
+    font-weight: normal;
+}
+
+h1 {
+    font-size: @font-size-max;
+}
+
+h2 {
+    font-size: @font-size-very-big;
+}
+
+h3 {
+    font-size: @font-size-big;
+}
+
+h4 {
+    font-size: @font-size-big;
+}
+
+h5 {
+    font-size: @font-size-bigger;
+}
+
+h6 {
+    font-size: @font-size-normal;
+}
+
+img {
+    border: @border;
+    border-radius: @border-radius-alt;
+    max-width: @image-width;
+}
+
+p {
+    line-height: @line-height-normal;
+    margin: 0 0 @space-big;
+    padding: 0 @space-max;
+    text-align: left;
+}
+
+
+a {
+    color: @link-color;
+    font-weight: bold;
+    outline: none;
+    text-decoration: none;
+
+    &:focus, &:hover {
+        border: none;
+        color: @text-color;
+        outline: none;
+    }
+}
+
+ul, ol {
+    margin: @space-max;
+    text-align: left;
+}
+
+ul {
+    li {
+        list-style-type: circle;
+        margin-left: @space-big;
+        padding-left: @space-small;
+        line-height: @line-height-normal;
+    }
+}
+
+ol {
+    li {
+        margin-left: @space-big;
+        padding-left: @space-small;
+        line-height: @line-height-normal;
+    }
+}
+
+blockquote {
+    margin: 0;
+    display: inline-block;
+    background: @blockquote-background-color;
+    width: auto;
+    line-height: @line-height-normal;
+    padding: @space-middle @space-big;
+    text-align: left;
+    border: @border;
+    border-radius: @border-radius;
+    font-weight: bold;
+    color: @blockquote-color;
+    font-style: italic;
+}
+
+form {
+    width: @form-width-mobile-small;
+    padding: 0 @space-middle @space-middle @space-middle;
+    margin: 0;
+    font-weight: bold;
+    overflow-x: hidden;
+    display: inline-block;
+
+    p {
+        margin: @space-middle 0 0 0;
+        padding: 0;
+    }
+
+    .success-message {
+        background: @background-alt-color;
+        color: @green-color;
+        font-weight: bold;
+    }
+
+    .info-message {
+        background: @background-alt-color;
+        font-weight: bold;
+    }
+
+    .error-message {
+        background: @red-color;
+        font-weight: bold;
+
+        ul {
+            li {
+                font-weight: bold;
+                list-style-type: none;
+                margin-left: 0;
+                padding-left: 0;
+            }
+        }
+    }
+}
+
+fieldset {
+    padding: 0;
+    border: none;
+}
+
+legend {
+    margin: 0;
+    padding: 0;
+    line-height: @line-height-normal;
+}
+
+input {
+    font-size: @font-size-normal;
+    background: @background-alt-color;
+    color: @text-color;
+    border: @border;
+    border-radius: @border-radius;
+
+    &[type="text"], &[type="password"], &[type="number"] {
+        width: 100%;
+        margin-right: @space-middle;
+        padding: @space-middle;
+    }
+
+    &[type="submit"] {
+        display: inline-block;
+        min-width: 100%;
+        background: @button-background-color;
+        text-transform: uppercase;
+        line-height: @line-height-normal;
+        text-align: center;
+        font-weight: bold;
+        color: @button-color;
+        cursor: pointer;
+    }
+}
+
+select, textarea {
+    font-size: @font-size-normal;
+    background: @background-alt-color;
+    color: @text-color;
+    border: @border;
+    border-radius: @border-radius;
+}
+
+select {
+    padding: @space-middle;
+}
+
+textarea {
+    resize: none;
+    height: @textarea-height;
+    padding: @space-middle;
+    line-height: @line-height-normal;
+    width: 100%;
+    display: inline-block;
+}
+
+.hidden {
+    display: none;
+}
+
+.clear {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.button {
+    display: inline-block;
+    background: @button-background-color;
+    text-transform: uppercase;
+    line-height: @line-height-normal;
+    text-align: center;
+    font-weight: bold;
+    color: @button-color;
+    cursor: pointer;
+}

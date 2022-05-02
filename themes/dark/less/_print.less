@@ -1,0 +1,57 @@
+@media print {
+    a {
+        color: @text-color;
+    }
+
+    html {
+        body {
+            .wrapper {
+                .header {
+                    display: none;
+                }
+
+                .main {
+                    .main-content {
+                        p {
+                            img {
+                                display: none;
+                            }
+
+                            .article-meta {
+                                display: none;
+                            }
+
+                            .article-read-more {
+                                display: none;
+                            }
+                        }
+
+                        .post {
+                            .post-list-item-title {
+                                width: 100%;
+                            }
+
+                            p {
+                                .article-meta {
+                                    display: none;
+                                }
+
+                                .article-read-more {
+                                    display: none;
+                                }
+                            }
+                        }
+                    }
+
+                    .pagination {
+                        display: none;
+                    }
+                }
+
+                .footer {
+                    display: none;
+                }
+            }
+        }
+    }
+}

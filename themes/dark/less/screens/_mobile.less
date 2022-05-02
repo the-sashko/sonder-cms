@@ -1,0 +1,54 @@
+@media (min-width: @screen-mobile) {
+    form {
+        width: @form-width-mobile;
+    }
+
+    html {
+        body {
+            .wrapper {
+                .header {
+                    .site-title-wrapper {
+                        padding: @site-title-wrapper-padding;
+
+                        .site-title {
+                            font-size: @site-title-font-size;
+                        }
+                    }
+
+                    .mobile-menu-wrapper {
+                        .mobile-menu-button {
+                            font-size: @font-size-big;
+                            padding: @space-mobile-header-button @space-max;
+                        }
+                    }
+                }
+
+                .main {
+                    .pagination {
+                        p {
+                            margin: 0 0 @space-max 0;
+
+                            a, span {
+                                float: left;
+                                padding: @space-big;
+                                font-size: @font-size-bigger;
+                            }
+
+                            a {
+                                &:hover {
+                                    background: @link-color;
+                                    color: @text-color;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                .footer {
+                    text-align: left;
+                }
+            }
+        }
+    }
+}

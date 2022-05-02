@@ -1,0 +1,231 @@
+@import (less) url("../css/lib/normalize.min.css");
+@import (less) url("../css/lib/fonts.min.css");
+@import (less) url("../css/lib/fontawesome.min.css");
+
+@import "_colors";
+@import "_sizes";
+@import "_variables";
+@import "_typography";
+
+html {
+    height: 100%;
+    min-width: @screen-min-width;
+    font-size: @main-font-size-mobile-small;
+
+    body {
+        text-align: center;
+        background: @background-color;
+        color: @text-color;
+        font-family: @font-family;
+        font-size: @main-font-size-mobile-small;
+        height: 100%;
+        min-width: @screen-min-width;
+        line-height: @line-height-minimal;
+        word-wrap: anywhere;
+
+        .wrapper {
+            display: inline-block;
+            text-align: left;
+            background: @background-color;
+            position: relative;
+            width: 100%;
+
+            .header {
+                text-align: center;
+
+                .site-title-wrapper {
+                    padding: @space-small;
+
+                    .site-title {
+                        text-transform: uppercase;
+                        margin: 0;
+                        padding: 0;
+                        font-size: @font-size-normal;
+                        line-height: @line-height-minimal;
+                        font-weight: bold;
+                        width: 100%;
+                        text-align: center;
+                        cursor: pointer;
+                    }
+                }
+
+                .main-menu {
+                    display: none;
+                }
+
+                .language-selector {
+                    display: none;
+                }
+
+                .search-form-wrapper {
+                    display: none;
+                }
+
+                .search-form {
+                    display: none;
+                }
+
+                .mobile-menu-wrapper {
+                    .mobile-menu-button {
+                        font-weight: bold;
+                        padding-top: @space-big;
+                        cursor: pointer;
+                        width: 100%;
+                    }
+
+                    .mobile-menu {
+                        display: none;
+                    }
+                }
+
+                .mobile-menu {
+                    display: none;
+                    margin: 0;
+                    padding: 0 @space-middle;
+                    font-size: @font-size-smaller;
+                    line-height: @line-height-minimal;
+                    font-weight: bold;
+
+                    li {
+                        list-style-type: none;
+                        margin: @space-small 0;
+                        padding: @space-small 0;
+                    }
+
+                    .mobile-menu-search {
+                        display: none;
+                    }
+
+                    .mobile-menu-language {
+                        border-top: @border;
+                        text-transform: lowercase;
+                        text-align: center;
+
+                        a {
+                            padding: 0 @space-small 0 0;
+                        }
+                    }
+                }
+            }
+
+            .main {
+                margin: 0 @space-small;
+
+                .post-title, .topic-title, .page-title {
+                    margin: @space-big 0 0 0;
+                    padding: 0;
+                    width: 100%;
+                    font-size: @font-size-normal;
+                    font-weight: bold;
+                    line-height: @line-height-minimal;
+                    text-align: center;
+                }
+
+                .main-content {
+                    margin-top: @space-big;
+
+                    p {
+                        padding: 0;
+                        margin: 0 0 @space-big 0;
+                        text-align: left;
+
+                        .utag {
+                            text-decoration: underline;
+                        }
+
+                        .article-meta {
+                            display: block;
+                            margin: 0 0 @space-big 0;
+
+                            .article-meta-image-wrapper {
+                                display: none;
+                            }
+
+                            .article-meta-date, .article-meta-topic {
+                                font-weight: bold;
+                                font-size: @font-size-smaller;
+                                display: block;
+                            }
+                        }
+                    }
+
+                    .post {
+                        margin-top: @space-big;
+
+                        p {
+                            padding: 0;
+                            margin: 0 0 @space-big 0;
+                            text-align: left;
+
+                            .article-meta {
+                                display: block;
+                                margin: 0 0 @space-big 0;
+
+                                .article-meta-image-wrapper {
+                                    display: none;
+                                }
+
+                                .article-meta-date, .article-meta-topic {
+                                    display: none;
+                                }
+                            }
+                        }
+
+                        .post-js-link {
+                            cursor: pointer;
+                        }
+
+                        .post-list-item-title {
+                            margin: @space-big 0 0 0;
+                            padding: 0;
+                            width: 100%;
+                            font-size: @font-size-normal;
+                            font-weight: bold;
+                            line-height: @line-height-minimal;
+                            text-align: center;
+                        }
+                    }
+
+                    .all-topics {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .all-topics h2 {
+                        margin: 0;
+                        padding: .25rem 0;
+                        font-size: 1rem;
+                    }
+
+                    .form-wrapper {
+                        text-align: center;
+                        width: 100%;
+                    }
+                }
+
+                .pagination {
+                    text-align: center;
+
+                    p {
+                        padding: 0;
+                        margin: 0 0 @space-big 0;
+                        display: inline-block;
+                        width: auto;
+
+                        a, span {
+                            font-weight: bold;
+                            padding: @space-small;
+                        }
+                    }
+                }
+            }
+
+            .footer {
+                display: none;
+            }
+        }
+    }
+}
+
+@import "_screens";
+@import "_print";
