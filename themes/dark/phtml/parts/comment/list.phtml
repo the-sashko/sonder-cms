@@ -1,1 +1,23 @@
-<!-- TODO -->
+<?php
+/* @var array|null $comments */
+/* @var int $articleId */
+?>
+<div>
+    <?php
+    __part('comment/form', [
+        'article_id' => $articleId
+    ]);
+    ?>
+    <?php if (empty($comments)): ?>
+    <?php else: ?>
+        <?php foreach ($comments as $comment): ?>
+            <div>
+                <?php
+                __part('comment/single', [
+                    'comment' => $comment
+                ]);
+                ?>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

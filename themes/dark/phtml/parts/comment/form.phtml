@@ -1,1 +1,52 @@
-<!-- TODO -->
+<?php
+/* @var int $articleId */
+?>
+<form action="#"
+      method="post"
+      enctype="multipart/form-data"
+      class="comment-form"
+      id="comment-form">
+    <fieldset>
+        <legend>You Name</legend>
+        <label for="comment-form-input-name">
+            <input type="text"
+                   name="name"
+                   placeholder="Your name"
+                   value=""
+                   id="comment-form-input-name">
+        </label>
+    </fieldset>
+    <fieldset>
+        <legend>Your email</legend>
+        <label for="comment-form-input-email">
+            <input type="email"
+                   name="email"
+                   placeholder="Your email"
+                   value=""
+                   id="comment-form-input-email">
+        </label>
+    </fieldset>
+    <fieldset>
+        <legend>Comment</legend>
+        <label for="comment-form-input-text">
+            <textarea name="textarea"
+                      placeholder="Textarea"
+                      id="comment-form-input-text"></textarea>
+        </label>
+    </fieldset>
+    <fieldset>
+        <label for="comment-form-input-submit">
+            <input type="submit"
+                   name="submit"
+                   value="Submit"
+                   id="comment-form-input-submit"
+                   class="button">
+        </label>
+    </fieldset>
+    <label for="comment-form-input-article-id">
+        <input type="hidden"
+               name="article-id"
+               value="<?= $articleId; ?>"
+               id="comment-form-input-article-id">
+    </label>
+</form>

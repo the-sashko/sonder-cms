@@ -1,0 +1,18 @@
+<?php
+
+use Sonder\Models\Article\ArticleValuesObject;
+
+use function Sonder\__t;
+
+/* @var int $currentPage */
+/* @var ArticleValuesObject[]|null $articles */
+
+?>
+<?php if ($currentPage > 1): ?>
+    <h1 class="page-title"><?= __t('Page'); ?> - <?= $currentPage; ?></h1>
+<?php endif; ?>
+<?php
+__part('article/list', [
+    'articles' => $articles
+]);
+?>

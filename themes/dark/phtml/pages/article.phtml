@@ -1,0 +1,68 @@
+<?php
+
+use Sonder\Models\Article\ArticleValuesObject;
+
+/* @var ArticleValuesObject $article */
+/* @var array $meta */
+/* @var string $currentHost */
+
+?>
+    <div itemprop="mainEntity"
+         itemid="<?= $article->getLink(); ?>"
+         itemscope
+         itemtype="https://schema.org/BlogPosting">
+        <h1 class="post-title"
+            itemprop="headline"><?= $article->getTitle(); ?></h1>
+        <meta itemprop="abstract" content="<?= $article->getSummary(); ?>">
+        <div class="main-content">
+            <p>
+        <span class="article-meta article-meta-big">
+            <span class="article-meta-image-wrapper">
+                <img src="<?= $article->getImageLink('single_view'); ?>"
+                     alt="<?= $article->getTitle(); ?>">
+            </span>
+            <span class="article-meta-date">
+                <?= $article->getCdate('Y-m-d'); ?>
+            </span>
+            <?php if (empty($article->getTopicVO())): ?>
+                <span class="article-meta-topic">
+                    <a href="<?= $article->getTopicVO()->getLink(); ?>">
+                        <i class="fas fa-tag"></i>
+                        <?= $article->getTopicVO()->getTitle(); ?>
+                    </a>
+                </span>
+            <?php endif; ?>
+        </span>
+            </p>
+            <div itemprop="articleBody">
+                <?= $article->getHtml(); ?>
+            </div>
+            <meta itemprop="datePublished"
+                  content="<?= date('Y-m-d', $article->getCdate()); ?>">
+            <?php if (!empty($article->getMdate())): ?>
+                <meta itemprop="dateModified"
+                      content="<?= date('Y-m-d', $article->getMdate()); ?>">
+            <?php endif; ?>
+            <meta itemprop="image"
+                  content="<?= $article->getImageLink('post'); ?>">
+            <meta itemprop="articleSection"
+                  content="<?= $article->getTopicVO()?->getTitle(); ?>">
+        </div>
+        <div itemprop="publisher" itemscope
+             itemtype="https://schema.org/Organization">
+            <link itemprop="url" href="<?= $currentHost; ?>/">
+            <meta itemprop="name" content="<?= $meta['site_name']; ?>">
+            <meta itemprop="description" content="<?= $meta['site_slogan']; ?>">
+            <div itemprop="logo" itemscope
+                 itemtype="https://www.schema.org/ImageObject">
+                <link itemprop="url" href="<?= $meta['image']; ?>">
+                <link itemprop="contentUrl" href="<?= $meta['image']; ?>">
+            </div>
+        </div>
+    </div>
+<?php
+__part('comment/list', [
+    'comments' => $article->getComments(),
+    'article_id' => $article->getId()
+]);
+?>

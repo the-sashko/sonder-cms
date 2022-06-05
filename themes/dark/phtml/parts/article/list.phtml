@@ -1,1 +1,16 @@
-<!-- TODO -->
+<div class="main-content">
+    <?php if (empty($articles)): ?>
+        Empty...
+    <?php else: ?>
+        <?php foreach ($articles as $article): ?>
+            <?php
+            __part('article/card', [
+                'article' => $article
+            ]);
+            ?>
+            <div class="clear"></div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+<div class="clear"></div>
+<?php //__part('pagination'); ?>
