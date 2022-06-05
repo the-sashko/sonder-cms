@@ -6,5 +6,6 @@
   "locale": "<SITE_LOCATE>",
   "theme": "<FRONTEND_THEME>",
   "launch_date": "<SITE_CREATION_DATE>",
+  "not_found_url": "<NOT_FOUND_URL>",
   "admin_email": "<ADMIN_EMAIL>"
 }
