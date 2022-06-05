@@ -31,8 +31,8 @@ final class AdminArticleController extends AdminBaseController
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
 
-        $articles = $articleModel->getArticlesByPage($this->page);
-        $pageCount = $articleModel->getArticlesPageCount();
+        $articles = $articleModel->getArticlesByPage($this->page, false, false);
+        $pageCount = $articleModel->getArticlesPageCount(false, false);
 
         if (empty($articles) && $this->page > 1) {
             return $this->redirect('/admin/articles/');

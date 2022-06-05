@@ -29,8 +29,14 @@ final class AdminTagController extends AdminBaseController
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
 
-        $tags = $tagModel->getTagsByPage($this->page);
-        $pageCount = $tagModel->getTagsPageCount();
+        $tags = $tagModel->getTagsByPage(
+            $this->page,
+            false,
+            false,
+            false
+        );
+
+        $pageCount = $tagModel->getTagsPageCount(false, false);
 
         if (empty($tags) && $this->page > 1) {
             return $this->redirect('/admin/taxonomy/tags/');
@@ -80,7 +86,11 @@ final class AdminTagController extends AdminBaseController
         }
 
         /* @var $tagVO TagValuesObject */
-        $tagVO = $tagModel->getVOById($this->id);
+        $tagVO = $tagModel->getVOById(
+            $this->id,
+            false,
+            false
+        );
 
         if (empty($tagVO)) {
             return $this->redirect('/admin/taxonomy/tags/');
@@ -133,7 +143,7 @@ final class AdminTagController extends AdminBaseController
 
         if (!empty($id)) {
             /* @var $tagVO TagValuesObject|null */
-            $tagVO = $tagModel->getVOById($id);
+            $tagVO = $tagModel->getVOById($id, false, false);
             $pageTitle = 'Edit';
         }
 

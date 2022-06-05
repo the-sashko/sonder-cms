@@ -30,8 +30,8 @@ final class AdminRoleController extends AdminBaseController
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
 
-        $roles = $roleModel->getRolesByPage($this->page);
-        $pageCount = $roleModel->getRolesPageCount();
+        $roles = $roleModel->getRolesByPage($this->page, false, false);
+        $pageCount = $roleModel->getRolesPageCount(false, false);
 
         if (empty($roles) && $this->page > 1) {
             return $this->redirect('/admin/users/roles/');
@@ -80,7 +80,7 @@ final class AdminRoleController extends AdminBaseController
             return $this->redirect('/admin/users/roles/');
         }
 
-        $roleVO = $roleModel->getRoleVOById($this->id);
+        $roleVO = $roleModel->getVOById($this->id, false, false);
 
         if (empty($roleVO)) {
             return $this->redirect('/admin/users/roles/');
@@ -135,7 +135,7 @@ final class AdminRoleController extends AdminBaseController
 
         if (!empty($id)) {
             /* @var $roleVO RoleValuesObject|null */
-            $roleVO = $roleModel->getVOById($id);
+            $roleVO = $roleModel->getVOById($id, false, false);
             $pageTitle = 'Edit';
         }
 
@@ -283,6 +283,7 @@ final class AdminRoleController extends AdminBaseController
         $roleModel = $this->getModel('role');
 
         $roleActions = $roleModel->getRoleActionsByPage($this->page);
+
         $pageCount = $roleModel->getRoleActionsPageCount();
 
         if (empty($roleActions) && $this->page > 1) {
@@ -333,7 +334,11 @@ final class AdminRoleController extends AdminBaseController
             return $this->redirect('/admin/users/roles/actions/');
         }
 
-        $roleActionVO = $roleModel->getRoleActionVOById($this->id);
+        $roleActionVO = $roleModel->getRoleActionVOById(
+            $this->id,
+            false,
+            false
+        );
 
         if (empty($roleActionVO)) {
             return $this->redirect('/admin/users/roles/actions/');
@@ -385,7 +390,12 @@ final class AdminRoleController extends AdminBaseController
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
-            $roleActionVO = $roleModel->getRoleActionVOById($id);
+            $roleActionVO = $roleModel->getRoleActionVOById(
+                $id,
+                false,
+                false
+            );
+
             $pageTitle = 'Edit';
         }
 

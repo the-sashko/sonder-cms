@@ -29,8 +29,13 @@ final class AdminTopicController extends AdminBaseController
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        $topics = $topicModel->getTopicsByPage($this->page);
-        $pageCount = $topicModel->getTopicsPageCount();
+        $topics = $topicModel->getTopicsByPage(
+            $this->page,
+            false,
+            false,
+            false);
+
+        $pageCount = $topicModel->getTopicsPageCount(false, false);
 
         if (empty($topics) && $this->page > 1) {
             return $this->redirect('/admin/taxonomy/topics/');
@@ -80,7 +85,11 @@ final class AdminTopicController extends AdminBaseController
         }
 
         /* @var $topicVO TopicValuesObject */
-        $topicVO = $topicModel->getVOById($this->id);
+        $topicVO = $topicModel->getVOById(
+            $this->id,
+            false,
+            false
+        );
 
         if (empty($topicVO)) {
             return $this->redirect('/admin/taxonomy/topics/');
@@ -133,7 +142,12 @@ final class AdminTopicController extends AdminBaseController
 
         if (!empty($id)) {
             /* @var $topicVO TopicValuesObject | null */
-            $topicVO = $topicModel->getVOById($id);
+            $topicVO = $topicModel->getVOById(
+                $id,
+                false,
+                false
+            );
+
             $pageTitle = 'Edit';
         }
 

@@ -30,8 +30,8 @@ final class AdminUserController extends AdminBaseController
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        $users = $userModel->getUsersByPage($this->page);
-        $pageCount = $userModel->getUsersPageCount();
+        $users = $userModel->getUsersByPage($this->page, false, false);
+        $pageCount = $userModel->getUsersPageCount(false, false);
 
         if (empty($users) && $this->page > 1) {
             return $this->redirect('/admin/users/');
@@ -79,7 +79,11 @@ final class AdminUserController extends AdminBaseController
             return $this->redirect('/admin/users/');
         }
 
-        $userVO = $userModel->getVOById($this->id);
+        $userVO = $userModel->getVOById(
+            $this->id,
+            false,
+            false
+        );
 
         if (empty($userVO)) {
             return $this->redirect('/admin/users/');
@@ -136,7 +140,12 @@ final class AdminUserController extends AdminBaseController
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
-            $userVO = $userModel->getVOById($id);
+            $userVO = $userModel->getVOById(
+                $id,
+                false,
+                false
+            );
+
             $pageTitle = 'Edit';
         }
 
@@ -233,7 +242,11 @@ final class AdminUserController extends AdminBaseController
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        $userVO = $userModel->getVOById($this->id);
+        $userVO = $userModel->getVOById(
+            $this->id,
+            false,
+            false
+        );
 
         if (empty($userVO)) {
             return $this->redirect('/admin/users/');
