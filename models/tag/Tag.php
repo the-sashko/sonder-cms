@@ -26,6 +26,34 @@ final class Tag extends BaseModel
     protected int $itemsOnPage = 10;
 
     /**
+     * @param string|null $slug
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final public function getVOBySlug(
+        ?string $slug = null,
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getTagRowBySlug(
+            $slug,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
@@ -36,8 +64,8 @@ final class Tag extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getTagRowById(
@@ -54,18 +82,47 @@ final class Tag extends BaseModel
     }
 
     /**
-     * @param int $page
+     * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return array|null
+     * @return ValuesObject|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
+    final public function getSimpleVOById(
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getTagRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param int $page
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @param bool $simplify
+     * @return array|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
     final public function getTagsByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true,
+        bool $simplify = true
     ): ?array
     {
         $rows = $this->store->getTagRowsByPage(
@@ -77,6 +134,10 @@ final class Tag extends BaseModel
 
         if (empty($rows)) {
             return null;
+        }
+
+        if ($simplify) {
+            return $this->getSimpleVOArray($rows);
         }
 
         return $this->getVOArray($rows);
@@ -99,17 +160,25 @@ final class Tag extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return int
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    final public function getTagsPageCount(): int
+    final public function getTagsPageCount(
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): int
     {
-        $rowsCount = $this->store->getTagRowsCount();
+        $rowsCount = $this->store->getTagRowsCount(
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         $pageCount = (int)($rowsCount / $this->itemsOnPage);
 
@@ -139,7 +208,7 @@ final class Tag extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -268,7 +337,7 @@ final class Tag extends BaseModel
         }
 
         if (!empty($id)) {
-            $row = $this->store->getTagRowById($id);
+            $row = $this->store->getTagRowById($id, false, false);
         }
 
         if (!empty($id) && empty($row)) {
@@ -324,7 +393,7 @@ final class Tag extends BaseModel
      */
     private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
-        $row = $this->store->getTagRowByTitle($title, $id);
+        $row = $this->store->getTagRowByTitle($title, $id, false, false);
 
         return empty($row);
     }
@@ -373,7 +442,7 @@ final class Tag extends BaseModel
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
-        if (empty($this->store->getTagRowBySlug($slug, $id))) {
+        if (empty($this->store->getTagRowBySlug($slug, $id, false, false))) {
             return $slug;
         }
 

@@ -34,8 +34,8 @@ final class Shortener extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getShortenerRowById(
@@ -62,8 +62,8 @@ final class Shortener extends BaseModel
      */
     final public function getVOByCode(
         ?string $code = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getShortenerRowByCode(
@@ -90,8 +90,8 @@ final class Shortener extends BaseModel
      */
     final public function getShortenerVOsByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $rows = $this->store->getShortenerRowsByPage(
@@ -116,8 +116,8 @@ final class Shortener extends BaseModel
      * @throws DatabasePluginException
      */
     final public function getShortLinksPageCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $rowsCount = $this->store->getShortenerRowsCount(

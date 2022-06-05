@@ -27,8 +27,8 @@ final class TopicStore extends ModelStore implements IModelStore
      */
     final public function getTopicRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -100,8 +100,8 @@ final class TopicStore extends ModelStore implements IModelStore
     final public function getTopicRowByTitle(
         ?string $title = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($title)) {
@@ -153,8 +153,8 @@ final class TopicStore extends ModelStore implements IModelStore
     final public function getTopicRowBySlug(
         ?string $slug = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($slug)) {
@@ -270,8 +270,8 @@ final class TopicStore extends ModelStore implements IModelStore
     final public function getTopicRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -317,8 +317,8 @@ final class TopicStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getAllTopicRows(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -354,8 +354,8 @@ final class TopicStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getTopicRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';
@@ -392,8 +392,8 @@ final class TopicStore extends ModelStore implements IModelStore
      */
     final public function getTopicRowsByParentId(
         ?int $parentId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($parentId)) {

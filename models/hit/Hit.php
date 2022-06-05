@@ -37,8 +37,8 @@ final class Hit extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getHitRowById(
@@ -67,8 +67,8 @@ final class Hit extends BaseModel
     final public function getAggregationVOById(
         string $type,
         ?int   $id = null,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): ?ModelValuesObject
     {
         $row = $this->store->getAggregationRowById(
@@ -96,8 +96,8 @@ final class Hit extends BaseModel
      */
     final public function getHitVOsByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $rows = $this->store->getHitRowsByPage(
@@ -127,8 +127,8 @@ final class Hit extends BaseModel
     final public function getAggregationsVOsByPage(
         string $type,
         int    $page,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): ?array
     {
         $rows = $this->store->getAggregationRowsByPage(
@@ -156,8 +156,8 @@ final class Hit extends BaseModel
      * @throws DatabasePluginException
      */
     final public function getHitsPageCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $rowsCount = $this->store->getHitsRowsCount(
@@ -184,8 +184,8 @@ final class Hit extends BaseModel
      */
     final public function getAggregationsPageCount(
         string $type,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): int
     {
         $rowsCount = $this->store->getAggregationRowsCount(
@@ -213,8 +213,8 @@ final class Hit extends BaseModel
      */
     final public function getCountByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         return $this->store->getCountByArticleId(
@@ -234,8 +234,8 @@ final class Hit extends BaseModel
      */
     final public function getCountByTopicId(
         ?int $topicId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         return $this->store->getCountByTopicId(
@@ -255,8 +255,8 @@ final class Hit extends BaseModel
      */
     final public function getCountByTagId(
         ?int $tagId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         return $this->store->getCountByTagId(

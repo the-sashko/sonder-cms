@@ -27,8 +27,8 @@ final class ShortenerStore extends ModelStore implements IModelStore
      */
     final public function getShortenerRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -153,8 +153,8 @@ final class ShortenerStore extends ModelStore implements IModelStore
     final public function getShortenerRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -206,8 +206,8 @@ final class ShortenerStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getShortenerRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';
@@ -274,8 +274,8 @@ final class ShortenerStore extends ModelStore implements IModelStore
      */
     final public function getShortenerRowByCode(
         ?string $code = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($code)) {
@@ -332,8 +332,8 @@ final class ShortenerStore extends ModelStore implements IModelStore
      */
     final public function getShortenerRowByUrl(
         ?string $url = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($url)) {

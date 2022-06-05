@@ -34,8 +34,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     final public function getHitRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -93,8 +93,8 @@ final class HitStore extends ModelStore implements IModelStore
     final public function getAggregationRowById(
         string $type,
         ?int   $id = null,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -306,8 +306,8 @@ final class HitStore extends ModelStore implements IModelStore
     final public function getHitRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -369,8 +369,8 @@ final class HitStore extends ModelStore implements IModelStore
         string $type,
         int    $page = 1,
         int    $itemsOnPage = 10,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): ?array
     {
         $table = $this->_getAggregationTable($type);
@@ -432,8 +432,8 @@ final class HitStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getHitsRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';
@@ -480,8 +480,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     final public function getAggregationRowsCount(
         string $type,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): int
     {
         $table = $this->_getAggregationTable($type);
@@ -622,8 +622,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     final public function getCountByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sum = $this->_getCountFromHitsByArticleId(
@@ -666,8 +666,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     final public function getCountByTopicId(
         ?int $topicId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sum = $this->_getCountFromHitsByTopicId(
@@ -710,8 +710,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     final public function getCountByTagId(
         ?int $tagId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sum = $this->_getCountFromHitsByTagId(
@@ -754,8 +754,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     private function _getCountFromHitsByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = sprintf('"hits"."article_id" = %d', $articleId);
@@ -805,8 +805,8 @@ final class HitStore extends ModelStore implements IModelStore
     private function _getCountFromAggregationByArticleId(
         string $type,
         ?int   $articleId = null,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): int
     {
         $table = $this->_getAggregationTable($type);
@@ -862,8 +862,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     private function _getCountFromHitsByTopicId(
         ?int $topicId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = sprintf('"hits"."topic_id" = %d', $topicId);
@@ -913,8 +913,8 @@ final class HitStore extends ModelStore implements IModelStore
     private function _getCountFromAggregationByTopicId(
         string $type,
         ?int   $topicId = null,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): int
     {
         $table = $this->_getAggregationTable($type);
@@ -966,8 +966,8 @@ final class HitStore extends ModelStore implements IModelStore
      */
     private function _getCountFromHitsByTagId(
         ?int $tagId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = sprintf('"hits"."tag_id" = %d', $tagId);
@@ -1017,8 +1017,8 @@ final class HitStore extends ModelStore implements IModelStore
     private function _getCountFromAggregationByTagId(
         string $type,
         ?int   $tagId = null,
-        bool   $excludeRemoved = false,
-        bool   $excludeInactive = false
+        bool   $excludeRemoved = true,
+        bool   $excludeInactive = true
     ): int
     {
         $table = $this->_getAggregationTable($type);

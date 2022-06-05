@@ -29,8 +29,8 @@ final class TagStore extends ModelStore implements IModelStore
      */
     final public function getTagRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -102,8 +102,8 @@ final class TagStore extends ModelStore implements IModelStore
     final public function getTagRowByTitle(
         ?string $title = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($title)) {
@@ -155,8 +155,8 @@ final class TagStore extends ModelStore implements IModelStore
     final public function getTagRowBySlug(
         ?string $slug = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($slug)) {
@@ -272,8 +272,8 @@ final class TagStore extends ModelStore implements IModelStore
     final public function getTagRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -319,8 +319,8 @@ final class TagStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getAllTagRows(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -403,8 +403,8 @@ final class TagStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getTagRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';

@@ -7,9 +7,12 @@ use ImagickException;
 use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Article\ArticleForm;
+use Sonder\Models\Article\ArticleSimpleValuesObject;
 use Sonder\Models\Article\ArticleStore;
 use Sonder\Models\Article\ArticleValuesObject;
+use Sonder\Models\Topic\TopicSimpleValuesObject;
 use Sonder\Models\Topic\TopicValuesObject;
+use Sonder\Models\User\UserSimpleValuesObject;
 use Sonder\Models\User\UserValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
@@ -48,8 +51,8 @@ final class Article extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getArticleRowById(
@@ -66,6 +69,87 @@ final class Article extends BaseModel
     }
 
     /**
+     * @param int|null $id
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getSimpleVOById(
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getArticleRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string|null $slug
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getVOBySlug(
+        ?string $slug = null,
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getArticleRowBySlug(
+            $slug,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getVO($row);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string|null $slug
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getSimpleVOBySlug(
+        ?string $slug = null,
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getArticleRowBySlug(
+            $slug,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
      * @param int $page
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
@@ -76,8 +160,8 @@ final class Article extends BaseModel
      */
     final public function getArticlesByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $rows = $this->store->getArticleRowsByPage(
@@ -91,7 +175,7 @@ final class Article extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -102,8 +186,8 @@ final class Article extends BaseModel
      * @throws DatabasePluginException
      */
     final public function getArticlesPageCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $rowsCount = $this->store->getArticleRowsCount(
@@ -147,7 +231,7 @@ final class Article extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -202,7 +286,7 @@ final class Article extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -255,7 +339,7 @@ final class Article extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -406,6 +490,7 @@ final class Article extends BaseModel
         $this->_setUserVOToVO($articleVO);
         $this->_setTopicVOToVO($articleVO);
         $this->_setTagsToVO($articleVO);
+        $this->_setCommentsToVO($articleVO);
 
         return $articleVO;
     }
@@ -422,8 +507,8 @@ final class Article extends BaseModel
         /* @var $userModel User */
         $userModel = $this->getModel('user');
 
-        /* @var $userVO UserValuesObject */
-        $userVO = $userModel->getVOById($articleVO->getUserId());
+        /* @var $userVO UserSimpleValuesObject */
+        $userVO = $userModel->getSimpleVOById($articleVO->getUserId());
 
         if (!empty($userVO)) {
             $articleVO->setUserVO($userVO);
@@ -442,8 +527,8 @@ final class Article extends BaseModel
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
 
-        /* @var $topicVO TopicValuesObject */
-        $topicVO = $topicModel->getVOById($articleVO->getUserId());
+        /* @var $topicVO TopicSimpleValuesObject */
+        $topicVO = $topicModel->getSimpleVOById($articleVO->getUserId());
 
         if (!empty($topicVO)) {
             $articleVO->setTopicVO($topicVO);
@@ -455,6 +540,7 @@ final class Article extends BaseModel
      * @return void
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws Exception
      */
     private function _setTagsToVO(ArticleValuesObject $articleVO): void
     {
@@ -465,6 +551,27 @@ final class Article extends BaseModel
 
         if (!empty($tagVOs)) {
             $articleVO->setTags($tagVOs);
+        }
+    }
+
+    /**
+     * @param ArticleValuesObject $articleVO
+     * @return void
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    private function _setCommentsToVO(ArticleValuesObject $articleVO): void
+    {
+        /* @var $commentModel Comment */
+        $commentModel = $this->getModel('comment');
+
+        $commentVOs = $commentModel->getCommentsByArticleId(
+            $articleVO->getId()
+        );
+
+        if (!empty($commentVOs)) {
+            $articleVO->setComments($commentVOs);
         }
     }
 
@@ -831,7 +938,7 @@ final class Article extends BaseModel
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
-        if (empty($this->store->getArticleRowBySlug($slug, $id))) {
+        if (empty($this->store->getArticleRowBySlug($slug, $id, false, false))) {
             return $slug;
         }
 

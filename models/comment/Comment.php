@@ -6,8 +6,10 @@ use Exception;
 use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Comment\CommentForm;
+use Sonder\Models\Comment\CommentSimpleValuesObject;
 use Sonder\Models\Comment\CommentStore;
 use Sonder\Models\Comment\CommentValuesObject;
+use Sonder\Models\User\UserSimpleValuesObject;
 use Sonder\Models\User\UserValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
@@ -36,8 +38,8 @@ final class Comment extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?ValuesObject
     {
         $row = $this->store->getCommentRowById(
@@ -54,6 +56,33 @@ final class Comment extends BaseModel
     }
 
     /**
+     * @param int|null $id
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getSimpleVOById(
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getCommentRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
      * @param int $page
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
@@ -64,8 +93,8 @@ final class Comment extends BaseModel
      */
     final public function getCommentsByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $rows = $this->store->getCommentRowsByPage(
@@ -90,8 +119,8 @@ final class Comment extends BaseModel
      * @throws DatabasePluginException
      */
     final public function getCommentsPageCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $rowsCount = $this->store->getCommentRowsCount(
@@ -119,8 +148,8 @@ final class Comment extends BaseModel
      */
     final public function getCommentsByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($articleId)) {
@@ -137,7 +166,7 @@ final class Comment extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -150,8 +179,8 @@ final class Comment extends BaseModel
      */
     final public function getArticlesPageCountByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($articleId)) {
@@ -200,7 +229,7 @@ final class Comment extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
@@ -317,6 +346,23 @@ final class Comment extends BaseModel
     }
 
     /**
+     * @param array|null $row
+     * @return ValuesObject
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    final protected function getSimpleVO(?array $row = null): ValuesObject
+    {
+        /* @var $commentSimpleVO CommentSimpleValuesObject */
+        $commentSimpleVO = parent::getVO($row);
+
+        $this->_setSimpleUserVOToSimpleVO($commentSimpleVO);
+
+        return $commentSimpleVO;
+    }
+
+    /**
      * @param CommentValuesObject $commentVO
      * @return void
      * @throws DatabaseCacheException
@@ -333,6 +379,27 @@ final class Comment extends BaseModel
 
         if (!empty($userVO)) {
             $commentVO->setUserVO($userVO);
+        }
+    }
+
+    /**
+     * @param CommentSimpleValuesObject $commentSimpleVO
+     * @return void
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     * @throws Exception
+     */
+    private function _setSimpleUserVOToSimpleVO(
+        CommentSimpleValuesObject $commentSimpleVO): void
+    {
+        /* @var $userModel User */
+        $userModel = $this->getModel('user');
+
+        /* @var $userVO UserSimpleValuesObject */
+        $userVO = $userModel->getSimpleVOById($commentSimpleVO->getUserId());
+
+        if (!empty($userVO)) {
+            $commentSimpleVO->setUserVO($userVO);
         }
     }
 

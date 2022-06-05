@@ -4,7 +4,9 @@ namespace Sonder\Models\Article;
 
 use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\Models\Topic\TopicSimpleValuesObject;
 use Sonder\Models\Topic\TopicValuesObject;
+use Sonder\Models\User\UserSimpleValuesObject;
 use Sonder\Models\User\UserValuesObject;
 
 final class ArticleValuesObject extends ModelValuesObject
@@ -145,16 +147,16 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return TopicValuesObject|null
+     * @return TopicSimpleValuesObject|null
      * @throws Exception
      */
-    final public function getTopicVO(): ?TopicValuesObject
+    final public function getTopicVO(): ?TopicSimpleValuesObject
     {
-        if (!$this->has('topic_vo')) {
+        if (!$this->has('topic_simple_vo')) {
             return null;
         }
 
-        return $this->get('topic_vo');
+        return $this->get('topic_simple_vo');
     }
 
     /**
@@ -167,16 +169,16 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return UserValuesObject|null
+     * @return UserSimpleValuesObject|null
      * @throws Exception
      */
-    final public function getUserVO(): ?UserValuesObject
+    final public function getUserVO(): ?UserSimpleValuesObject
     {
-        if (!$this->has('user_vo')) {
+        if (!$this->has('user_simple_vo')) {
             return null;
         }
 
-        return $this->get('user_vo');
+        return $this->get('user_simple_vo');
     }
 
     /**
@@ -218,6 +220,21 @@ final class ArticleValuesObject extends ModelValuesObject
         $tags = $this->get('tags');
 
         return !empty($tags) && is_array($tags) ? $tags : null;
+    }
+
+    /**
+     * @return array|null
+     * @throws Exception
+     */
+    final public function getComments(): ?array
+    {
+        if (!$this->has('comments')) {
+            return null;
+        }
+
+        $comments = $this->get('comments');
+
+        return !empty($comments) && is_array($comments) ? $comments : null;
     }
 
     /**
@@ -368,14 +385,16 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param TopicValuesObject|null $topicVO
+     * @param TopicSimpleValuesObject|null $topicVO
      * @return void
      * @throws Exception
      */
-    final public function setTopicVO(?TopicValuesObject $topicVO = null): void
+    final public function setTopicVO(
+        ?TopicSimpleValuesObject $topicVO = null
+    ): void
     {
         if (!empty($topicVO)) {
-            $this->set('topic_vo', $topicVO);
+            $this->set('topic_simple_vo', $topicVO);
         }
     }
 
@@ -392,14 +411,16 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param UserValuesObject|null $userVO
+     * @param UserSimpleValuesObject|null $userVO
      * @return void
      * @throws Exception
      */
-    final public function setUserVO(?UserValuesObject $userVO = null): void
+    final public function setUserVO(
+        ?UserSimpleValuesObject $userVO = null
+    ): void
     {
         if (!empty($userVO)) {
-            $this->set('user_vo', $userVO);
+            $this->set('user_simple_vo', $userVO);
         }
     }
 
@@ -442,6 +463,18 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
+     * @param array|null $comments
+     * @return void
+     * @throws Exception
+     */
+    final public function setComments(?array $comments = null): void
+    {
+        if (!empty($comments)) {
+            $this->set('comments', $comments);
+        }
+    }
+
+    /**
      * @return void
      * @throws Exception
      */
@@ -466,12 +499,12 @@ final class ArticleValuesObject extends ModelValuesObject
             return null;
         }
 
-        if (array_key_exists('topic_vo', $row)) {
-            unset($row['topic_vo']);
+        if (array_key_exists('topic_simple_vo', $row)) {
+            unset($row['topic_simple_vo']);
         }
 
-        if (array_key_exists('user_vo', $row)) {
-            unset($row['user_vo']);
+        if (array_key_exists('user_simple_vo', $row)) {
+            unset($row['user_simple_vo']);
         }
 
         return $row;

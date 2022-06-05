@@ -42,7 +42,7 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @var string|null
      */
-    protected ?string $imageLinkPattern = '/media/topics/%s-topic.png';
+    protected ?string $imageLinkPattern = '/media/topics/%d-topic.png';
 
     /**
      * @return string
@@ -76,16 +76,16 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return TopicValuesObject|null
+     * @return TopicSimpleValuesObject|null
      * @throws Exception
      */
-    final public function getParentVO(): ?TopicValuesObject
+    final public function getParentVO(): ?TopicSimpleValuesObject
     {
-        if (!$this->has('parent_vo')) {
+        if (!$this->has('parent_simple_vo')) {
             return null;
         }
 
-        return $this->get('parent_vo');
+        return $this->get('parent_simple_vo');
     }
 
     /**
@@ -107,7 +107,7 @@ final class TopicValuesObject extends ModelValuesObject
      */
     final public function getImageLink(): string
     {
-        return sprintf($this->imageLinkPattern, $this->getSlug());
+        return sprintf($this->imageLinkPattern, $this->getId());
     }
 
     /**
@@ -147,14 +147,16 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param TopicValuesObject|null $parentVO
+     * @param TopicSimpleValuesObject|null $parentVO
      * @return void
      * @throws Exception
      */
-    final public function setParentVO(?TopicValuesObject $parentVO = null): void
+    final public function setParentVO(
+        ?TopicSimpleValuesObject $parentVO = null
+    ): void
     {
         if (!empty($parentVO)) {
-            $this->set('parent_vo', $parentVO);
+            $this->set('parent_simple_vo', $parentVO);
         }
     }
 
@@ -183,8 +185,8 @@ final class TopicValuesObject extends ModelValuesObject
             return null;
         }
 
-        if (array_key_exists('parent_vo', $row)) {
-            unset($row['parent_vo']);
+        if (array_key_exists('parent_simple_vo', $row)) {
+            unset($row['parent_simple_vo']);
         }
 
         return $row;

@@ -134,7 +134,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
             );
         }
 
-        $commentVO = $this->model->getVOById(
+        $commentVO = $this->model->getSimpleVOById(
             $id,
             true,
             true
@@ -159,7 +159,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
      */
     private function _getRowsByArticleId(int $articleId): ResponseObject
     {
-        $comments = $this->model->getCommentsByArticleId($articleId);
+        $comments = $this->model->getSimpleCommentsByArticleId($articleId);
 
         if (empty($comments)) {
             return $this->getApiResponse([
@@ -185,7 +185,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
      */
     private function _getRowsByUserId(int $userId): ResponseObject
     {
-        $comments = $this->model->getCommentsByUserId($userId);
+        $comments = $this->model->getSimpleCommentsByUserId($userId);
 
         if (empty($comments)) {
             return $this->getApiResponse([

@@ -7,6 +7,7 @@ use ImagickException;
 use Sonder\CMS\Essentials\BaseModel;
 use Sonder\Core\ValuesObject;
 use Sonder\Models\Topic\TopicForm;
+use Sonder\Models\Topic\TopicSimpleValuesObject;
 use Sonder\Models\Topic\TopicStore;
 use Sonder\Models\Topic\TopicValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
@@ -45,8 +46,8 @@ final class Topic extends BaseModel
      */
     final public function getVOById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?TopicValuesObject
     {
         $row = $this->store->getTopicRowById(
@@ -63,9 +64,37 @@ final class Topic extends BaseModel
     }
 
     /**
+     * @param int|null $id
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return ValuesObject|null
+     * @throws DatabaseCacheException
+     * @throws DatabasePluginException
+     */
+    final public function getSimpleVOById(
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?ValuesObject
+    {
+        $row = $this->store->getTopicRowById(
+            $id,
+            $excludeRemoved,
+            $excludeInactive
+        );
+
+        if (!empty($row)) {
+            return $this->getSimpleVO($row);
+        }
+
+        return null;
+    }
+
+    /**
      * @param int $page
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
+     * @param bool $simplify
      * @return array|null
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
@@ -73,8 +102,9 @@ final class Topic extends BaseModel
      */
     final public function getTopicsByPage(
         int  $page,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true,
+        bool $simplify = true
     ): ?array
     {
         $rows = $this->store->getTopicRowsByPage(
@@ -86,6 +116,10 @@ final class Topic extends BaseModel
 
         if (empty($rows)) {
             return null;
+        }
+
+        if ($simplify) {
+            return $this->getSimpleVOArray($rows);
         }
 
         return $this->getVOArray($rows);
@@ -108,17 +142,25 @@ final class Topic extends BaseModel
             return null;
         }
 
-        return $this->getVOArray($rows);
+        return $this->getSimpleVOArray($rows);
     }
 
     /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return int
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      */
-    final public function getTopicsPageCount(): int
+    final public function getTopicsPageCount(
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): int
     {
-        $rowsCount = $this->store->getTopicRowsCount();
+        $rowsCount = $this->store->getTopicRowsCount(
+            $excludeRemoved,
+            $excludeInactive
+        );
 
         $pageCount = (int)($rowsCount / $this->itemsOnPage);
 
@@ -249,7 +291,7 @@ final class Topic extends BaseModel
 
             $topicForm->setId($id);
 
-            if (!$this->_uploadImageFile($topicVO->getSlug(), $topicForm)) {
+            if (!$this->_uploadImageFile($topicForm)) {
                 $topicForm->setError(
                     TopicForm::UPLOAD_IMAGE_FILE_ERROR_MESSAGE
                 );
@@ -304,8 +346,8 @@ final class Topic extends BaseModel
      */
     private function _setParentToVO(TopicValuesObject $topicVO): void
     {
-        /* @var $parentVO TopicValuesObject */
-        $parentVO = $this->getVOById($topicVO->getParentId());
+        /* @var $parentVO TopicSimpleValuesObject */
+        $parentVO = $this->getSimpleVOById($topicVO->getParentId());
 
         if (!empty($parentVO)) {
             $topicVO->setParentVO($parentVO);
@@ -365,7 +407,11 @@ final class Topic extends BaseModel
         }
 
         if (!empty($id)) {
-            $row = $this->store->getTopicRowById($id);
+            $row = $this->store->getTopicRowById(
+                $id,
+                false,
+                false
+            );
         }
 
         if (!empty($id) && empty($row)) {
@@ -479,7 +525,12 @@ final class Topic extends BaseModel
      */
     private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
-        $row = $this->store->getTopicRowByTitle($title, $id);
+        $row = $this->store->getTopicRowByTitle(
+            $title,
+            $id,
+            false,
+            false
+        );
 
         return empty($row);
     }
@@ -528,7 +579,7 @@ final class Topic extends BaseModel
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
-        if (empty($this->store->getTopicRowBySlug($slug, $id))) {
+        if (empty($this->store->getTopicRowBySlug($slug, $id, false, false))) {
             return $slug;
         }
 
@@ -556,27 +607,28 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param string $slug
      * @param TopicForm $topicForm
      * @return bool
-     * @throws ImagickException
      * @throws ImagePluginException
      * @throws ImageSizeException
+     * @throws ImagickException
      * @throws Exception
      */
-    private function _uploadImageFile(string $slug, TopicForm $topicForm): bool
+    private function _uploadImageFile(TopicForm $topicForm): bool
     {
+        $id = $topicForm->getId();
+
         /* @var $uploadPlugin UploadPlugin */
         $uploadPlugin = $this->getPlugin('upload');
 
         $imageDirPath = $this->_getImagesDirPath();
 
-        $imageFilePath = sprintf('%s/%s-topic.png', $imageDirPath, $slug);
+        $imageFilePath = sprintf('%s/%d-topic.png', $imageDirPath, $id);
 
         $imageFullFilePath = sprintf(
             '%s/%s-full.png',
             $imageDirPath,
-            $slug
+            $id
         );
 
         $defaultImageFilePath = sprintf(
@@ -647,7 +699,7 @@ final class Topic extends BaseModel
         $imagePlugin->resize(
             $uploadedFilePath,
             $imageDirPath,
-            $slug,
+            (string)$id,
             TopicValuesObject::IMAGE_FORMAT,
             TopicValuesObject::IMAGE_SIZES
         );

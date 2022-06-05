@@ -27,8 +27,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -83,8 +83,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowsByParentId(
         ?int $parentId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($parentId)) {
@@ -141,8 +141,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowsByUserId(
         ?int $userId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($userId)) {
@@ -196,8 +196,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowsByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($articleId)) {
@@ -324,8 +324,8 @@ final class CommentStore extends ModelStore implements IModelStore
     final public function getCommentRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -380,8 +380,8 @@ final class CommentStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getCommentRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';
@@ -431,8 +431,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowsCountByArticleId(
         ?int $articleId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($articleId)) {
@@ -489,8 +489,8 @@ final class CommentStore extends ModelStore implements IModelStore
      */
     final public function getCommentRowsCountByUserId(
         ?int $userId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($userId)) {

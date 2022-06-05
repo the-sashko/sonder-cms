@@ -31,8 +31,8 @@ final class ArticleStore extends ModelStore implements IModelStore
      */
     final public function getArticleRowById(
         ?int $id = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($id)) {
@@ -125,8 +125,8 @@ final class ArticleStore extends ModelStore implements IModelStore
     final public function getArticleRowByTitle(
         ?string $title = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($title)) {
@@ -199,8 +199,8 @@ final class ArticleStore extends ModelStore implements IModelStore
     final public function getArticleRowByMetaTitle(
         ?string $metaTitle = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($metaTitle)) {
@@ -273,8 +273,8 @@ final class ArticleStore extends ModelStore implements IModelStore
     final public function getArticleRowBySlug(
         ?string $slug = null,
         ?int    $excludeId = null,
-        bool    $excludeRemoved = false,
-        bool    $excludeInactive = false
+        bool    $excludeRemoved = true,
+        bool    $excludeInactive = true
     ): ?array
     {
         if (empty($slug)) {
@@ -417,8 +417,8 @@ final class ArticleStore extends ModelStore implements IModelStore
     final public function getArticleRowsByPage(
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         $sqlWhere = 'true';
@@ -481,8 +481,8 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @throws DatabasePluginException
      */
     final public function getArticleRowsCount(
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         $sqlWhere = 'true';
@@ -544,8 +544,8 @@ final class ArticleStore extends ModelStore implements IModelStore
         ?int $topicId = null,
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($topicId)) {
@@ -617,8 +617,8 @@ final class ArticleStore extends ModelStore implements IModelStore
      */
     final public function getArticleRowsCountByTopicId(
         ?int $topicId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($topicId)) {
@@ -687,8 +687,8 @@ final class ArticleStore extends ModelStore implements IModelStore
         ?int $tagId = null,
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($tagId)) {
@@ -765,8 +765,8 @@ final class ArticleStore extends ModelStore implements IModelStore
      */
     final public function getArticleRowsCountByTagId(
         ?int $tagId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($tagId)) {
@@ -839,8 +839,8 @@ final class ArticleStore extends ModelStore implements IModelStore
         ?int $userId = null,
         int  $page = 1,
         int  $itemsOnPage = 10,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): ?array
     {
         if (empty($userId)) {
@@ -912,8 +912,8 @@ final class ArticleStore extends ModelStore implements IModelStore
      */
     final public function getArticleRowsCountByUserId(
         ?int $userId = null,
-        bool $excludeRemoved = false,
-        bool $excludeInactive = false
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
     ): int
     {
         if (empty($userId)) {

@@ -44,6 +44,8 @@ final class ArticleForm extends ModelFormObject
     const META_TITLE_EXISTS_ERROR_MESSAGE = 'Article with this meta title ' .
     'already exists';
 
+    const META_DESCRIPTION_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
+
     const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
 
     const TOPIC_IS_NOT_SET_ERROR_MESSAGE = 'Topic is not set';
@@ -541,7 +543,7 @@ final class ArticleForm extends ModelFormObject
             mb_strlen($metaDescription) > $metaDescriptionMaxLength
         ) {
             $this->setError(
-                ArticleForm::META_TITLE_TOO_LONG_ERROR_MESSAGE
+                ArticleForm::META_DESCRIPTION_TOO_LONG_ERROR_MESSAGE
             );
 
             $this->setStatusFail();
