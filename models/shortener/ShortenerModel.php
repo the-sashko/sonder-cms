@@ -2,42 +2,43 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Shortener\ShortenerForm;
-use Sonder\Models\Shortener\ShortenerStore;
-use Sonder\Models\Shortener\ShortenerValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Shortener\Interfaces\IShortenerApi;
+use Sonder\Models\Shortener\Interfaces\IShortenerForm;
+use Sonder\Models\Shortener\Interfaces\IShortenerModel;
+use Sonder\Models\Shortener\Interfaces\IShortenerStore;
+use Sonder\Models\Shortener\Forms\ShortenerForm;
+use Sonder\Models\Shortener\Interfaces\IShortenerValuesObject;
+use Sonder\Models\Shortener\ValuesObjects\ShortenerValuesObject;
 use Sonder\Plugins\MathPlugin;
 use Throwable;
 
 /**
- * @property ShortenerStore $store
+ * @property IShortenerApi $api
+ * @property IShortenerStore $store
  */
-final class Shortener extends BaseModel
+#[IModel]
+#[IShortenerModel]
+final class ShortenerModel extends BaseModel implements IShortenerModel
 {
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    final protected const ITEMS_ON_PAGE = 10;
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IShortenerValuesObject|null
+     * @throws ModelException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?IShortenerValuesObject {
         $row = $this->store->getShortenerRowById(
             $id,
             $excludeRemoved,
@@ -45,7 +46,10 @@ final class Shortener extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getVO($row);
+            /* @var $shortenerVO ShortenerValuesObject */
+            $shortenerVO = $this->getVO($row);
+
+            return $shortenerVO;
         }
 
         return null;
@@ -55,17 +59,14 @@ final class Shortener extends BaseModel
      * @param string|null $code
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IShortenerValuesObject|null
+     * @throws ModelException
      */
     final public function getVOByCode(
         ?string $code = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?ValuesObject
-    {
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?IShortenerValuesObject {
         $row = $this->store->getShortenerRowByCode(
             $code,
             $excludeRemoved,
@@ -73,7 +74,10 @@ final class Shortener extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getVO($row);
+            /* @var $shortenerVO ShortenerValuesObject */
+            $shortenerVO = $this->getVO($row);
+
+            return $shortenerVO;
         }
 
         return null;
@@ -84,19 +88,16 @@ final class Shortener extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getShortenerVOsByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $rows = $this->store->getShortenerRowsByPage(
             $page,
-            $this->itemsOnPage,
+            ShortenerModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -112,22 +113,19 @@ final class Shortener extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getShortLinksPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $rowsCount = $this->store->getShortenerRowsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / ShortenerModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * ShortenerModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -137,7 +135,6 @@ final class Shortener extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeShortenerById(?int $id = null): bool
     {
@@ -151,7 +148,6 @@ final class Shortener extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreShortenerById(?int $id = null): bool
     {
@@ -163,13 +159,12 @@ final class Shortener extends BaseModel
     }
 
     /**
-     * @param ShortenerForm $shortenerForm
+     * @param IShortenerForm $shortenerForm
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    final public function save(ShortenerForm $shortenerForm): bool
+    final public function save(IShortenerForm $shortenerForm): bool
     {
         $shortenerForm->checkInputValues();
 
@@ -225,14 +220,14 @@ final class Shortener extends BaseModel
     }
 
     /**
-     * @param ShortenerForm $shortenerForm
+     * @param IShortenerForm $shortenerForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _checkIdInShortenerForm(ShortenerForm $shortenerForm): void
-    {
+    private function _checkIdInShortenerForm(
+        IShortenerForm $shortenerForm
+    ): void {
         $id = $shortenerForm->getId();
 
         if (empty($id)) {
@@ -244,24 +239,23 @@ final class Shortener extends BaseModel
         if (empty($shortenerVO)) {
             $shortenerForm->setStatusFail();
 
-            $shortenerForm->setError(sprintf(
-                ShortenerForm::SHORTENER_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
+            $shortenerForm->setError(
+                sprintf(
+                    ShortenerForm::SHORTENER_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
     }
 
     /**
-     * @param ShortenerForm $shortenerForm
+     * @param IShortenerForm $shortenerForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _checkUrlInShortenerForm(
-        ShortenerForm $shortenerForm
-    ): void
-    {
+        IShortenerForm $shortenerForm
+    ): void {
         $row = $this->store->getShortenerRowByUrl($shortenerForm->getUrl());
 
         if (!empty($row)) {
@@ -269,27 +263,27 @@ final class Shortener extends BaseModel
 
             $shortenerForm->setStatusFail();
 
-            $shortenerForm->setError(sprintf(
-                ShortenerForm::SHORTENER_ALREADY_EXISTS_ERROR_MESSAGE,
-                $shortenerForm->getUrl(),
-                $shortenerVO->getCode()
-            ));
+            $shortenerForm->setError(
+                sprintf(
+                    ShortenerForm::SHORTENER_ALREADY_EXISTS_ERROR_MESSAGE,
+                    $shortenerForm->getUrl(),
+                    $shortenerVO->getCode()
+                )
+            );
         }
     }
 
     /**
-     * @param ShortenerForm $shortenerForm
+     * @param IShortenerForm $shortenerForm
      * @param bool $isCreateVOIfEmptyId
-     * @return ShortenerValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IShortenerValuesObject|null
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _getVOFromShortenerForm(
-        ShortenerForm $shortenerForm,
-        bool          $isCreateVOIfEmptyId = false
-    ): ?ShortenerValuesObject
-    {
+        IShortenerForm $shortenerForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?IShortenerValuesObject {
         $row = null;
 
         $id = $shortenerForm->getId();
@@ -317,11 +311,11 @@ final class Shortener extends BaseModel
     }
 
     /**
-     * @param ShortenerValuesObject $shortenerVO
+     * @param IShortenerValuesObject $shortenerVO
      * @return void
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setCodeToVO(ShortenerValuesObject $shortenerVO): void
+    private function _setCodeToVO(IShortenerValuesObject $shortenerVO): void
     {
         if (empty($shortenerVO->getCode())) {
             /* @var MathPlugin MathPlugin */

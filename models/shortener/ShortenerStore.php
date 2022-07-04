@@ -2,28 +2,25 @@
 
 namespace Sonder\Models\Shortener;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Shortener\Interfaces\IShortenerStore;
+use Sonder\Models\Shortener\Interfaces\IShortenerValuesObject;
 
-final class ShortenerStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[IShortenerStore]
+final class ShortenerStore extends ModelStore implements IShortenerStore
 {
-    const SHORTENER_TABLE = 'shortener';
+    final protected const SCOPE ='shortener';
 
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'shortener';
+    private const SHORTENER_TABLE = 'shortener';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getShortenerRowById(
         ?int $id = null,
@@ -77,7 +74,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateShortenerById(
         ?array $row = null,
@@ -99,7 +95,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteShortenerById(
         ?int $id = null,
@@ -125,7 +120,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreShortenerById(?int $id = null): bool
     {
@@ -143,16 +137,14 @@ final class ShortenerStore extends ModelStore implements IModelStore
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getShortenerRowsByPage(
         int  $page = 1,
-        int  $itemsOnPage = 10,
+        int  $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
     ): ?array
@@ -179,7 +171,7 @@ final class ShortenerStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
@@ -194,7 +186,7 @@ final class ShortenerStore extends ModelStore implements IModelStore
             $sql,
             ShortenerStore::SHORTENER_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -202,8 +194,9 @@ final class ShortenerStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return int
      */
     final public function getShortenerRowsCount(
         bool $excludeRemoved = true,
@@ -248,8 +241,7 @@ final class ShortenerStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return int
      */
     final public function getMaxId(): int
     {
@@ -269,8 +261,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getShortenerRowByCode(
         ?string $code = null,
@@ -327,8 +317,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getShortenerRowByUrl(
         ?string $url = null,
@@ -381,13 +369,12 @@ final class ShortenerStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param ShortenerValuesObject|null $shortenerVO
+     * @param IShortenerValuesObject|null $shortenerVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateShortener(
-        ?ShortenerValuesObject $shortenerVO = null
+        ?IShortenerValuesObject $shortenerVO = null
     ): bool
     {
         $id = $shortenerVO->getId();
@@ -406,7 +393,6 @@ final class ShortenerStore extends ModelStore implements IModelStore
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertShortener(?array $row = null): bool
     {

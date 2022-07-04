@@ -2,29 +2,31 @@
 
 namespace Sonder\Models\Shortener;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelApi;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
-use Sonder\Core\ResponseObject;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
-use Sonder\Models\Shortener;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Shortener\Exceptions\ShortenerApiException;
+use Sonder\Models\Shortener\Exceptions\ShortenerException;
+use Sonder\Models\Shortener\Forms\ShortenerForm;
+use Sonder\Models\Shortener\Interfaces\IShortenerApi;
+use Sonder\Models\Shortener\Interfaces\IShortenerModel;
 
 /**
- * @property Shortener $model
+ * @property IShortenerModel $model
  */
-final class ShortenerApi extends ModelApiCore implements IModelApi
+#[IModelApi]
+#[IShortenerApi]
+final class ShortenerApi extends ModelApiCore implements IShortenerApi
 {
     /**
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws ShortenerApiException
+     * @throws ValuesObjectException
      */
-    final public function actionCreate(): ResponseObject
+    final public function actionCreate(): IResponseObject
     {
         $apiValues = $this->request->getApiValues();
 
@@ -46,29 +48,32 @@ final class ShortenerApi extends ModelApiCore implements IModelApi
             ]);
         }
 
-        throw new ApiException('Can Not Create New Short Link');
+        throw new ShortenerApiException(
+            ShortenerApiException::MESSAGE_API_CAN_NOT_CREATE_SHORT_LINK,
+            ShortenerException::CODE_API_CAN_NOT_CREATE_SHORT_LINK
+        );
     }
 
     /**
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return IResponseObject
+     * @throws ShortenerApiException
      */
-    final public function actionGet(): ResponseObject
+    final public function actionGet(): IResponseObject
     {
         $id = $this->request->getApiValue('id');
         $code = $this->request->getApiValue('code');
 
         if (empty($id) && empty($code)) {
-            throw new ApiException(
-                'Input Values Are Not Set Or Have Invalid Format'
+            throw new ShortenerApiException(
+                ShortenerApiException::MESSAGE_API_INPUT_VALUES_HAVE_INVALID_FORMAT,
+                ShortenerException::CODE_API_INPUT_VALUES_HAVE_INVALID_FORMAT
             );
         }
 
         if (!empty($id) && !empty($code)) {
-            throw new ApiException(
-                'Both Input Values "id" And "code" Can Not Be Set'
+            throw new ShortenerApiException(
+                ShortenerApiException::MESSAGE_API_BOTH_ID_AND_CODE_CAN_NOT_BE_SET,
+                ShortenerException::CODE_API_BOTH_ID_AND_CODE_CAN_NOT_BE_SET
             );
         }
 
@@ -80,10 +85,10 @@ final class ShortenerApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionUpdate(): ResponseObject
+    final public function actionUpdate(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -92,10 +97,10 @@ final class ShortenerApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionDelete(): ResponseObject
+    final public function actionDelete(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -105,25 +110,23 @@ final class ShortenerApi extends ModelApiCore implements IModelApi
 
     /**
      * @param string $code
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws ShortenerApiException
      */
-    private function _getRowByCode(string $code): ResponseObject
+    private function _getRowByCode(string $code): IResponseObject
     {
-        $shortenerVO = $this->model->getVOByCode(
-            $code,
-            true,
-            true
-        );
+        $shortenerVO = $this->model->getVOByCode($code);
 
         if (empty($shortenerVO)) {
-            throw new ApiException(sprintf(
-                'Short Link With Code "%s" Not Exists',
+            $errorMessage = sprintf(
+                ShortenerApiException::MESSAGE_API_SHORT_LINK_WITH_CODE_NOT_EXISTS,
                 $code
-            ));
+            );
+
+            throw new ShortenerApiException(
+                $errorMessage,
+                ShortenerException::CODE_API_SHORT_LINK_WITH_CODE_NOT_EXISTS
+            );
         }
 
         return $this->getApiResponse($shortenerVO->exportRow());
@@ -131,31 +134,30 @@ final class ShortenerApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $id
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws ShortenerApiException
      */
-    private function _getRowById(int $id): ResponseObject
+    private function _getRowById(int $id): IResponseObject
     {
         if ($id < 1) {
-            throw new ApiException(
-                'ID Value Has Invalid Format'
+            throw new ShortenerApiException(
+                ShortenerApiException::MESSAGE_API_ID_VALUE_HAS_INVALID_FORMAT,
+                ShortenerException::CODE_API_ID_VALUE_HAS_INVALID_FORMAT
             );
         }
 
-        $shortenerVO = $this->model->getVOById(
-            $id,
-            true,
-            true
-        );
+        $shortenerVO = $this->model->getVOById($id);
 
         if (empty($shortenerVO)) {
-            throw new ApiException(sprintf(
-                'Short Link With ID "%d" Not Exists',
+            $errorMessage = sprintf(
+                ShortenerApiException::MESSAGE_API_SHORT_LINK_WITH_ID_NOT_EXISTS,
                 $id
-            ));
+            );
+
+            throw new ShortenerApiException(
+                $errorMessage,
+                ShortenerException::CODE_API_SHORT_LINK_WITH_ID_NOT_EXISTS
+            );
         }
 
         return $this->getApiResponse($shortenerVO->exportRow());

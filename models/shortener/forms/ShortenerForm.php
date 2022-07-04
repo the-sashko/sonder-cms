@@ -1,30 +1,33 @@
 <?php
 
-namespace Sonder\Models\Shortener;
+namespace Sonder\Models\Shortener\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Shortener\Interfaces\IShortenerForm;
 
-final class ShortenerForm extends ModelFormObject
+#[IModelFormObject]
+#[IShortenerForm]
+final class ShortenerForm extends ModelFormObject implements IShortenerForm
 {
-    const URL_MAX_LENGTH = 512;
+    final public const URL_EMPTY_ERROR_MESSAGE = 'URL is empty';
 
-    const URL_PATTERN = '/^((http)|(https)):\/\/(.*?)\.(.*?)$/su';
+    final public const URL_IS_TOO_LONG_ERROR_MESSAGE = 'URL is too long';
 
-    const URL_EMPTY_ERROR_MESSAGE = 'URL is empty';
+    final public const URL_HAS_BAD_FORMAT_ERROR_MESSAGE = 'URL has bad format';
 
-    const URL_IS_TOO_LONG_ERROR_MESSAGE = 'URL is too long';
+    final public const SHORTENER_NOT_EXISTS_ERROR_MESSAGE = 'Short link with id "%d" not exists';
 
-    const URL_HAS_BAD_FORMAT_ERROR_MESSAGE = 'URL has bad format';
+    final public const SHORTENER_ALREADY_EXISTS_ERROR_MESSAGE = 'Short link with URL "%s" already exists and has "%s" code';
 
-    const SHORTENER_NOT_EXISTS_ERROR_MESSAGE = 'Short link with id "%d" not ' .
-    'exists';
+    private const URL_MAX_LENGTH = 512;
 
-    const SHORTENER_ALREADY_EXISTS_ERROR_MESSAGE = 'Short link with URL "%s" ' .
-    'already exists and has "%s" code';
+    private const URL_PATTERN = '/^((http)|(https)):\/\/(.*?)\.(.*?)$/su';
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
@@ -35,7 +38,7 @@ final class ShortenerForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -54,14 +57,14 @@ final class ShortenerForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUrl(): ?string
     {
         if ($this->has('url')) {
             $url = $this->get('url');
 
-            $url = preg_replace('/(\s+)/su', '', $url);
+            $url = preg_replace('/(\s+)/u', '', $url);
 
             return empty($url) ? null : $url;
         }
@@ -71,14 +74,14 @@ final class ShortenerForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getCode(): ?string
     {
         if ($this->has('code')) {
             $code = $this->get('code');
 
-            $code = preg_replace('/(\s+)/su', '', $code);
+            $code = preg_replace('/(\s+)/u', '', $code);
 
             return empty($code) ? null : $code;
         }
@@ -88,7 +91,7 @@ final class ShortenerForm extends ModelFormObject
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -102,7 +105,7 @@ final class ShortenerForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -112,11 +115,11 @@ final class ShortenerForm extends ModelFormObject
     /**
      * @param string|null $url
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUrl(?string $url = null): void
     {
-        $url = preg_replace('/(\s+)/su', '', $url);
+        $url = preg_replace('/(\s+)/u', '', $url);
 
         $this->set('url', $url);
     }
@@ -124,11 +127,11 @@ final class ShortenerForm extends ModelFormObject
     /**
      * @param string|null $code
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setCode(?string $code = null): void
     {
-        $url = preg_replace('/(\s+)/su', '', $code);
+        $code = preg_replace('/(\s+)/u', '', $code);
 
         $this->set('url', $code);
     }
@@ -136,7 +139,7 @@ final class ShortenerForm extends ModelFormObject
     /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -145,7 +148,7 @@ final class ShortenerForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateUrlValue(): void
     {
