@@ -3,9 +3,7 @@ CREATE SEQUENCE "tags_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 922337203685477580
 CREATE SEQUENCE "articles_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "tag2article_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "hits_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE "hits_by_day_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE "hits_by_month_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE "hits_by_year_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE "hit_aggregations_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "comments_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "shortener_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE "demo_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -119,83 +117,27 @@ CREATE TABLE "hits"
         NOT DEFERRABLE
 ) WITH (oids = false);
 
-CREATE TABLE "hits_by_day"
+CREATE TABLE "hit_aggregations"
 (
-    "id"         integer DEFAULT nextval('hits_by_day_id_seq') NOT NULL,
+    "id"         integer DEFAULT nextval('hit_aggregations_id_seq') NOT NULL,
     "article_id" integer,
     "topic_id"   integer,
     "tag_id"     integer,
     "count"      integer,
-    "day"        date                                          NOT NULL,
-    "is_active"  boolean DEFAULT true                          NOT NULL,
-    "cdate"      integer                                       NOT NULL,
+    "is_active"  boolean DEFAULT true                               NOT NULL,
+    "cdate"      integer                                            NOT NULL,
     "mdate"      integer,
     "ddate"      integer,
-    CONSTRAINT "hits_by_day_id" PRIMARY KEY ("id"),
-    CONSTRAINT "hits_by_day_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles" ("id")
+    CONSTRAINT "hit_aggregations_id" PRIMARY KEY ("id"),
+    CONSTRAINT "hit_aggregations_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles" ("id")
         ON UPDATE CASCADE
         ON DELETE CASCADE
         NOT DEFERRABLE,
-    CONSTRAINT "hits_by_day_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topics" ("id")
+    CONSTRAINT "hit_aggregations_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topics" ("id")
         ON UPDATE CASCADE
         ON DELETE CASCADE
         NOT DEFERRABLE,
-    CONSTRAINT "hits_by_day_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE
-) WITH (oids = false);
-
-CREATE TABLE "hits_by_month"
-(
-    "id"         integer DEFAULT nextval('hits_by_month_id_seq') NOT NULL,
-    "article_id" integer,
-    "topic_id"   integer,
-    "tag_id"     integer,
-    "count"      integer,
-    "month"      integer                                         NOT NULL,
-    "year"       integer                                         NOT NULL,
-    "is_active"  boolean DEFAULT true                            NOT NULL,
-    "cdate"      integer                                         NOT NULL,
-    "mdate"      integer,
-    "ddate"      integer,
-    CONSTRAINT "hits_by_month_id" PRIMARY KEY ("id"),
-    CONSTRAINT "hits_by_month_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE,
-    CONSTRAINT "hits_by_month_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topics" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE,
-    CONSTRAINT "hits_by_month_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE
-) WITH (oids = false);
-
-CREATE TABLE "hits_by_year"
-(
-    "id"         integer DEFAULT nextval('hits_by_year_id_seq') NOT NULL,
-    "article_id" integer,
-    "topic_id"   integer,
-    "tag_id"     integer,
-    "count"      integer,
-    "year"       integer                                        NOT NULL,
-    "is_active"  boolean DEFAULT true                           NOT NULL,
-    "cdate"      integer                                        NOT NULL,
-    "mdate"      integer,
-    "ddate"      integer,
-    CONSTRAINT "hits_by_year_id" PRIMARY KEY ("id"),
-    CONSTRAINT "hits_by_year_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE,
-    CONSTRAINT "hits_by_year_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topics" ("id")
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT DEFERRABLE,
-    CONSTRAINT "hits_by_year_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id")
+    CONSTRAINT "hit_aggregations_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id")
         ON UPDATE CASCADE
         ON DELETE CASCADE
         NOT DEFERRABLE
@@ -302,75 +244,23 @@ CREATE INDEX "hits_article_id_is_active_ddate" ON "hits" USING btree ("article_i
 CREATE INDEX "hits_topic_id_is_active_ddate" ON "hits" USING btree ("topic_id", "is_active", "ddate");
 CREATE INDEX "hits_tag_id_is_active_ddate" ON "hits" USING btree ("tag_id", "is_active", "ddate");
 
-CREATE INDEX "hits_by_day_article_id" ON "hits_by_day" USING btree ("article_id");
-CREATE INDEX "hits_by_day_topic_id" ON "hits_by_day" USING btree ("topic_id");
-CREATE INDEX "hits_by_day_tag_id" ON "hits_by_day" USING btree ("tag_id");
-CREATE INDEX "hits_by_day_count" ON "hits_by_day" USING btree ("count");
-CREATE INDEX "hits_by_day_day" ON "hits_by_day" USING btree ("day");
-CREATE INDEX "hits_by_day_is_active" ON "hits_by_day" USING btree ("is_active");
-CREATE INDEX "hits_by_day_cdate" ON "hits_by_day" USING btree ("cdate");
-CREATE INDEX "hits_by_day_mdate" ON "hits_by_day" USING btree ("mdate");
-CREATE INDEX "hits_by_day_ddate" ON "hits_by_day" USING btree ("ddate");
-CREATE INDEX "hits_by_day_is_active_ddate" ON "hits_by_day" USING btree ("is_active", "ddate");
-CREATE INDEX "hits_by_day_article_id_is_active_ddate" ON "hits_by_day" USING btree ("article_id", "is_active", "ddate");
-CREATE INDEX "hits_by_day_topic_id_is_active" ON "hits_by_day" USING btree ("topic_id", "is_active", "ddate");
-CREATE INDEX "hits_by_day_tag_id_is_active_ddate" ON "hits_by_day" USING btree ("tag_id", "is_active", "ddate");
-CREATE INDEX "hits_by_day_count_is_active_ddate" ON "hits_by_day" USING btree ("count", "is_active", "ddate");
-CREATE INDEX "hits_by_day_day_is_active_ddate" ON "hits_by_day" USING btree ("day", "is_active", "ddate");
-CREATE INDEX "hits_by_day_article_id_day_is_active_ddate" ON "hits_by_day"
-    USING btree ("article_id", "day", "is_active", "ddate");
-CREATE INDEX "hits_by_day_topic_id_day_is_active" ON "hits_by_day"
-    USING btree ("topic_id", "day", "is_active", "ddate");
-CREATE INDEX "hits_by_day_tag_id_day_is_active_ddate" ON "hits_by_day"
-    USING btree ("tag_id", "day", "is_active", "ddate");
-
-CREATE INDEX "hits_by_month_article_id" ON "hits_by_month" USING btree ("article_id");
-CREATE INDEX "hits_by_month_topic_id" ON "hits_by_month" USING btree ("topic_id");
-CREATE INDEX "hits_by_month_tag_id" ON "hits_by_month" USING btree ("tag_id");
-CREATE INDEX "hits_by_month_count" ON "hits_by_month" USING btree ("count");
-CREATE INDEX "hits_by_month_month" ON "hits_by_month" USING btree ("month");
-CREATE INDEX "hits_by_month_year" ON "hits_by_month" USING btree ("year");
-CREATE INDEX "hits_by_month_is_active" ON "hits_by_month" USING btree ("is_active");
-CREATE INDEX "hits_by_month_cdate" ON "hits_by_month" USING btree ("cdate");
-CREATE INDEX "hits_by_month_mdate" ON "hits_by_month" USING btree ("mdate");
-CREATE INDEX "hits_by_month_ddate" ON "hits_by_month" USING btree ("ddate");
-CREATE INDEX "hits_by_month_is_active_ddate" ON "hits_by_month" USING btree ("is_active", "ddate");
-CREATE INDEX "hits_by_month_article_id_is_active_ddate" ON "hits_by_month"
+CREATE INDEX "hit_aggregations_article_id" ON "hit_aggregations" USING btree ("article_id");
+CREATE INDEX "hit_aggregations_topic_id" ON "hit_aggregations" USING btree ("topic_id");
+CREATE INDEX "hit_aggregations_tag_id" ON "hit_aggregations" USING btree ("tag_id");
+CREATE INDEX "hit_aggregations_count" ON "hit_aggregations" USING btree ("count");
+CREATE INDEX "hit_aggregations_is_active" ON "hit_aggregations" USING btree ("is_active");
+CREATE INDEX "hit_aggregations_cdate" ON "hit_aggregations" USING btree ("cdate");
+CREATE INDEX "hit_aggregations_mdate" ON "hit_aggregations" USING btree ("mdate");
+CREATE INDEX "hit_aggregations_ddate" ON "hit_aggregations" USING btree ("ddate");
+CREATE INDEX "hit_aggregations_is_active_ddate" ON "hit_aggregations" USING btree ("is_active", "ddate");
+CREATE INDEX "hit_aggregations_article_id_is_active_ddate"
+    ON "hit_aggregations"
     USING btree ("article_id", "is_active", "ddate");
-CREATE INDEX "hits_by_month_topic_id_is_active" ON "hits_by_month" USING btree ("topic_id", "is_active", "ddate");
-CREATE INDEX "hits_by_month_tag_id_is_active_ddate" ON "hits_by_month" USING btree ("tag_id", "is_active", "ddate");
-CREATE INDEX "hits_by_month_count_is_active_ddate" ON "hits_by_month" USING btree ("count", "is_active", "ddate");
-CREATE INDEX "hits_by_month_month_is_active_ddate" ON "hits_by_month" USING btree ("month", "is_active", "ddate");
-CREATE INDEX "hits_by_month_year_is_active_ddate" ON "hits_by_month" USING btree ("year", "is_active", "ddate");
-CREATE INDEX "hits_by_month_article_month_year_id_is_active_ddate" ON "hits_by_month"
-    USING btree ("article_id", "month", "year", "is_active", "ddate");
-CREATE INDEX "hits_by_month_topic_id_month_year_is_active_ddate" ON "hits_by_month"
-    USING btree ("topic_id", "month", "year", "is_active", "ddate");
-CREATE INDEX "hits_by_month_tag_id_month_year_is_active_ddate" ON "hits_by_month"
-    USING btree ("tag_id", "month", "year", "is_active", "ddate");
-
-CREATE INDEX "hits_by_year_article_id" ON "hits_by_year" USING btree ("article_id");
-CREATE INDEX "hits_by_year_topic_id" ON "hits_by_year" USING btree ("topic_id");
-CREATE INDEX "hits_by_year_tag_id" ON "hits_by_year" USING btree ("tag_id");
-CREATE INDEX "hits_by_year_count" ON "hits_by_year" USING btree ("count");
-CREATE INDEX "hits_by_year_year" ON "hits_by_year" USING btree ("year");
-CREATE INDEX "hits_by_year_is_active" ON "hits_by_year" USING btree ("is_active");
-CREATE INDEX "hits_by_year_cdate" ON "hits_by_year" USING btree ("cdate");
-CREATE INDEX "hits_by_year_mdate" ON "hits_by_year" USING btree ("mdate");
-CREATE INDEX "hits_by_year_ddate" ON "hits_by_year" USING btree ("ddate");
-CREATE INDEX "hits_by_year_is_active_ddate" ON "hits_by_year" USING btree ("is_active", "ddate");
-CREATE INDEX "hits_by_year_article_id_is_active_ddate" ON "hits_by_year"
-    USING btree ("article_id", "is_active", "ddate");
-CREATE INDEX "hits_by_year_topic_id_is_active" ON "hits_by_year" USING btree ("topic_id", "is_active", "ddate");
-CREATE INDEX "hits_by_year_tag_id_is_active_ddate" ON "hits_by_year" USING btree ("tag_id", "is_active", "ddate");
-CREATE INDEX "hits_by_year_count_is_active_ddate" ON "hits_by_year" USING btree ("count", "is_active", "ddate");
-CREATE INDEX "hits_by_year_year_is_active_ddate" ON "hits_by_year" USING btree ("year", "is_active", "ddate");
-CREATE INDEX "hits_by_year_article_id_year_is_active_ddate" ON "hits_by_year"
-    USING btree ("article_id", "year", "is_active", "ddate");
-CREATE INDEX "hits_by_year_topic_id_year_is_active_ddate" ON "hits_by_year"
-    USING btree ("topic_id", "year", "is_active", "ddate");
-CREATE INDEX "hits_by_year_tag_id_year_is_active_ddate" ON "hits_by_year"
-    USING btree ("tag_id", "year", "is_active", "ddate");
+CREATE INDEX "hit_aggregations_topic_id_is_active" ON "hit_aggregations" USING btree ("topic_id", "is_active", "ddate");
+CREATE INDEX "hit_aggregations_tag_id_is_active_ddate"
+    ON "hit_aggregations"
+    USING btree ("tag_id", "is_active", "ddate");
+CREATE INDEX "hit_aggregations_count_is_active_ddate" ON "hit_aggregations" USING btree ("count", "is_active", "ddate");
 
 CREATE INDEX "comments_parent_id" ON "comments" USING btree ("parent_id");
 CREATE INDEX "comments_article_id" ON "comments" USING btree ("article_id");
@@ -488,11 +378,12 @@ VALUES (1, 1, 1, 't'),
 INSERT INTO "users" ("id", "login", "email", "role_id", "cdate")
 VALUES (1, 'admin', 'admin@admin.admin', 10, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
-INSERT INTO "cron_jobs" ("id", "alias", "controller", "method", "interval", "cdate")
-VALUES (3, 'RSS', 'cron_rss', 'generate', 60 * 30, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
-       (4, 'Hits', 'cron_hit', 'aggregate', 60 * 60 * 24, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
-       (5, 'Share', 'cron_share', 'send', 60 * 15, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
-       (6, 'Sitemap', 'cron_sitemap', 'generate', 60 * 30, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
+INSERT INTO "cron_jobs" ("id", "alias", "controller", "controller_method", "interval", "cdate")
+VALUES (3, 'RSS', 'cron_rss', 'generate', 1800/* 30 min */, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (4, 'Hits', 'cron_hit', 'aggregate', 86400/* 1 day */, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (5, 'Share', 'cron_share', 'send', 900/* 15 min */, CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
+       (6, 'Sitemap', 'cron_sitemap', 'generate', 1800/* 30 min */,
+        CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER));
 
 INSERT INTO "demo" ("id", "foo", "bar", "cdate")
 VALUES (1, 'test', 'a b c', CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS INTEGER)),
