@@ -3,8 +3,9 @@
 namespace Sonder\Hooks;
 
 use Exception;
+use Sonder\Enums\ContentTypesEnum;
 use Sonder\Core\CoreHook;
-use Sonder\Core\Interfaces\IHook;
+use Sonder\Interfaces\IHook;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 
@@ -44,16 +45,20 @@ final class SystemHook extends CoreHook implements IHook
             $redirectUrl = sprintf('%s/', $request->getFullUrl());
         }
 
-        if (!empty($redirectUrl)) {
-            /* @var $response ResponseObject|null */
-            $response = $this->get('response');
-
-            $response = empty($response) ? new ResponseObject() : $response;
-
-            $response->redirect->setUrl($redirectUrl);
-            $response->redirect->setIsPermanent(true);
-
-            $this->set('response', $response);
+        if (empty($redirectUrl)) {
+            return;
         }
+
+        /* @var $response ResponseObject|null */
+        $response = $this->get('response');
+
+        if (empty($response)) {
+            $response = new ResponseObject();
+        }
+
+        $response->redirect->setUrl($redirectUrl);
+        $response->redirect->setIsPermanent(true);
+
+        $this->set('response', $response);
     }
 }
