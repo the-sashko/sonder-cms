@@ -2,15 +2,16 @@
 
 namespace Sonder\Plugins\Page;
 
-use Exception;
 use Sonder\Core\ValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IValuesObject;
 
+#[IValuesObject]
 final class PageValuesObject extends ValuesObject
 {
     /**
      * @return string|null
-     *
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     public function getTitle(): ?string
     {
@@ -23,8 +24,7 @@ final class PageValuesObject extends ValuesObject
 
     /**
      * @return string|null
-     *
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     public function getContent(): ?string
     {
@@ -37,8 +37,8 @@ final class PageValuesObject extends ValuesObject
 
     /**
      * @param string|null $title
-     *
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     public function setTitle(?string $title = null): void
     {
@@ -47,8 +47,8 @@ final class PageValuesObject extends ValuesObject
 
     /**
      * @param string|null $content
-     *
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     public function setContent(?string $content = null): void
     {
