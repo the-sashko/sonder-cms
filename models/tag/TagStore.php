@@ -2,37 +2,35 @@
 
 namespace Sonder\Models\Tag;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Tag\Interfaces\ITagStore;
+use Sonder\Models\Tag\Interfaces\ITagValuesObject;
 
-final class TagStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[ITagStore]
+final class TagStore extends ModelStore implements ITagStore
 {
-    const TAGS_TABLE = 'tags';
-    const TAG_TO_ARTICLE_TABLE = 'tag2article';
-    const ARTICLES_TABLE = 'articles';
+    final protected const SCOPE ='tag';
 
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'tag';
+    private const TAGS_TABLE = 'tags';
+
+    private const TAG_TO_ARTICLE_TABLE = 'tag2article';
+
+    private const ARTICLES_TABLE = 'articles';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagRowById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($id)) {
             return null;
         }
@@ -65,8 +63,6 @@ final class TagStore extends ModelStore implements IModelStore
     /**
      * @param string|null $slug
      * @return int|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagIdBySlug(?string $slug = null): ?int
     {
@@ -96,16 +92,13 @@ final class TagStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagRowByTitle(
         ?string $title = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($title)) {
             return null;
         }
@@ -149,16 +142,13 @@ final class TagStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagRowBySlug(
         ?string $slug = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($slug)) {
             return null;
         }
@@ -200,13 +190,11 @@ final class TagStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateTagById(
         ?array $row = null,
-        ?int   $id = null
-    ): bool
-    {
+        ?int $id = null
+    ): bool {
         if (empty($row) || empty($id)) {
             return false;
         }
@@ -218,13 +206,11 @@ final class TagStore extends ModelStore implements IModelStore
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteTagById(
         ?int $id = null,
         bool $isSoftDelete = true
-    ): bool
-    {
+    ): bool {
         if (empty($id)) {
             return false;
         }
@@ -244,7 +230,6 @@ final class TagStore extends ModelStore implements IModelStore
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreTagById(?int $id = null): bool
     {
@@ -253,7 +238,7 @@ final class TagStore extends ModelStore implements IModelStore
         }
 
         $row = [
-            'ddate' => NULL,
+            'ddate' => null,
             'is_active' => true
         ];
 
@@ -262,20 +247,17 @@ final class TagStore extends ModelStore implements IModelStore
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagRowsByPage(
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -289,7 +271,7 @@ final class TagStore extends ModelStore implements IModelStore
             $sqlWhere = sprintf('%s AND "is_active" = true', $sqlWhere);
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
@@ -304,7 +286,7 @@ final class TagStore extends ModelStore implements IModelStore
             $sql,
             TagStore::TAGS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -315,14 +297,11 @@ final class TagStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getAllTagRows(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -351,16 +330,12 @@ final class TagStore extends ModelStore implements IModelStore
     /**
      * @param int|null $articleId
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagsByArticleId(?int $articleId = null): ?array
     {
         if (empty($articleId)) {
             return null;
         }
-
-        $this->scope = 'article';
 
         $sql = '
             SELECT "tags".*
@@ -399,14 +374,11 @@ final class TagStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagRowsCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -432,15 +404,13 @@ final class TagStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param TagValuesObject|null $tagVO
+     * @param ITagValuesObject|null $tagVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateTag(
-        ?TagValuesObject $tagVO = null
-    ): bool
-    {
+        ?ITagValuesObject $tagVO = null
+    ): bool {
         $id = $tagVO->getId();
 
         if (empty($id)) {
@@ -457,7 +427,6 @@ final class TagStore extends ModelStore implements IModelStore
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertTag(?array $row = null): bool
     {

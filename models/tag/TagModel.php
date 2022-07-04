@@ -2,44 +2,47 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Tag\TagForm;
-use Sonder\Models\Tag\TagStore;
-use Sonder\Models\Tag\TagValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Tag\Interfaces\ITagApi;
+use Sonder\Models\Tag\Interfaces\ITagForm;
+use Sonder\Models\Tag\Interfaces\ITagModel;
+use Sonder\Models\Tag\Interfaces\ITagSimpleValuesObject;
+use Sonder\Models\Tag\Interfaces\ITagStore;
+use Sonder\Models\Tag\Forms\TagForm;
+use Sonder\Models\Tag\Interfaces\ITagValuesObject;
+use Sonder\Models\Tag\ValuesObjects\TagSimpleValuesObject;
+use Sonder\Models\Tag\ValuesObjects\TagValuesObject;
 use Sonder\Plugins\TranslitPlugin;
 use Throwable;
 
 /**
- * @property TagStore $store
+ * @property ITagApi $api
+ * @property ITagStore $store
  */
-final class Tag extends BaseModel
+#[IModel]
+#[ITagModel]
+final class TagModel extends BaseModel implements ITagModel
 {
-    const DEFAULT_SLUG = 'tag';
+    final protected const ITEMS_ON_PAGE = 10;
 
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    private const DEFAULT_SLUG = 'tag';
 
     /**
      * @param string|null $slug
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ITagValuesObject|null
+     * @throws ModelException
      */
     final public function getVOBySlug(
         ?string $slug = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?ValuesObject
-    {
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?ITagValuesObject {
         $row = $this->store->getTagRowBySlug(
             $slug,
             $excludeRemoved,
@@ -47,7 +50,10 @@ final class Tag extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getSimpleVO($row);
+            /* @var $tagVO TagValuesObject */
+            $tagVO = $this->getVO($row);
+
+            return $tagVO;
         }
 
         return null;
@@ -57,17 +63,14 @@ final class Tag extends BaseModel
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ITagValuesObject|null
+     * @throws ModelException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?ITagValuesObject {
         $row = $this->store->getTagRowById(
             $id,
             $excludeRemoved,
@@ -75,7 +78,10 @@ final class Tag extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getVO($row);
+            /* @var $tagVO TagValuesObject */
+            $tagVO = $this->getVO($row);
+
+            return $tagVO;
         }
 
         return null;
@@ -85,17 +91,14 @@ final class Tag extends BaseModel
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ITagSimpleValuesObject|null
+     * @throws ModelException
      */
     final public function getSimpleVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?ITagSimpleValuesObject {
         $row = $this->store->getTagRowById(
             $id,
             $excludeRemoved,
@@ -103,7 +106,10 @@ final class Tag extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getSimpleVO($row);
+            /* @var $tagSimpleVO TagSimpleValuesObject */
+            $tagSimpleVO = $this->getSimpleVO($row);
+
+            return $tagSimpleVO;
         }
 
         return null;
@@ -115,19 +121,17 @@ final class Tag extends BaseModel
      * @param bool $excludeInactive
      * @param bool $simplify
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @throws ModelException
      */
     final public function getTagsByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
         bool $excludeInactive = true,
         bool $simplify = true
-    ): ?array
-    {
+    ): ?array {
         $rows = $this->store->getTagRowsByPage(
             $page,
-            $this->itemsOnPage,
+            TagModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -144,16 +148,19 @@ final class Tag extends BaseModel
     }
 
     /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
-    final public function getAllTags(): ?array
+    final public function getAllTags(
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array
     {
         $rows = $this->store->getAllTagRows(
-            true,
-            true
+            $excludeRemoved,
+            $excludeInactive
         );
 
         if (empty($rows)) {
@@ -167,22 +174,19 @@ final class Tag extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTagsPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $rowsCount = $this->store->getTagRowsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / TagModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * TagModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -192,9 +196,7 @@ final class Tag extends BaseModel
     /**
      * @param int|null $articleId
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getTagsByArticleId(?int $articleId = null): ?array
     {
@@ -214,7 +216,6 @@ final class Tag extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeTagById(?int $id = null): bool
     {
@@ -228,7 +229,6 @@ final class Tag extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreTagById(?int $id = null): bool
     {
@@ -240,13 +240,12 @@ final class Tag extends BaseModel
     }
 
     /**
-     * @param TagForm $tagForm
+     * @param ITagForm $tagForm
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    final public function save(TagForm $tagForm): bool
+    final public function save(ITagForm $tagForm): bool
     {
         $tagForm->checkInputValues();
 
@@ -287,47 +286,42 @@ final class Tag extends BaseModel
 
     /**
      * @param TagForm $tagForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _checkIdInTagForm(TagForm $tagForm): bool
+    private function _checkIdInTagForm(TagForm $tagForm): void
     {
         $id = $tagForm->getId();
 
         if (empty($id)) {
-            return true;
+            return;
         }
 
         $tagVO = $this->_getVOFromTagForm($tagForm);
 
         if (empty($tagVO)) {
             $tagForm->setStatusFail();
-            $tagForm->setError(sprintf(
-                TagForm::TAG_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
-
-            return false;
+            $tagForm->setError(
+                sprintf(
+                    TagForm::TAG_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
-
-        return true;
     }
 
     /**
      * @param TagForm $tagForm
      * @param bool $isCreateVOIfEmptyId
      * @return TagValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _getVOFromTagForm(
         TagForm $tagForm,
-        bool    $isCreateVOIfEmptyId = false
-    ): ?TagValuesObject
-    {
+        bool $isCreateVOIfEmptyId = false
+    ): ?TagValuesObject {
         $row = null;
 
         $id = $tagForm->getId();
@@ -356,17 +350,14 @@ final class Tag extends BaseModel
     }
 
     /**
-     * @param TagForm $tagForm
+     * @param ITagForm $tagForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    private function _checkTitleInTagForm(TagForm $tagForm): void
+    private function _checkTitleInTagForm(ITagForm $tagForm): void
     {
         $title = $tagForm->getTitle();
-        $title = preg_replace('/^\s+$/su', ' ', $title);
-        $title = preg_replace('/((^\s)|(\s$))/su', '', $title);
+        $title = preg_replace('/^\s+$/u', ' ', $title);
+        $title = preg_replace('/((^\s)|(\s$))/u', '', $title);
 
         $tagForm->setTitle($title);
 
@@ -388,8 +379,6 @@ final class Tag extends BaseModel
      * @param string|null $title
      * @param int|null $id
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
@@ -401,9 +390,8 @@ final class Tag extends BaseModel
     /**
      * @param TagValuesObject $tagVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _setUniqSlugToVO(TagValuesObject $tagVO): void
     {
@@ -412,20 +400,20 @@ final class Tag extends BaseModel
 
         $slug = (string)$tagVO->getSlug();
 
-        $slug = preg_replace('/^\s+$/su', '', $slug);
-        $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+        $slug = preg_replace('/^\s+$/u', '', $slug);
+        $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
 
         if (empty($slug)) {
             $slug = $tagVO->getTitle();
 
-            $slug = preg_replace('/^\s+$/su', '', $slug);
-            $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+            $slug = preg_replace('/^\s+$/u', '', $slug);
+            $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
         }
 
         $slug = $translitPlugin->getSlug($slug);
 
         if (empty($slug)) {
-            $slug = Tag::DEFAULT_SLUG;
+            $slug = TagModel::DEFAULT_SLUG;
         }
 
         $slug = $this->_makeSlugUniq($slug, $tagVO->getId());
@@ -437,8 +425,6 @@ final class Tag extends BaseModel
      * @param string $slug
      * @param int|null $id
      * @return string|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
@@ -448,15 +434,15 @@ final class Tag extends BaseModel
 
         $slugCount = 1;
 
-        if (preg_match('/^(.*?)-([0-9]+)$/su', $slug)) {
+        if (preg_match('/^(.*?)-(\d+)$/su', $slug)) {
             $slugCount = (int)preg_match(
-                '/^(.*?)-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$2',
                 $slug
             );
 
             $slug = preg_match(
-                '/^(.*?)\-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$1',
                 $slug
             );

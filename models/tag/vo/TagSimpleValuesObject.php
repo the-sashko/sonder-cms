@@ -1,20 +1,25 @@
 <?php
 
-namespace Sonder\Models\Tag;
+namespace Sonder\Models\Tag\ValuesObjects;
 
-use Exception;
 use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelSimpleValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Tag\Interfaces\ITagSimpleValuesObject;
 
-final class TagSimpleValuesObject extends ModelSimpleValuesObject
+#[IValuesObject]
+#[IModelSimpleValuesObject]
+#[ITagSimpleValuesObject]
+final class TagSimpleValuesObject
+    extends ModelSimpleValuesObject
+    implements ITagSimpleValuesObject
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $linkPattern = '/tag/%s/';
+    final protected const LINK_PATTERN = '/tag/%s/';
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -27,7 +32,7 @@ final class TagSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final protected function getSlug(): ?string
     {
@@ -39,11 +44,10 @@ final class TagSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws ValuesObjectException
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
         return [
             'id' => $this->getId(),

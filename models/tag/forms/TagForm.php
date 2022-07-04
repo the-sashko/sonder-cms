@@ -1,35 +1,37 @@
 <?php
 
-namespace Sonder\Models\Tag;
+namespace Sonder\Models\Tag\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Tag\Interfaces\ITagForm;
 
-final class TagForm extends ModelFormObject
+#[IModelFormObject]
+#[ITagForm]
+final class TagForm extends ModelFormObject implements ITagForm
 {
-    const TITLE_MIN_LENGTH = 3;
+    final public const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
-    const TITLE_MAX_LENGTH = 64;
+    final public const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
 
-    const SLUG_MAX_LENGTH = 128;
+    final public const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
 
-    const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
+    final public const TITLE_EXISTS_ERROR_MESSAGE = 'Tag with this title already exists';
 
-    const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
+    final public const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
 
-    const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
+    final public const TAG_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" not exists';
 
-    const TITLE_EXISTS_ERROR_MESSAGE = 'Tag with this title already exists';
+    private const TITLE_MIN_LENGTH = 3;
 
-    const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
+    private const TITLE_MAX_LENGTH = 64;
 
-    const TAG_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Tag can not have a ' .
-    'circular dependencies';
-
-    const TAG_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" not exists';
+    private const SLUG_MAX_LENGTH = 128;
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
@@ -41,7 +43,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -60,7 +62,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -73,7 +75,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -86,7 +88,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -100,7 +102,7 @@ final class TagForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -110,7 +112,7 @@ final class TagForm extends ModelFormObject
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -120,7 +122,7 @@ final class TagForm extends ModelFormObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -130,7 +132,7 @@ final class TagForm extends ModelFormObject
     /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -139,7 +141,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTitleValue(): void
     {
@@ -163,7 +165,7 @@ final class TagForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateSlugValue(): void
     {

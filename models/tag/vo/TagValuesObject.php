@@ -1,37 +1,33 @@
 <?php
 
-namespace Sonder\Models\Tag;
+namespace Sonder\Models\Tag\ValuesObjects;
 
-use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Tag\Interfaces\ITagValuesObject;
 
-final class TagValuesObject extends ModelValuesObject
+#[IValuesObject]
+#[IModelValuesObject]
+#[ITagValuesObject]
+final class TagValuesObject
+    extends ModelValuesObject
+    implements ITagValuesObject
 {
-    const TAGS_LINK = '/tags/';
+    final public const TAGS_LINK = '/tags/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $editLinkPattern = '/admin/taxonomy/tag/%d/';
+    final protected const EDIT_LINK_PATTERN = '/admin/taxonomy/tag/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $removeLinkPattern = '/admin/taxonomy/tags/remove/%d/';
+    final protected const REMOVE_LINK_PATTERN = '/admin/taxonomy/tags/remove/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $restoreLinkPattern = '/admin/taxonomy/tags/restore/%d/';
+    final protected const RESTORE_LINK_PATTERN = '/admin/taxonomy/tags/restore/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $adminViewLinkPattern = '/admin/taxonomy/tags/view/%d/';
+    final protected const ADMIN_VIEW_LINK_PATTERN = '/admin/taxonomy/tags/view/%d/';
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): string
     {
@@ -40,7 +36,7 @@ final class TagValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -53,7 +49,7 @@ final class TagValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getViewsCount(): int
     {
@@ -67,7 +63,7 @@ final class TagValuesObject extends ModelValuesObject
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -79,7 +75,7 @@ final class TagValuesObject extends ModelValuesObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -90,7 +86,7 @@ final class TagValuesObject extends ModelValuesObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setViewsCount(): void
     {
