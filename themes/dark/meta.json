@@ -1,0 +1,15 @@
+{
+  "name": "dark",
+  "version": "1.0",
+  "assets": {
+    "js": [
+      "js/theme.js"
+    ],
+    "css": [],
+    "less": [
+      "less/theme.less"
+    ],
+    "font": [],
+    "img": []
+  }
+}
