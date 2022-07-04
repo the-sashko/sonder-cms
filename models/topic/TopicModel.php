@@ -2,16 +2,23 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use ImagickException;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Topic\TopicForm;
-use Sonder\Models\Topic\TopicSimpleValuesObject;
-use Sonder\Models\Topic\TopicStore;
-use Sonder\Models\Topic\TopicValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Topic\Exceptions\TopicException;
+use Sonder\Models\Topic\Exceptions\TopicModelException;
+use Sonder\Models\Topic\Interfaces\ITopicApi;
+use Sonder\Models\Topic\Interfaces\ITopicForm;
+use Sonder\Models\Topic\Interfaces\ITopicModel;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicStore;
+use Sonder\Models\Topic\Forms\TopicForm;
+use Sonder\Models\Topic\Interfaces\ITopicValuesObject;
+use Sonder\Models\Topic\ValuesObjects\TopicSimpleValuesObject;
+use Sonder\Models\Topic\ValuesObjects\TopicValuesObject;
 use Sonder\Plugins\Image\Exceptions\ImagePluginException;
 use Sonder\Plugins\Image\Exceptions\ImageSizeException;
 use Sonder\Plugins\ImagePlugin;
@@ -20,36 +27,33 @@ use Sonder\Plugins\UploadPlugin;
 use Throwable;
 
 /**
- * @property TopicStore $store
+ * @property ITopicApi $api
+ * @property ITopicStore $store
  */
-final class Topic extends BaseModel
+#[IModel]
+#[ITopicModel]
+final class TopicModel extends BaseModel implements ITopicModel
 {
-    const DEFAULT_SLUG = 'topic';
+    final protected const ITEMS_ON_PAGE = 10;
 
-    const IMAGES_DIR_PATH = '%s/media/topics';
+    private const DEFAULT_SLUG = 'topic';
 
-    const UPLOADS_DIR_PATH = 'uploads/topics';
+    private const IMAGES_DIR_PATH = '%s/media/topics';
 
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    private const UPLOADS_DIR_PATH = 'uploads/topics';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return TopicValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ITopicValuesObject|null
+     * @throws ModelException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?TopicValuesObject
-    {
+    ): ?ITopicValuesObject {
         $row = $this->store->getTopicRowById(
             $id,
             $excludeRemoved,
@@ -67,16 +71,14 @@ final class Topic extends BaseModel
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return ITopicSimpleValuesObject|null
+     * @throws ModelException
      */
     final public function getSimpleVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?ITopicSimpleValuesObject {
         $row = $this->store->getTopicRowById(
             $id,
             $excludeRemoved,
@@ -84,7 +86,10 @@ final class Topic extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getSimpleVO($row);
+            /* @var $topicSimpleVO ITopicSimpleValuesObject */
+            $topicSimpleVO = $this->getSimpleVO($row);
+
+            return $topicSimpleVO;
         }
 
         return null;
@@ -96,20 +101,17 @@ final class Topic extends BaseModel
      * @param bool $excludeInactive
      * @param bool $simplify
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getTopicsByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
         bool $excludeInactive = true,
         bool $simplify = true
-    ): ?array
-    {
+    ): ?array {
         $rows = $this->store->getTopicRowsByPage(
             $page,
-            $this->itemsOnPage,
+            TopicModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -126,16 +128,18 @@ final class Topic extends BaseModel
     }
 
     /**
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
-    final public function getAllTopics(): ?array
-    {
+    final public function getAllTopics(
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         $rows = $this->store->getAllTopicRows(
-            true,
-            true
+            $excludeRemoved,
+            $excludeInactive
         );
 
         if (empty($rows)) {
@@ -149,22 +153,19 @@ final class Topic extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicsPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $rowsCount = $this->store->getTopicRowsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / TopicModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * TopicModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -174,7 +175,6 @@ final class Topic extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeTopicById(?int $id = null): bool
     {
@@ -188,9 +188,8 @@ final class Topic extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws TopicModelException
      */
     final public function removeTopicImageById(?int $id = null): bool
     {
@@ -232,7 +231,6 @@ final class Topic extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreTopicById(?int $id = null): bool
     {
@@ -244,13 +242,13 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicForm $topicForm
+     * @param ITopicForm $topicForm
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final public function save(TopicForm $topicForm): bool
+    final public function save(ITopicForm $topicForm): bool
     {
         $topicForm->checkInputValues();
 
@@ -324,12 +322,12 @@ final class Topic extends BaseModel
 
     /**
      * @param array|null $row
-     * @return TopicValuesObject
-     * @throws Exception
+     * @return ITopicValuesObject
+     * @throws ModelException
      */
-    final protected function getVO(?array $row = null): ValuesObject
+    final protected function getVO(?array $row = null): ITopicValuesObject
     {
-        /* @var $topicVO TopicValuesObject */
+        /* @var $topicVO ITopicValuesObject */
         $topicVO = parent::getVO($row);
 
         $this->_setParentToVO($topicVO);
@@ -338,13 +336,11 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicValuesObject $topicVO
+     * @param ITopicValuesObject $topicVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
-    private function _setParentToVO(TopicValuesObject $topicVO): void
+    private function _setParentToVO(ITopicValuesObject $topicVO): void
     {
         /* @var $parentVO TopicSimpleValuesObject */
         $parentVO = $this->getSimpleVOById($topicVO->getParentId());
@@ -355,18 +351,17 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicForm $topicForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param ITopicForm $topicForm
+     * @return void
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _checkIdInTopicForm(TopicForm $topicForm): bool
+    private function _checkIdInTopicForm(ITopicForm $topicForm): void
     {
         $id = $topicForm->getId();
 
         if (empty($id)) {
-            return true;
+            return;
         }
 
         $topicVO = $this->_getVOFromTopicForm($topicForm);
@@ -374,30 +369,26 @@ final class Topic extends BaseModel
         if (empty($topicVO)) {
             $topicForm->setStatusFail();
 
-            $topicForm->setError(sprintf(
-                TopicForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
-
-            return false;
+            $topicForm->setError(
+                sprintf(
+                    TopicForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param TopicForm $topicForm
+     * @param ITopicForm $topicForm
      * @param bool $isCreateVOIfEmptyId
-     * @return TopicValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ITopicValuesObject|null
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _getVOFromTopicForm(
-        TopicForm $topicForm,
-        bool      $isCreateVOIfEmptyId = false
-    ): ?TopicValuesObject
-    {
+        ITopicForm $topicForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?ITopicValuesObject {
         $row = null;
 
         $id = $topicForm->getId();
@@ -431,25 +422,20 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicForm $topicForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param ITopicForm $topicForm
+     * @return void
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _checkParentIdInTopicForm(TopicForm $topicForm): bool
+    private function _checkParentIdInTopicForm(ITopicForm $topicForm): void
     {
         $parentId = $topicForm->getParentId();
 
         if (empty($parentId)) {
-            return true;
+            return;
         }
 
-        $row = $this->store->getTopicRowById(
-            $parentId,
-            true,
-            true
-        );
+        $row = $this->store->getTopicRowById($parentId);
 
         if (empty($row)) {
             $topicForm->setStatusFail();
@@ -458,13 +444,13 @@ final class Topic extends BaseModel
                 TopicForm::PARENT_TOPIC_NOT_EXISTS_ERROR_MESSAGE
             );
 
-            return false;
+            return;
         }
 
         $topicId = $topicForm->getId();
 
         if (empty($topicId)) {
-            return true;
+            return;
         }
 
         /* @var $parentVO TopicValuesObject */
@@ -483,22 +469,17 @@ final class Topic extends BaseModel
 
             $parentVO = $parentVO->getParentVO();
         }
-
-        return true;
     }
 
     /**
-     * @param TopicForm $topicForm
+     * @param ITopicForm $topicForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    private function _checkTitleInTopicForm(TopicForm $topicForm): void
+    private function _checkTitleInTopicForm(ITopicForm $topicForm): void
     {
         $title = $topicForm->getTitle();
-        $title = preg_replace('/^\s+$/su', ' ', $title);
-        $title = preg_replace('/((^\s)|(\s$))/su', '', $title);
+        $title = preg_replace('/^\s+$/u', ' ', $title);
+        $title = preg_replace('/((^\s)|(\s$))/u', '', $title);
 
         $topicForm->setTitle($title);
 
@@ -520,8 +501,6 @@ final class Topic extends BaseModel
      * @param string|null $title
      * @param int|null $id
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
@@ -536,33 +515,32 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicValuesObject $topicVO
+     * @param ITopicValuesObject $topicVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _setUniqSlugToVO(TopicValuesObject $topicVO): void
+    private function _setUniqSlugToVO(ITopicValuesObject $topicVO): void
     {
         /* @var $translitPlugin TranslitPlugin */
         $translitPlugin = $this->getPlugin('translit');
 
         $slug = (string)$topicVO->getSlug();
 
-        $slug = preg_replace('/^\s+$/su', '', $slug);
-        $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+        $slug = preg_replace('/^\s+$/u', '', $slug);
+        $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
 
         if (empty($slug)) {
             $slug = $topicVO->getTitle();
 
-            $slug = preg_replace('/^\s+$/su', '', $slug);
-            $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+            $slug = preg_replace('/^\s+$/u', '', $slug);
+            $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
         }
 
         $slug = $translitPlugin->getSlug($slug);
 
         if (empty($slug)) {
-            $slug = Topic::DEFAULT_SLUG;
+            $slug = TopicModel::DEFAULT_SLUG;
         }
 
         $slug = $this->_makeSlugUniq($slug, $topicVO->getId());
@@ -574,8 +552,6 @@ final class Topic extends BaseModel
      * @param string $slug
      * @param int|null $id
      * @return string|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
@@ -585,15 +561,15 @@ final class Topic extends BaseModel
 
         $slugCount = 1;
 
-        if (preg_match('/^(.*?)-([0-9]+)$/su', $slug)) {
+        if (preg_match('/^(.*?)-(\d+)$/su', $slug)) {
             $slugCount = (int)preg_match(
-                '/^(.*?)-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$2',
                 $slug
             );
 
             $slug = preg_match(
-                '/^(.*?)-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$1',
                 $slug
             );
@@ -607,14 +583,15 @@ final class Topic extends BaseModel
     }
 
     /**
-     * @param TopicForm $topicForm
+     * @param ITopicForm $topicForm
      * @return bool
+     * @throws CoreException
      * @throws ImagePluginException
      * @throws ImageSizeException
      * @throws ImagickException
-     * @throws Exception
+     * @throws TopicModelException
      */
-    private function _uploadImageFile(TopicForm $topicForm): bool
+    private function _uploadImageFile(ITopicForm $topicForm): bool
     {
         $id = $topicForm->getId();
 
@@ -659,13 +636,21 @@ final class Topic extends BaseModel
         $uploadPlugin->upload(
             TopicForm::IMAGE_EXTENSIONS,
             TopicForm::IMAGE_FILE_MAX_SIZE,
-            Topic::UPLOADS_DIR_PATH
+            TopicModel::UPLOADS_DIR_PATH
         );
 
         $error = $uploadPlugin->getError();
 
         if (!empty($error)) {
-            throw new Exception($error);
+            $errorMessage = sprintf(
+                TopicModelException::MESSAGE_MODEL_UPLOAD_FILE_ERROR,
+                $error
+            );
+
+            throw new TopicModelException(
+                $errorMessage,
+                TopicException::CODE_MODEL_UPLOAD_FILE_ERROR
+            );
         }
 
         $uploadedFiles = $uploadPlugin->getFiles();
@@ -715,18 +700,18 @@ final class Topic extends BaseModel
 
     /**
      * @return string
-     * @throws Exception
+     * @throws TopicModelException
      */
     private function _getImagesDirPath(): string
     {
         $publicDirPath = $this->_getPublicDirPath();
 
-        return sprintf(Topic::IMAGES_DIR_PATH, $publicDirPath);
+        return sprintf(TopicModel::IMAGES_DIR_PATH, $publicDirPath);
     }
 
     /**
      * @return string
-     * @throws Exception
+     * @throws TopicModelException
      */
     private function _getPublicDirPath(): string
     {
@@ -737,7 +722,10 @@ final class Topic extends BaseModel
         $publicDirPath = realpath(__DIR__ . '/../../../../public');
 
         if (empty($publicDirPath)) {
-            throw new Exception('Can not find public directory path');
+            throw new TopicModelException(
+                TopicModelException::MESSAGE_MODEL_NOT_FOUND_PUBLIC_DIRECTORY,
+                TopicException::CODE_MODEL_NOT_FOUND_PUBLIC_DIRECTORY
+            );
         }
 
         return $publicDirPath;

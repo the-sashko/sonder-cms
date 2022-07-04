@@ -2,35 +2,31 @@
 
 namespace Sonder\Models\Topic;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Topic\Interfaces\ITopicStore;
+use Sonder\Models\Topic\Interfaces\ITopicValuesObject;
 
-final class TopicStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[ITopicStore]
+final class TopicStore extends ModelStore implements ITopicStore
 {
-    const TOPICS_TABLE = 'topics';
+    final protected const SCOPE = 'topic';
 
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'topic';
+    private const TOPICS_TABLE = 'topics';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($id)) {
             return null;
         }
@@ -63,8 +59,6 @@ final class TopicStore extends ModelStore implements IModelStore
     /**
      * @param string|null $slug
      * @return int|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicIdBySlug(?string $slug = null): ?int
     {
@@ -94,16 +88,13 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowByTitle(
         ?string $title = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($title)) {
             return null;
         }
@@ -147,16 +138,13 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowBySlug(
         ?string $slug = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($slug)) {
             return null;
         }
@@ -198,13 +186,11 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateTopicById(
         ?array $row = null,
-        ?int   $id = null
-    ): bool
-    {
+        ?int $id = null
+    ): bool {
         if (empty($row) || empty($id)) {
             return false;
         }
@@ -216,13 +202,11 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteTopicById(
         ?int $id = null,
         bool $isSoftDelete = true
-    ): bool
-    {
+    ): bool {
         if (empty($id)) {
             return false;
         }
@@ -242,7 +226,6 @@ final class TopicStore extends ModelStore implements IModelStore
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreTopicById(?int $id = null): bool
     {
@@ -251,7 +234,7 @@ final class TopicStore extends ModelStore implements IModelStore
         }
 
         $row = [
-            'ddate' => NULL,
+            'ddate' => null,
             'is_active' => true
         ];
 
@@ -260,20 +243,17 @@ final class TopicStore extends ModelStore implements IModelStore
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowsByPage(
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -287,7 +267,7 @@ final class TopicStore extends ModelStore implements IModelStore
             $sqlWhere = sprintf('%s AND "is_active" = true', $sqlWhere);
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
@@ -302,7 +282,7 @@ final class TopicStore extends ModelStore implements IModelStore
             $sql,
             TopicStore::TOPICS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -313,14 +293,11 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getAllTopicRows(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -350,14 +327,11 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowsCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -387,15 +361,12 @@ final class TopicStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getTopicRowsByParentId(
         ?int $parentId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($parentId)) {
             return null;
         }
@@ -426,15 +397,13 @@ final class TopicStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param TopicValuesObject|null $topicVO
+     * @param ITopicValuesObject|null $topicVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateTopic(
-        ?TopicValuesObject $topicVO = null
-    ): bool
-    {
+        ?ITopicValuesObject $topicVO = null
+    ): bool {
         $id = $topicVO->getId();
 
         if (empty($id)) {
@@ -451,7 +420,6 @@ final class TopicStore extends ModelStore implements IModelStore
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertTopic(?array $row = null): bool
     {

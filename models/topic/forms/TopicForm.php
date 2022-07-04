@@ -1,49 +1,52 @@
 <?php
 
-namespace Sonder\Models\Topic;
+namespace Sonder\Models\Topic\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormFileObject;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Topic\Interfaces\ITopicForm;
 
-final class TopicForm extends ModelFormObject
+#[IModelFormObject]
+#[ITopicForm]
+final class TopicForm extends ModelFormObject implements ITopicForm
 {
-    const TITLE_MIN_LENGTH = 3;
+    final public const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
 
-    const TITLE_MAX_LENGTH = 64;
+    final public const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
 
-    const SLUG_MAX_LENGTH = 128;
+    final public const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
-    const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
+    final public const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
 
-    const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
+    final public const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
 
-    const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
+    final public const TITLE_EXISTS_ERROR_MESSAGE = 'Topic with this title already exists';
 
-    const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
+    final public const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
 
-    const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
+    final public const TOPIC_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Topic can not have a circular dependencies';
 
-    const TITLE_EXISTS_ERROR_MESSAGE = 'Topic with this title already exists';
+    final public const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
-    const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
+    final public const PARENT_TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Parent Topic with id "%d" not exists';
 
-    const TOPIC_HAVE_CIRCULAR_DEPENDENCY_ERROR_MESSAGE = 'Topic can not have ' .
-    'a circular dependencies';
+    final public const IMAGE_FILE_TOO_LARGE_ERROR_MESSAGE = 'Image file in too large';
 
-    const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
+    final public const IMAGE_FILE_HAS_BAD_EXTENSION_ERROR_MESSAGE = 'Image file has bad extension';
 
-    const PARENT_TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Parent Topic with id "%d" ' .
-    'not exists';
+    final public const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
 
-    const IMAGE_FILE_TOO_LARGE_ERROR_MESSAGE = 'Image file in too large';
+    private const TITLE_MIN_LENGTH = 3;
 
-    const IMAGE_FILE_HAS_BAD_EXTENSION_ERROR_MESSAGE = 'Image file has bad ' .
-    'extension';
+    private const TITLE_MAX_LENGTH = 64;
 
-    const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
+    private const SLUG_MAX_LENGTH = 128;
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
@@ -58,7 +61,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -77,7 +80,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getParentId(): ?int
     {
@@ -96,7 +99,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -109,7 +112,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -122,7 +125,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -134,10 +137,10 @@ final class TopicForm extends ModelFormObject
     }
 
     /**
-     * @return array|null
-     * @throws Exception
+     * @return IModelFormFileObject|null
+     * @throws ValuesObjectException
      */
-    final public function getImage(): ?array
+    final public function getImage(): ?IModelFormFileObject
     {
         if (!$this->has('image')) {
             return null;
@@ -155,7 +158,7 @@ final class TopicForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -165,7 +168,7 @@ final class TopicForm extends ModelFormObject
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -175,7 +178,7 @@ final class TopicForm extends ModelFormObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -185,7 +188,7 @@ final class TopicForm extends ModelFormObject
     /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -193,18 +196,18 @@ final class TopicForm extends ModelFormObject
     }
 
     /**
-     * @param array|null $image
+     * @param IModelFormFileObject|null $image
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    final public function setImage(?array $image = null): void
+    final public function setImage(?IModelFormFileObject $image = null): void
     {
         $this->set('image', $image);
     }
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTitleValue(): void
     {
@@ -228,7 +231,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateSlugValue(): void
     {
@@ -242,7 +245,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateImage(): void
     {
@@ -280,7 +283,7 @@ final class TopicForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _setImageFileFromRequest(): void
     {

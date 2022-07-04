@@ -1,13 +1,22 @@
 <?php
 
-namespace Sonder\Models\Topic;
+namespace Sonder\Models\Topic\ValuesObjects;
 
-use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 
-final class TopicValuesObject extends ModelValuesObject
+#[IValuesObject]
+#[IModelValuesObject]
+#[ITopicValuesObject]
+final class TopicValuesObject
+    extends ModelValuesObject
+    implements ITopicValuesObject
 {
-    const IMAGE_SIZES = [
+    final public const IMAGE_SIZES = [
         'topic' => [
             'height' => 256,
             'width' => 256,
@@ -15,38 +24,23 @@ final class TopicValuesObject extends ModelValuesObject
         ]
     ];
 
-    const IMAGE_FORMAT = 'png';
+    final public const IMAGE_FORMAT = 'png';
 
-    const TOPICS_LINK = '/topics/';
+    final public const TOPICS_LINK = '/topics/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $editLinkPattern = '/admin/taxonomy/topic/%d/';
+    final protected const EDIT_LINK_PATTERN = '/admin/taxonomy/topic/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $removeLinkPattern = '/admin/taxonomy/topics/remove/%d/';
+    final protected const REMOVE_LINK_PATTERN = '/admin/taxonomy/topics/remove/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $restoreLinkPattern = '/admin/taxonomy/topics/restore/%d/';
+    final protected const RESTORE_LINK_PATTERN = '/admin/taxonomy/topics/restore/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $adminViewLinkPattern = '/admin/taxonomy/topics/view/%d/';
+    final protected const ADMIN_VIEW_LINK_PATTERN = '/admin/taxonomy/topics/view/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $imageLinkPattern = '/media/topics/%d-topic.png';
+    private const IMAGE_LINK_PATTERN = '/media/topics/%d-topic.png';
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): string
     {
@@ -55,7 +49,7 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -68,7 +62,7 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getParentId(): int
     {
@@ -77,7 +71,7 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return TopicSimpleValuesObject|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getParentVO(): ?TopicSimpleValuesObject
     {
@@ -90,7 +84,7 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getViewsCount(): int
     {
@@ -103,17 +97,20 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getImageLink(): string
     {
-        return sprintf($this->imageLinkPattern, $this->getId());
+        return sprintf(
+            TopicValuesObject::IMAGE_LINK_PATTERN,
+            $this->getId()
+        );
     }
 
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -125,7 +122,7 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -137,7 +134,7 @@ final class TopicValuesObject extends ModelValuesObject
     /**
      * @param int|null $parentId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setParentId(?int $parentId = null): void
     {
@@ -147,14 +144,13 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param TopicSimpleValuesObject|null $parentVO
+     * @param ITopicSimpleValuesObject|null $parentVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setParentVO(
-        ?TopicSimpleValuesObject $parentVO = null
-    ): void
-    {
+        ?ITopicSimpleValuesObject $parentVO = null
+    ): void {
         if (!empty($parentVO)) {
             $this->set('parent_simple_vo', $parentVO);
         }
@@ -162,7 +158,7 @@ final class TopicValuesObject extends ModelValuesObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setViewsCount(): void
     {
@@ -174,15 +170,14 @@ final class TopicValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @return array
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
-        $row = parent::exportRow($params);
+        $row = parent::exportRow();
 
         if (empty($row)) {
-            return null;
+            return $row;
         }
 
         if (array_key_exists('parent_simple_vo', $row)) {

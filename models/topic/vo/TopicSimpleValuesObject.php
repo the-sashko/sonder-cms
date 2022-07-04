@@ -1,20 +1,25 @@
 <?php
 
-namespace Sonder\Models\Topic;
+namespace Sonder\Models\Topic\ValuesObjects;
 
-use Exception;
 use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelSimpleValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 
-final class TopicSimpleValuesObject extends ModelSimpleValuesObject
+#[IValuesObject]
+#[IModelSimpleValuesObject]
+#[ITopicSimpleValuesObject]
+final class TopicSimpleValuesObject
+    extends ModelSimpleValuesObject
+    implements ITopicSimpleValuesObject
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $linkPattern = '/topic/%s/';
+    final protected const LINK_PATTERN = '/topic/%s/';
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -27,7 +32,7 @@ final class TopicSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final protected function getSlug(): ?string
     {
@@ -39,11 +44,10 @@ final class TopicSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws ValuesObjectException
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
         return [
             'id' => $this->getId(),
