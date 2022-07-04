@@ -2,13 +2,14 @@
 
 namespace Sonder\Hooks;
 
-use Exception;
-use Sonder\Enums\ContentTypesEnum;
 use Sonder\Core\CoreHook;
+use Sonder\Exceptions\HookException;
+use Sonder\Exceptions\RequestObjectException;
 use Sonder\Interfaces\IHook;
 use Sonder\Core\RequestObject;
 use Sonder\Core\ResponseObject;
 
+#[IHook]
 final class SystemHook extends CoreHook implements IHook
 {
     /**
@@ -21,7 +22,8 @@ final class SystemHook extends CoreHook implements IHook
 
     /**
      * @return void
-     * @throws Exception
+     * @throws HookException
+     * @throws RequestObjectException
      */
     final public function onBeforeMiddlewares(): void
     {

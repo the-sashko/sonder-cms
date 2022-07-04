@@ -2,7 +2,6 @@
 
 namespace Sonder\Hooks;
 
-use Exception;
 use Sonder\Core\ConfigObject;
 use Sonder\Core\CoreHook;
 use Sonder\Enums\ConfigNamesEnum;
@@ -10,6 +9,7 @@ use Sonder\Exceptions\ConfigException;
 use Sonder\Exceptions\HookException;
 use Sonder\Interfaces\IHook;
 
+#[IHook]
 final class CopyrightHook extends CoreHook implements IHook
 {
     private const LAUNCH_DATE_CONFIG_VALUE = 'launch_date';
