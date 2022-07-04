@@ -2,20 +2,26 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\CronBaseController;
 use Sonder\Core\RequestObject;
 use Sonder\Enums\ConfigNamesEnum;
-use Sonder\Models\Article;
-use Sonder\Models\Article\ArticleValuesObject;
-use Sonder\Models\Tag;
-use Sonder\Models\Tag\TagValuesObject;
-use Sonder\Models\Topic;
-use Sonder\Models\Topic\TopicValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Models\Article\Interfaces\IArticleValuesObject;
+use Sonder\Models\ArticleModel;
+use Sonder\Models\Tag\Interfaces\ITagValuesObject;
+use Sonder\Models\Tag\ValuesObjects\TagValuesObject;
+use Sonder\Models\TagModel;
+use Sonder\Models\Topic\Interfaces\ITopicValuesObject;
+use Sonder\Models\Topic\ValuesObjects\TopicValuesObject;
+use Sonder\Models\TopicModel;
 use Sonder\Plugins\SitemapPlugin;
 
+#[IController]
 final class CronSitemapController extends CronBaseController
 {
     private const SITEMAP_STATIC_PAGE_FREQUENCY = 'weekly';
@@ -40,6 +46,12 @@ final class CronSitemapController extends CronBaseController
      */
     private SitemapPlugin $_sitemapPlugin;
 
+    /**
+     * @param RequestObject $request
+     * @throws ConfigException
+     * @throws CoreException
+     * @throws ControllerException
+     */
     final public function __construct(RequestObject $request)
     {
         parent::__construct($request);
@@ -54,9 +66,10 @@ final class CronSitemapController extends CronBaseController
 
     /**
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function jobGenerate(): void
     {
@@ -104,25 +117,21 @@ final class CronSitemapController extends CronBaseController
     /**
      * @param array $sitemaps
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     private function _generateArticleSitemaps(array &$sitemaps): void
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         $page = 1;
 
-        $articleVOs = $articleModel->getArticlesByPage(
-            $page,
-            true,
-            true
-        );
+        $articleVOs = $articleModel->getArticlesByPage($page);
 
         while (!empty($articleVOs)) {
-            $links = array_map(function (ArticleValuesObject $articleVO) {
+            $links = array_map(function (IArticleValuesObject $articleVO) {
                 return sprintf(
                     '%s%s',
                     $this->request->getHost(),
@@ -153,36 +162,28 @@ final class CronSitemapController extends CronBaseController
 
             $page++;
 
-            $articleVOs = $articleModel->getArticlesByPage(
-                $page,
-                true,
-                true
-            );
+            $articleVOs = $articleModel->getArticlesByPage($page);
         }
     }
 
     /**
      * @param array $sitemaps
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     private function _generateTopicsSitemaps(array &$sitemaps): void
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         $page = 1;
 
-        $topicVOs = $topicModel->getTopicsByPage(
-            $page,
-            true,
-            true
-        );
+        $topicVOs = $topicModel->getTopicsByPage($page);
 
         while (!empty($topicVOs)) {
-            $links = array_map(function (TopicValuesObject $topicVO) {
+            $links = array_map(function (ITopicValuesObject $topicVO) {
                 return sprintf(
                     '%s%s',
                     $this->request->getHost(),
@@ -213,36 +214,28 @@ final class CronSitemapController extends CronBaseController
 
             $page++;
 
-            $topicVOs = $topicModel->getTopicsByPage(
-                $page,
-                true,
-                true
-            );
+            $topicVOs = $topicModel->getTopicsByPage($page);
         }
     }
 
     /**
      * @param array $sitemaps
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     private function _generateTagsSitemaps(array &$sitemaps): void
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         $page = 1;
 
-        $tagVOs = $tagModel->getTagsByPage(
-            $page,
-            true,
-            true
-        );
+        $tagVOs = $tagModel->getTagsByPage($page);
 
         while (!empty($tagVOs)) {
-            $links = array_map(function (TopicValuesObject $tagVO) {
+            $links = array_map(function (ITagValuesObject $tagVO) {
                 return sprintf(
                     '%s%s',
                     $this->request->getHost(),
@@ -273,18 +266,14 @@ final class CronSitemapController extends CronBaseController
 
             $page++;
 
-            $tagVOs = $tagModel->getTagsByPage(
-                $page,
-                true,
-                true
-            );
+            $tagVOs = $tagModel->getTagsByPage($page);
         }
     }
 
     /**
      * @param array $sitemaps
      * @return void
-     * @throws Exception
+     * @throws ConfigException
      */
     private function _generateStaticPagesSitemaps(array &$sitemaps): void
     {

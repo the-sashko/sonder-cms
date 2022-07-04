@@ -3,7 +3,9 @@
 namespace Sonder\Controllers;
 
 use Sonder\CMS\Essentials\CronBaseController;
+use Sonder\Interfaces\IController;
 
+#[IController]
 final class CronHitController extends CronBaseController
 {
     /**

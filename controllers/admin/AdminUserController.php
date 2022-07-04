@@ -2,16 +2,20 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Role;
-use Sonder\Models\User;
-use Sonder\Models\User\CredentialsForm;
-use Sonder\Models\User\UserForm;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\RoleModel;
+use Sonder\Models\User\Forms\CredentialsForm;
+use Sonder\Models\User\Forms\UserForm;
+use Sonder\Models\UserModel;
 
+#[IController]
 final class AdminUserController extends AdminBaseController
 {
     /**
@@ -19,15 +23,15 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/users((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayUsers(): IResponseObject
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         $users = $userModel->getUsersByPage($this->page, false, false);
@@ -64,15 +68,16 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/users/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayUser(): IResponseObject
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         if (empty($this->id)) {
@@ -100,7 +105,6 @@ final class AdminUserController extends AdminBaseController
             'page_path' => $pagePath
         ]);
 
-
         return $this->render('user/view');
     }
 
@@ -109,11 +113,12 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/user((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayUserForm(): IResponseObject
     {
@@ -133,10 +138,10 @@ final class AdminUserController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
@@ -162,7 +167,7 @@ final class AdminUserController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $userForm UserForm|null */
+            /* @var $userForm UserForm */
             $userForm = $userModel->getForm(
                 $this->request->getPostValues(),
                 'user'
@@ -221,11 +226,12 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/users/credentials/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayUserCredentialsForm(): IResponseObject
     {
@@ -239,7 +245,7 @@ final class AdminUserController extends AdminBaseController
 
         $credentialsForm = null;
 
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         $userVO = $userModel->getVOById(
@@ -257,7 +263,7 @@ final class AdminUserController extends AdminBaseController
         $isAllowAccessByApi = !empty($userVO->getApiToken());
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $credentialsForm CredentialsForm|null */
+            /* @var $credentialsForm CredentialsForm */
             $credentialsForm = $userModel->getForm(
                 $this->request->getPostValues(),
                 'credentials'
@@ -267,10 +273,12 @@ final class AdminUserController extends AdminBaseController
         }
 
         if (!empty($credentialsForm) && $credentialsForm->getStatus()) {
-            return $this->redirect(sprintf(
-                '/admin/users/view/%d/',
-                $this->id
-            ));
+            return $this->redirect(
+                sprintf(
+                    '/admin/users/view/%d/',
+                    $this->id
+                )
+            );
         }
 
         if (!empty($credentialsForm)) {
@@ -304,14 +312,12 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/users/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveUser(): IResponseObject
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         if (!$userModel->removeById($this->id)) {
@@ -331,14 +337,12 @@ final class AdminUserController extends AdminBaseController
      * @route /admin/users/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreUser(): IResponseObject
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         if (!$userModel->restoreById($this->id)) {

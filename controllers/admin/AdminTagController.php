@@ -2,15 +2,19 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Tag;
-use Sonder\Models\Tag\TagForm;
-use Sonder\Models\Tag\TagValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Tag\Forms\TagForm;
+use Sonder\Models\Tag\ValuesObjects\TagValuesObject;
+use Sonder\Models\TagModel;
 
+#[IController]
 final class AdminTagController extends AdminBaseController
 {
     /**
@@ -18,15 +22,15 @@ final class AdminTagController extends AdminBaseController
      * @route /admin/taxonomy/tags((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayTags(): IResponseObject
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         $tags = $tagModel->getTagsByPage(
@@ -70,15 +74,16 @@ final class AdminTagController extends AdminBaseController
      * @route /admin/taxonomy/tags/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayTag(): IResponseObject
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         if (empty($this->id)) {
@@ -108,7 +113,6 @@ final class AdminTagController extends AdminBaseController
             'page_path' => $pagePath
         ]);
 
-
         return $this->render('tag/view');
     }
 
@@ -117,11 +121,12 @@ final class AdminTagController extends AdminBaseController
      * @route /admin/taxonomy/tag((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayTagForm(): IResponseObject
     {
@@ -138,11 +143,11 @@ final class AdminTagController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         if (!empty($id)) {
-            /* @var $tagVO TagValuesObject|null */
+            /* @var $tagVO TagValuesObject */
             $tagVO = $tagModel->getVOById($id, false, false);
             $pageTitle = 'Edit';
         }
@@ -152,7 +157,7 @@ final class AdminTagController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $tagForm TagForm|null */
+            /* @var $tagForm TagForm */
             $tagForm = $tagModel->getForm(
                 $this->request->getPostValues(),
                 'tag'
@@ -212,14 +217,12 @@ final class AdminTagController extends AdminBaseController
      * @route /admin/taxonomy/tags/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveTag(): IResponseObject
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         if (!$tagModel->removeTagById($this->id)) {
@@ -239,14 +242,12 @@ final class AdminTagController extends AdminBaseController
      * @route /admin/taxonomy/tags/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreTag(): IResponseObject
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         if (!$tagModel->restoreTagById($this->id)) {

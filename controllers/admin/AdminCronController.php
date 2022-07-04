@@ -2,32 +2,36 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use ReflectionException;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Cron;
-use Sonder\Models\Cron\CronForm;
-use Sonder\Models\Cron\CronValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Cron\Forms\CronForm;
+use Sonder\Models\Cron\ValuesObjects\CronValuesObject;
+use Sonder\Models\CronModel;
 
+#[IController]
 final class AdminCronController extends AdminBaseController
 {
     /**
      * @area admin
-     * @route /admin/settings/cron((/page-([0-9]+)/)|/)
-     * @url_params page=$3
+     * @route /admin/settings/cron/job/view/([0-9]+)/
+     * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayCronJobs(): IResponseObject
     {
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         $cronJobs = $cronModel->getCronJobsByPage($this->page);
@@ -65,15 +69,16 @@ final class AdminCronController extends AdminBaseController
      * @route /admin/settings/cron/job/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayCronJob(): IResponseObject
     {
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         if (empty($this->id)) {
@@ -107,12 +112,13 @@ final class AdminCronController extends AdminBaseController
      * @route /admin/settings/cron/job((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @throws CoreException
+     * @throws ModelException
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ValuesObjectException
+     * @throws ConfigException
+     * @throws ControllerException
      */
     final public function displayCronJobForm(): IResponseObject
     {
@@ -131,7 +137,7 @@ final class AdminCronController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         if (!empty($id)) {
@@ -211,14 +217,12 @@ final class AdminCronController extends AdminBaseController
      * @route /admin/settings/cron/job/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveCronJob(): IResponseObject
     {
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         if (!$cronModel->removeCronJobById($this->id)) {
@@ -238,14 +242,12 @@ final class AdminCronController extends AdminBaseController
      * @route /admin/settings/cron/job/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreCronJob(): IResponseObject
     {
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         if (!$cronModel->restoreCronJobById($this->id)) {
@@ -265,14 +267,14 @@ final class AdminCronController extends AdminBaseController
      * @route /admin/settings/cron/job/run/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayRunCronJob(): IResponseObject
     {
-        /* @var $cronModel Cron */
+        /* @var $cronModel CronModel */
         $cronModel = $this->getModel('cron');
 
         /* @var $cronJob CronValuesObject */

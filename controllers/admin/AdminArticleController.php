@@ -2,17 +2,23 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Article;
-use Sonder\Models\Article\ArticleForm;
-use Sonder\Models\Article\ArticleValuesObject;
-use Sonder\Models\Tag;
-use Sonder\Models\Topic;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Article\Forms\ArticleForm;
+use Sonder\Models\Article\ValuesObjects\ArticleValuesObject;
+use Sonder\Models\ArticleModel;
+use Sonder\Models\TagModel;
+use Sonder\Models\TopicModel;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
+#[IController]
 final class AdminArticleController extends AdminBaseController
 {
     /**
@@ -21,13 +27,14 @@ final class AdminArticleController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayArticles(): IResponseObject
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         $articles = $articleModel->getArticlesByPage(
@@ -71,13 +78,17 @@ final class AdminArticleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      * @return IResponseObject
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayArticle(): IResponseObject
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         if (empty($this->id)) {
@@ -111,9 +122,13 @@ final class AdminArticleController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      * @return IResponseObject
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayArticleForm(): IResponseObject
     {
@@ -125,17 +140,17 @@ final class AdminArticleController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         if (!empty($id)) {
-            /* @var $articleVO ArticleValuesObject|null */
+            /* @var $articleVO ArticleValuesObject */
             $articleVO = $articleModel->getVOById($id);
             $pageTitle = 'Edit';
         }
@@ -145,7 +160,7 @@ final class AdminArticleController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $articleForm ArticleForm|null */
+            /* @var $articleForm ArticleForm */
             $articleForm = $articleModel->getForm(
                 $this->request->getPostValues()
             );
@@ -238,12 +253,11 @@ final class AdminArticleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveArticle(): IResponseObject
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         if (!$articleModel->removeArticleById($this->id)) {
@@ -264,12 +278,11 @@ final class AdminArticleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreArticle(): IResponseObject
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         if (!$articleModel->restoreArticleById($this->id)) {

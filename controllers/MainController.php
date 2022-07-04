@@ -2,16 +2,17 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseController;
 use Sonder\Enums\HttpCodesEnum;
-use Sonder\Core\ResponseObject;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
 use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Interfaces\IController;
 use Sonder\Interfaces\IResponseObject;
-use Sonder\Models\Article;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\ArticleModel;
 
+#[IController]
 final class MainController extends BaseController
 {
     private const MAIN_PAGE_URL = '/';
@@ -21,20 +22,17 @@ final class MainController extends BaseController
      * @route /
      * @url_params page=$3
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @throws ConfigException
+     * @throws ControllerException
      * @throws CoreException
+     * @throws ModelException
      */
     final public function displayIndex(): IResponseObject
     {
-        /* @var Article $articleModel */
+        /* @var ArticleModel $articleModel */
         $articleModel = $this->getModel('article');
 
-        $articles = $articleModel->getArticlesByPage(
-            $this->page,
-            true,
-            true
-        );
+        $articles = $articleModel->getArticlesByPage($this->page);
 
         if (empty($articles) && $this->page > 1) {
             return $this->redirect(MainController::MAIN_PAGE_URL);
@@ -56,7 +54,9 @@ final class MainController extends BaseController
      * @area blog
      * @route /demo/
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayDemo(): IResponseObject
     {
@@ -67,7 +67,9 @@ final class MainController extends BaseController
      * @area blog
      * @route /not-found/
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayNotFound(): IResponseObject
     {

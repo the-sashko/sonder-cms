@@ -2,20 +2,26 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
 use Sonder\Models\Config;
+use Sonder\Models\ConfigModel;
 
+#[IController]
 final class AdminSettingsController extends AdminBaseController
 {
     /**
      * @area admin
      * @route /admin/settings/
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displaySettings(): IResponseObject
     {
@@ -33,13 +39,14 @@ final class AdminSettingsController extends AdminBaseController
      * @area admin
      * @route /admin/settings/configs/
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayConfigs(): IResponseObject
     {
-        /* @var $configModel Config */
+        /* @var $configModel ConfigModel */
         $configModel = $this->getModel('config');
 
         $this->assign([
@@ -59,9 +66,10 @@ final class AdminSettingsController extends AdminBaseController
      * @route /admin/settings/configs/view/([a-z-_]+)/
      * @url_params config_name=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayConfig(): IResponseObject
     {
@@ -71,7 +79,7 @@ final class AdminSettingsController extends AdminBaseController
             return $this->redirect('/admin/settings/configs/');
         }
 
-        /* @var $configModel Config */
+        /* @var $configModel ConfigModel */
         $configModel = $this->getModel('config');
 
         $configVO = $configModel->getConfig($name);
@@ -98,9 +106,10 @@ final class AdminSettingsController extends AdminBaseController
      * @route /admin/settings/configs/edit/([a-z-_]+)/
      * @url_params config_name=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayEditConfig(): IResponseObject
     {
@@ -112,7 +121,7 @@ final class AdminSettingsController extends AdminBaseController
             return $this->redirect('/admin/settings/configs/');
         }
 
-        /* @var $configModel Config */
+        /* @var $configModel ConfigModel */
         $configModel = $this->getModel('config');
 
         $configVO = $configModel->getConfig($name);

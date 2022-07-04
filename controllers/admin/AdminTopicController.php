@@ -2,15 +2,20 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Topic;
-use Sonder\Models\Topic\TopicForm;
-use Sonder\Models\Topic\TopicValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Topic\Exceptions\TopicModelException;
+use Sonder\Models\Topic\Forms\TopicForm;
+use Sonder\Models\Topic\ValuesObjects\TopicValuesObject;
+use Sonder\Models\TopicModel;
 
+#[IController]
 final class AdminTopicController extends AdminBaseController
 {
     /**
@@ -18,15 +23,15 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topics((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayTopics(): IResponseObject
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         $topics = $topicModel->getTopicsByPage(
@@ -69,15 +74,16 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topics/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayTopic(): IResponseObject
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         if (empty($this->id)) {
@@ -114,11 +120,12 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topic((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws ValuesObjectException
      */
     final public function displayTopicForm(): IResponseObject
     {
@@ -137,11 +144,11 @@ final class AdminTopicController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         if (!empty($id)) {
-            /* @var $topicVO TopicValuesObject | null */
+            /* @var $topicVO TopicValuesObject */
             $topicVO = $topicModel->getVOById(
                 $id,
                 false,
@@ -156,7 +163,7 @@ final class AdminTopicController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $topicForm TopicForm|null */
+            /* @var $topicForm TopicForm */
             $topicForm = $topicModel->getForm(
                 $this->request->getPostValues(),
                 'topic'
@@ -224,14 +231,12 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topics/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveTopic(): IResponseObject
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         if (!$topicModel->removeTopicById($this->id)) {
@@ -251,14 +256,12 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topics/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreTopic(): IResponseObject
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         if (!$topicModel->restoreTopicById($this->id)) {
@@ -278,14 +281,14 @@ final class AdminTopicController extends AdminBaseController
      * @route /admin/taxonomy/topics/remove-image/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws TopicModelException
      */
     final public function displayRemoveImage(): IResponseObject
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         $topicModel->removeTopicImageById($this->id);

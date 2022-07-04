@@ -2,16 +2,20 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Models\Role;
-use Sonder\Models\Role\RoleActionForm;
-use Sonder\Models\Role\RoleForm;
-use Sonder\Models\Role\RoleValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Role\Forms\RoleActionForm;
+use Sonder\Models\Role\Forms\RoleForm;
+use Sonder\Models\Role\ValuesObjects\RoleValuesObject;
+use Sonder\Models\RoleModel;
 
+#[IController]
 final class AdminRoleController extends AdminBaseController
 {
     /**
@@ -19,15 +23,15 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
      */
     final public function displayRoles(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         $roles = $roleModel->getRolesByPage($this->page, false, false);
@@ -65,15 +69,16 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function displayRole(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (empty($this->id)) {
@@ -107,11 +112,12 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/role((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ValuesObjectException
+     * @throws ModelException
      */
     final public function displayRoleForm(): IResponseObject
     {
@@ -130,11 +136,11 @@ final class AdminRoleController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
-            /* @var $roleVO RoleValuesObject|null */
+            /* @var $roleVO RoleValuesObject */
             $roleVO = $roleModel->getVOById($id, false, false);
             $pageTitle = 'Edit';
         }
@@ -144,7 +150,7 @@ final class AdminRoleController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $roleForm RoleForm|null */
+            /* @var $roleForm RoleForm */
             $roleForm = $roleModel->getForm(
                 $this->request->getPostValues(),
                 'role'
@@ -217,14 +223,12 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveRole(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!$roleModel->removeRoleById($this->id)) {
@@ -244,14 +248,12 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreRole(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!$roleModel->restoreRoleById($this->id)) {
@@ -271,15 +273,14 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/actions((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayRoleActions(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         $roleActions = $roleModel->getRoleActionsByPage($this->page);
@@ -319,15 +320,15 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/actions/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     final public function displayRoleAction(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (empty($this->id)) {
@@ -366,11 +367,11 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/action((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws ValuesObjectException
      */
     final public function displayRoleActionForm(): IResponseObject
     {
@@ -386,7 +387,7 @@ final class AdminRoleController extends AdminBaseController
 
         $pageTitle = 'new';
 
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!empty($id)) {
@@ -409,7 +410,7 @@ final class AdminRoleController extends AdminBaseController
         }
 
         if ($this->request->getHttpMethod()->isPost()) {
-            /* @var $roleActionForm RoleActionForm|null */
+            /* @var $roleActionForm RoleActionForm */
             $roleActionForm = $roleModel->getForm(
                 $this->request->getPostValues(),
                 'role_action'
@@ -460,14 +461,12 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/actions/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRemoveRoleAction(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!$roleModel->removeRoleActionById($this->id)) {
@@ -487,14 +486,12 @@ final class AdminRoleController extends AdminBaseController
      * @route /admin/users/roles/actions/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
     final public function displayRestoreRoleAction(): IResponseObject
     {
-        /* @var $roleModel Role */
+        /* @var $roleModel RoleModel */
         $roleModel = $this->getModel('role');
 
         if (!$roleModel->restoreRoleActionById($this->id)) {

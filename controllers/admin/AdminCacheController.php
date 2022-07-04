@@ -2,19 +2,24 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Interfaces\IController;
+use Sonder\Interfaces\IResponseObject;
 
+#[IController]
 final class AdminCacheController extends AdminBaseController
 {
     /**
      * @area admin
      * @route /admin/settings/cache/
      * @no_cache true
-     *
      * @return IResponseObject
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
+     * @throws CoreException
      */
     final public function displayCache(): IResponseObject
     {
@@ -33,6 +38,7 @@ final class AdminCacheController extends AdminBaseController
      * @area admin
      * @route /admin/settings/cache/remove/
      * @no_cache true
+     * @return IResponseObject
      */
     final public function displayRemoveCache(): IResponseObject
     {

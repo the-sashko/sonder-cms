@@ -2,88 +2,48 @@
 
 namespace Sonder\Controllers;
 
-use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\IResponseObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Interfaces\IController;
 
+#[IController]
 final class AdminHitController extends AdminBaseController
 {
     /**
-     * @area admin
-     * @route /admin/articles/hits((/page-([0-9]+)/)|/)
-     * @url_params page=$3
-     * @no_cache true
-     *
-     * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
      */
-    final public function displayHits(): IResponseObject
+    final public function displayHits(): void
     {
         //TODO
     }
 
     /**
-     * @area admin
-     * @route /admin/articles/hits/view/([0-9]+)/
-     * @url_params id=$1
-     * @no_cache true
-     *
-     * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
      */
-    final public function displayHit(): IResponseObject
+    final public function displayHit(): void
     {
         //TODO
     }
 
     /**
-     * @area admin
-     * @route /admin/articles/hit((/([0-9]+)/)|/)
-     * @url_params id=$3
-     * @no_cache true
-     *
-     * @return IResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
      */
-    final public function displayHitForm(): IResponseObject
+    final public function displayHitForm(): void
     {
         //TODO
     }
 
     /**
-     * @area admin
-     * @route /admin/articles/hits/remove/([0-9]+)/
-     * @url_params id=$1
-     * @no_cache true
-     *
-     * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
      */
-    final public function displayRemoveHit(): IResponseObject
+    final public function displayRemoveHit(): void
     {
         //TODO
     }
 
     /**
-     * @area admin
-     * @route /admin/articles/hits/restore/([0-9]+)/
-     * @url_params id=$1
-     * @no_cache true
-     *
-     * @return IResponseObject
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return void
      */
-    final public function displayRestoreHit(): IResponseObject
+    final public function displayRestoreHit(): void
     {
         //TODO
     }
