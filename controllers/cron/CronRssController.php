@@ -12,7 +12,8 @@ final class CronRssController extends CronBaseController
      * @throws Exception
      */
     final public function jobGenerate(): void
-    {$locales = $this->getConfig('locale');
+    {
+        $locales = $this->getConfig('locale');
 
         $mainConfig = $this->getConfig('main');
         $mainLocale = $mainConfig['site_locale'];
@@ -29,11 +30,12 @@ final class CronRssController extends CronBaseController
                     'timestamp' => $postVO->getCdate(),
                     'description' => $postVO->getShortText()
                 ];
-            }, (array)$this->getModel('post')->getAll(
-                1,
-                true,
-                $lang
-            ));
+            },
+                (array)$this->getModel('post')->getAll(
+                    1,
+                    true,
+                    $lang
+                ));
 
             if (empty($links)) {
                 continue;
@@ -43,13 +45,12 @@ final class CronRssController extends CronBaseController
 
             $siteLink = $this->currentHost;
 
-            $siteTitle = null;
-            $siteImage = null;
             $siteDescription = null;
 
-            if (array_key_exists('title', $seoConfig)) {
-                $siteTitle = $seoConfig['title'];
-            }
+            $siteTitle = $seoConfig['title'] ?? null;
+            $siteDescription = $seoConfig['description'] ?? null;
+
+            $siteImage = null;
 
             if (array_key_exists('image', $seoConfig)) {
                 $siteImage = $seoConfig['image'];
@@ -59,10 +60,6 @@ final class CronRssController extends CronBaseController
                     $this->currentHost,
                     $siteImage
                 );
-            }
-
-            if (array_key_exists('description', $seoConfig)) {
-                $siteDescription = $seoConfig['description'];
             }
 
             $rssPlugin = $this->getPlugin('rss');

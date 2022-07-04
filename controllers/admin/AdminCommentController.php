@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
@@ -16,12 +16,12 @@ final class AdminCommentController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayComments(): ResponseObject
+    final public function displayComments(): IResponseObject
     {
         //TODO
     }
@@ -32,12 +32,12 @@ final class AdminCommentController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayComment(): ResponseObject
+    final public function displayComment(): IResponseObject
     {
         //TODO
     }
@@ -48,12 +48,12 @@ final class AdminCommentController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayCommentForm(): ResponseObject
+    final public function displayCommentForm(): IResponseObject
     {
         //TODO
     }
@@ -64,11 +64,11 @@ final class AdminCommentController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveComment(): ResponseObject
+    final public function displayRemoveComment(): IResponseObject
     {
         //TODO
     }
@@ -79,11 +79,11 @@ final class AdminCommentController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreComment(): ResponseObject
+    final public function displayRestoreComment(): IResponseObject
     {
         //TODO
     }

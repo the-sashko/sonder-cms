@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Tag;
 use Sonder\Models\Tag\TagForm;
 use Sonder\Models\Tag\TagValuesObject;
@@ -19,12 +19,12 @@ final class AdminTagController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTags(): ResponseObject
+    final public function displayTags(): IResponseObject
     {
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
@@ -71,12 +71,12 @@ final class AdminTagController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTag(): ResponseObject
+    final public function displayTag(): IResponseObject
     {
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
@@ -118,12 +118,12 @@ final class AdminTagController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTagForm(): ResponseObject
+    final public function displayTagForm(): IResponseObject
     {
         $id = $this->id;
 
@@ -151,7 +151,7 @@ final class AdminTagController extends AdminBaseController
             return $this->redirect('/admin/taxonomy/tag/');
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $tagForm TagForm|null */
             $tagForm = $tagModel->getForm(
                 $this->request->getPostValues(),
@@ -213,11 +213,11 @@ final class AdminTagController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveTag(): ResponseObject
+    final public function displayRemoveTag(): IResponseObject
     {
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');
@@ -240,11 +240,11 @@ final class AdminTagController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreTag(): ResponseObject
+    final public function displayRestoreTag(): IResponseObject
     {
         /* @var $tagModel Tag */
         $tagModel = $this->getModel('tag');

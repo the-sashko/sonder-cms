@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Config;
 
 final class AdminSettingsController extends AdminBaseController
@@ -14,10 +14,10 @@ final class AdminSettingsController extends AdminBaseController
      * @route /admin/settings/
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displaySettings(): ResponseObject
+    final public function displaySettings(): IResponseObject
     {
         $this->assign([
             'page_path' => [
@@ -34,10 +34,10 @@ final class AdminSettingsController extends AdminBaseController
      * @route /admin/settings/configs/
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayConfigs(): ResponseObject
+    final public function displayConfigs(): IResponseObject
     {
         /* @var $configModel Config */
         $configModel = $this->getModel('config');
@@ -60,10 +60,10 @@ final class AdminSettingsController extends AdminBaseController
      * @url_params config_name=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayConfig(): ResponseObject
+    final public function displayConfig(): IResponseObject
     {
         $name = $this->request->getUrlValue('config_name');
 
@@ -99,10 +99,10 @@ final class AdminSettingsController extends AdminBaseController
      * @url_params config_name=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayEditConfig(): ResponseObject
+    final public function displayEditConfig(): IResponseObject
     {
         $errors = null;
 
@@ -121,7 +121,7 @@ final class AdminSettingsController extends AdminBaseController
             return $this->redirect('/admin/settings/configs/');
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             $errors = $configModel->updateConfig(
                 $name,
                 $this->request->getPostValues()

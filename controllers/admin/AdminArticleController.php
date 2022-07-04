@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Article;
 use Sonder\Models\Article\ArticleForm;
 use Sonder\Models\Article\ArticleValuesObject;
@@ -20,18 +20,23 @@ final class AdminArticleController extends AdminBaseController
      * @route /admin/articles((/page-([0-9]+)/)|/)
      * @url_params page=$3
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayArticles(): ResponseObject
+    final public function displayArticles(): IResponseObject
     {
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
 
-        $articles = $articleModel->getArticlesByPage($this->page, false, false);
+        $articles = $articleModel->getArticlesByPage(
+            $this->page,
+            false,
+            false,
+            false
+        );
+
         $pageCount = $articleModel->getArticlesPageCount(false, false);
 
         if (empty($articles) && $this->page > 1) {
@@ -65,13 +70,12 @@ final class AdminArticleController extends AdminBaseController
      * @route /admin/articles/view/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayArticle(): ResponseObject
+    final public function displayArticle(): IResponseObject
     {
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
@@ -81,7 +85,7 @@ final class AdminArticleController extends AdminBaseController
         }
 
         /* @var $articleVO ArticleValuesObject */
-        $articleVO = $articleModel->getVOById($this->id);
+        $articleVO = $articleModel->getVOById($this->id, false, false);
 
         if (empty($articleVO)) {
             return $this->redirect('/admin/articles/');
@@ -106,31 +110,18 @@ final class AdminArticleController extends AdminBaseController
      * @route /admin/article((/([0-9]+)/)|/)
      * @url_params id=$3
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayArticleForm(): ResponseObject
+    final public function displayArticleForm(): IResponseObject
     {
         $id = $this->id;
 
-        $errors = [];
-
-        $title = null;
-        $slug = null;
-        $image = null;
-        $imageDir = null;
-        $summary = null;
-        $text = null;
-        $metaTitle = null;
-        $metaDescription = null;
-        $topicId = null;
-        $selectedTags = null;
-        $isActive = true;
-
+        $errors = null;
         $articleVO = null;
+        $articleForm = null;
 
         $pageTitle = 'new';
 
@@ -153,15 +144,13 @@ final class AdminArticleController extends AdminBaseController
             return $this->redirect('/admin/article/');
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $articleForm ArticleForm|null */
             $articleForm = $articleModel->getForm(
                 $this->request->getPostValues()
             );
 
-            if (!empty($articleForm)) {
-                $articleForm->setUserId($this->request->getUser()->getId());
-            }
+            $articleForm?->setUserId($this->request->getUser()->getId());
 
             $articleModel->save($articleForm);
         }
@@ -177,25 +166,20 @@ final class AdminArticleController extends AdminBaseController
             return $this->redirect($url);
         }
 
+        $title = $articleVO?->getTitle();
+        $slug = $articleVO?->getSlug();
+        $image = $articleVO?->getImageLink('single_view');
+        $imageDir = $articleVO?->getImageDir();
+        $text = $articleVO?->getText();
+        $summary = $articleVO?->getSummary();
+        $metaTitle = $articleVO?->getMetaTitle();
+        $metaDescription = $articleVO?->getMetaDescription();
+        $topicId = $articleVO?->getTopicId();
+        $selectedTags = $articleVO?->getTagIds();
+        $isActive = $articleVO?->isActive();
+
         if (!empty($articleForm)) {
             $errors = $articleForm->getErrors();
-        }
-
-        if (!empty($articleVO)) {
-            $title = $articleVO->getTitle();
-            $slug = $articleVO->getSlug();
-            $image = $articleVO->getImageLink('single_view');
-            $imageDir = $articleVO->getImageDir();
-            $text = $articleVO->getText();
-            $summary = $articleVO->getSummary();
-            $metaTitle = $articleVO->getMetaTitle();
-            $metaDescription = $articleVO->getMetaDescription();
-            $topicId = $articleVO->getTopicId();
-            $selectedTags = $articleVO->getTagIds();
-            $isActive = $articleVO->isActive();
-        }
-
-        if (!empty($articleForm)) {
             $title = $articleForm->getTitle();
             $slug = $articleForm->getSlug();
             $text = $articleForm->getText();
@@ -253,12 +237,11 @@ final class AdminArticleController extends AdminBaseController
      * @route /admin/articles/remove/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveArticle(): ResponseObject
+    final public function displayRemoveArticle(): IResponseObject
     {
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');
@@ -280,12 +263,11 @@ final class AdminArticleController extends AdminBaseController
      * @route /admin/articles/restore/([0-9]+)/
      * @url_params id=$1
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreArticle(): ResponseObject
+    final public function displayRestoreArticle(): IResponseObject
     {
         /* @var $articleModel Article */
         $articleModel = $this->getModel('article');

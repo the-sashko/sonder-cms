@@ -5,6 +5,7 @@ namespace Sonder\Controllers;
 use Exception;
 use Sonder\CMS\Essentials\CronBaseController;
 use Sonder\Core\RequestObject;
+use Sonder\Enums\ConfigNamesEnum;
 use Sonder\Models\Article;
 use Sonder\Models\Article\ArticleValuesObject;
 use Sonder\Models\Tag;
@@ -17,22 +18,22 @@ use Sonder\Plugins\SitemapPlugin;
 
 final class CronSitemapController extends CronBaseController
 {
-    const SITEMAP_STATIC_PAGE_FREQUENCY = 'weekly';
-    const SITEMAP_STATIC_PAGE_PRIORITY = '0.7';
+    private const SITEMAP_STATIC_PAGE_FREQUENCY = 'weekly';
+    private const SITEMAP_STATIC_PAGE_PRIORITY = '0.7';
 
-    const SITEMAP_MAIN_PAGE_FREQUENCY = 'hourly';
-    const SITEMAP_MAIN_PAGE_PRIORITY = '0.8';
+    private const SITEMAP_MAIN_PAGE_FREQUENCY = 'hourly';
+    private const SITEMAP_MAIN_PAGE_PRIORITY = '0.8';
 
-    const SITEMAP_TOPIC_FREQUENCY = 'hourly';
-    const SITEMAP_TOPIC_PRIORITY = '0.9';
+    private const SITEMAP_TOPIC_FREQUENCY = 'hourly';
+    private const SITEMAP_TOPIC_PRIORITY = '0.9';
 
-    const SITEMAP_TAG_FREQUENCY = 'hourly';
-    const SITEMAP_TAG_PRIORITY = '0.9';
+    private const SITEMAP_TAG_FREQUENCY = 'hourly';
+    private const SITEMAP_TAG_PRIORITY = '0.9';
 
-    const SITEMAP_ARTICLE_FREQUENCY = 'daily';
-    const SITEMAP_ARTICLE_PRIORITY = '1.0';
+    private const SITEMAP_ARTICLE_FREQUENCY = 'daily';
+    private const SITEMAP_ARTICLE_PRIORITY = '1.0';
 
-    const PAGINATION_PATTERN = 'page-';
+    private const PAGINATION_PATTERN = 'page-';
 
     /**
      * @var SitemapPlugin
@@ -68,11 +69,13 @@ final class CronSitemapController extends CronBaseController
 
         $mainPageLinks = [
             sprintf('%s/', $this->request->getHost()),
-            sprintf('%s%s',
+            sprintf(
+                '%s%s',
                 $this->request->getHost(),
                 TopicValuesObject::TOPICS_LINK
             ),
-            sprintf('%s%s',
+            sprintf(
+                '%s%s',
                 $this->request->getHost(),
                 TagValuesObject::TAGS_LINK
             ),
@@ -203,7 +206,7 @@ final class CronSitemapController extends CronBaseController
                 $sitemap,
                 $links,
                 CronSitemapController::SITEMAP_TOPIC_FREQUENCY,
-                CronSitemapController::SITEMAP_TAG_PRIORITY
+                CronSitemapController::SITEMAP_TOPIC_PRIORITY
             );
 
             $sitemaps[] = $sitemap;
@@ -285,7 +288,7 @@ final class CronSitemapController extends CronBaseController
      */
     private function _generateStaticPagesSitemaps(array &$sitemaps): void
     {
-        $staticPages = $this->config->get('pages');
+        $staticPages = $this->config->get(ConfigNamesEnum::PAGES);
 
         if (!empty($staticPages)) {
             $links = array_map(function ($staticPage) {

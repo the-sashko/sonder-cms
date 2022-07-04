@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Topic;
 use Sonder\Models\Topic\TopicForm;
 use Sonder\Models\Topic\TopicValuesObject;
@@ -19,12 +19,12 @@ final class AdminTopicController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTopics(): ResponseObject
+    final public function displayTopics(): IResponseObject
     {
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
@@ -70,12 +70,12 @@ final class AdminTopicController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTopic(): ResponseObject
+    final public function displayTopic(): IResponseObject
     {
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
@@ -115,12 +115,12 @@ final class AdminTopicController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTopicForm(): ResponseObject
+    final public function displayTopicForm(): IResponseObject
     {
         $id = $this->id;
 
@@ -155,7 +155,7 @@ final class AdminTopicController extends AdminBaseController
             return $this->redirect('/admin/taxonomy/topic/');
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $topicForm TopicForm|null */
             $topicForm = $topicModel->getForm(
                 $this->request->getPostValues(),
@@ -225,11 +225,11 @@ final class AdminTopicController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveTopic(): ResponseObject
+    final public function displayRemoveTopic(): IResponseObject
     {
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
@@ -252,11 +252,11 @@ final class AdminTopicController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreTopic(): ResponseObject
+    final public function displayRestoreTopic(): IResponseObject
     {
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');
@@ -279,11 +279,11 @@ final class AdminTopicController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveImage(): ResponseObject
+    final public function displayRemoveImage(): IResponseObject
     {
         /* @var $topicModel Topic */
         $topicModel = $this->getModel('topic');

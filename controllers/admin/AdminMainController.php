@@ -4,26 +4,26 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
-use Sonder\Models\User\SignInForm;
+use Sonder\Core\IResponseObject;
+use Sonder\Models\User\Forms\SignInForm;
 
 final class AdminMainController extends AdminBaseController
 {
-    const SIGN_IN_URL = '/admin/login/';
+    final public const SIGN_IN_URL = '/admin/login/';
 
-    const ADMIN_INDEX_URL = '/admin/';
+    final public const ADMIN_INDEX_URL = '/admin/';
 
-    const USER_ACTION_ADMIN = 'login-to-admin';
+use Sonder\Models\User\Forms\SignInForm;
+    final public const USER_ACTION_ADMIN = 'login-to-admin';
 
     /**
      * @area admin
      * @route /admin/
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayIndex(): ResponseObject
+    final public function displayIndex(): IResponseObject
     {
         return $this->render('main');
     }
@@ -32,11 +32,10 @@ final class AdminMainController extends AdminBaseController
      * @area admin
      * @route /admin/login/
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayLogin(): ResponseObject
+    final public function displayLogin(): IResponseObject
     {
         $isSignedIn = false;
 
@@ -56,7 +55,7 @@ final class AdminMainController extends AdminBaseController
 
             if (!$isSignedIn) {
                 $errors = [
-                    SignInForm::INVALID_LOGIN_OR_PASSWORD
+                    SignInForm::INVALID_LOGIN_OR_PASSWORD_ERROR_MESSAGE
                 ];
             }
         }
@@ -68,7 +67,8 @@ final class AdminMainController extends AdminBaseController
         $this->assign([
             'errors' => $errors,
             'is_hide_navigation' => true,
-            'form' => $signInForm, 'page_path' => [
+            'form' => $signInForm,
+            'page_path' => [
                 '/admin/' => 'Admin',
                 '#' => 'Login'
             ]
@@ -81,10 +81,9 @@ final class AdminMainController extends AdminBaseController
      * @area admin
      * @route /admin/logout/
      * @no_cache true
-     *
-     * @return ResponseObject
+     * @return IResponseObject
      */
-    final public function displayLogout(): ResponseObject
+    final public function displayLogout(): IResponseObject
     {
         $user = $this->request->getUser();
 

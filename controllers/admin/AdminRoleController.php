@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Role;
 use Sonder\Models\Role\RoleActionForm;
 use Sonder\Models\Role\RoleForm;
@@ -20,12 +20,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoles(): ResponseObject
+    final public function displayRoles(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -66,12 +66,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRole(): ResponseObject
+    final public function displayRole(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -108,12 +108,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoleForm(): ResponseObject
+    final public function displayRoleForm(): IResponseObject
     {
         $id = $this->id;
 
@@ -143,7 +143,7 @@ final class AdminRoleController extends AdminBaseController
             return $this->redirect('/admin/users/role/');
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $roleForm RoleForm|null */
             $roleForm = $roleModel->getForm(
                 $this->request->getPostValues(),
@@ -218,11 +218,11 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveRole(): ResponseObject
+    final public function displayRemoveRole(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -245,11 +245,11 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreRole(): ResponseObject
+    final public function displayRestoreRole(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -272,12 +272,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoleActions(): ResponseObject
+    final public function displayRoleActions(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -320,12 +320,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoleAction(): ResponseObject
+    final public function displayRoleAction(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -367,12 +367,12 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRoleActionForm(): ResponseObject
+    final public function displayRoleActionForm(): IResponseObject
     {
         $id = $this->id;
 
@@ -408,7 +408,7 @@ final class AdminRoleController extends AdminBaseController
             $isActive = $roleActionVO->isActive();
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $roleActionForm RoleActionForm|null */
             $roleActionForm = $roleModel->getForm(
                 $this->request->getPostValues(),
@@ -461,11 +461,11 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveRoleAction(): ResponseObject
+    final public function displayRemoveRoleAction(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');
@@ -488,11 +488,11 @@ final class AdminRoleController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreRoleAction(): ResponseObject
+    final public function displayRestoreRoleAction(): IResponseObject
     {
         /* @var $roleModel Role */
         $roleModel = $this->getModel('role');

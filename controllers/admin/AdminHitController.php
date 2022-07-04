@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
@@ -16,12 +16,12 @@ final class AdminHitController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayHits(): ResponseObject
+    final public function displayHits(): IResponseObject
     {
         //TODO
     }
@@ -32,12 +32,12 @@ final class AdminHitController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayHit(): ResponseObject
+    final public function displayHit(): IResponseObject
     {
         //TODO
     }
@@ -48,12 +48,12 @@ final class AdminHitController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayHitForm(): ResponseObject
+    final public function displayHitForm(): IResponseObject
     {
         //TODO
     }
@@ -64,11 +64,11 @@ final class AdminHitController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveHit(): ResponseObject
+    final public function displayRemoveHit(): IResponseObject
     {
         //TODO
     }
@@ -79,11 +79,11 @@ final class AdminHitController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreHit(): ResponseObject
+    final public function displayRestoreHit(): IResponseObject
     {
         //TODO
     }

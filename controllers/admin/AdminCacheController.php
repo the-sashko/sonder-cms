@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 
 final class AdminCacheController extends AdminBaseController
 {
@@ -13,10 +13,10 @@ final class AdminCacheController extends AdminBaseController
      * @route /admin/settings/cache/
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws Exception
      */
-    final public function displayCache(): ResponseObject
+    final public function displayCache(): IResponseObject
     {
         $this->assign([
             'page_path' => [
@@ -34,7 +34,7 @@ final class AdminCacheController extends AdminBaseController
      * @route /admin/settings/cache/remove/
      * @no_cache true
      */
-    final public function displayRemoveCache(): ResponseObject
+    final public function displayRemoveCache(): IResponseObject
     {
         //TODO
 

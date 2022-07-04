@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Models\Role;
 use Sonder\Models\User;
 use Sonder\Models\User\CredentialsForm;
@@ -20,12 +20,12 @@ final class AdminUserController extends AdminBaseController
      * @url_params page=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayUsers(): ResponseObject
+    final public function displayUsers(): IResponseObject
     {
         /* @var $userModel User */
         $userModel = $this->getModel('user');
@@ -65,12 +65,12 @@ final class AdminUserController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayUser(): ResponseObject
+    final public function displayUser(): IResponseObject
     {
         /* @var $userModel User */
         $userModel = $this->getModel('user');
@@ -110,12 +110,12 @@ final class AdminUserController extends AdminBaseController
      * @url_params id=$3
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayUserForm(): ResponseObject
+    final public function displayUserForm(): IResponseObject
     {
         $id = $this->id;
 
@@ -161,7 +161,7 @@ final class AdminUserController extends AdminBaseController
             $isActive = $userVO->isActive();
         }
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $userForm UserForm|null */
             $userForm = $userModel->getForm(
                 $this->request->getPostValues(),
@@ -222,12 +222,12 @@ final class AdminUserController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayUserCredentialsForm(): ResponseObject
+    final public function displayUserCredentialsForm(): IResponseObject
     {
         if (empty($this->id)) {
             return $this->redirect('/admin/users/');
@@ -256,7 +256,7 @@ final class AdminUserController extends AdminBaseController
         $apiToken = $userVO->getApiToken();
         $isAllowAccessByApi = !empty($userVO->getApiToken());
 
-        if ($this->request->getHttpMethod() == 'post') {
+        if ($this->request->getHttpMethod()->isPost()) {
             /* @var $credentialsForm CredentialsForm|null */
             $credentialsForm = $userModel->getForm(
                 $this->request->getPostValues(),
@@ -305,11 +305,11 @@ final class AdminUserController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRemoveUser(): ResponseObject
+    final public function displayRemoveUser(): IResponseObject
     {
         /* @var $userModel User */
         $userModel = $this->getModel('user');
@@ -332,11 +332,11 @@ final class AdminUserController extends AdminBaseController
      * @url_params id=$1
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayRestoreUser(): ResponseObject
+    final public function displayRestoreUser(): IResponseObject
     {
         /* @var $userModel User */
         $userModel = $this->getModel('user');

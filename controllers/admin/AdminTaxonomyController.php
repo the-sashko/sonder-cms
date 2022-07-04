@@ -4,7 +4,7 @@ namespace Sonder\Controllers;
 
 use Exception;
 use Sonder\CMS\Essentials\AdminBaseController;
-use Sonder\Core\ResponseObject;
+use Sonder\Core\IResponseObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 
@@ -15,12 +15,12 @@ final class AdminTaxonomyController extends AdminBaseController
      * @route /admin/taxonomy/
      * @no_cache true
      *
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
      * @throws Exception
      */
-    final public function displayTaxonomy(): ResponseObject
+    final public function displayTaxonomy(): IResponseObject
     {
         $this->assign([
             'page_path' => [
