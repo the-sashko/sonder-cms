@@ -2,11 +2,18 @@
 
 namespace Sonder\CMS\Essentials;
 
-use Sonder\Core\RequestObject;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
+use Sonder\Interfaces\IRequestObject;
 
 abstract class CronBaseController extends BaseController
 {
-    public function __construct(RequestObject $request)
+    /**
+     * @param IRequestObject $request
+     * @throws ConfigException
+     * @throws ControllerException
+     */
+    public function __construct(IRequestObject $request)
     {
         parent::__construct($request);
 

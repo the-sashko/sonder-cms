@@ -2,12 +2,15 @@
 
 namespace Sonder\CMS\Essentials;
 
-use Exception;
 use Sonder\Core\CoreController;
 use Sonder\Enums\ConfigNamesEnum;
+use Sonder\Exceptions\ConfigException;
+use Sonder\Exceptions\ControllerException;
 use Sonder\Interfaces\IController;
 use Sonder\Core\RequestObject;
+use Sonder\Interfaces\IRequestObject;
 
+#[IController]
 abstract class BaseController extends CoreController implements IController
 {
     final protected const NOT_FOUND_URL_CONFIG_VALUE = 'not_found_url';
@@ -15,23 +18,24 @@ abstract class BaseController extends CoreController implements IController
     /**
      * @var int|null
      */
-    protected readonly ?int $id;
+    protected ?int $id;
 
     /**
      * @var string|null
      */
-    protected readonly ?string $slug;
+    protected ?string $slug;
 
     /**
      * @var int
      */
-    protected readonly int $page;
+    protected int $page;
 
     /**
      * @param RequestObject $request
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ControllerException
      */
-    public function __construct(RequestObject $request)
+    public function __construct(IRequestObject $request)
     {
         parent::__construct($request);
 
@@ -42,7 +46,7 @@ abstract class BaseController extends CoreController implements IController
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ConfigException
      */
     final protected function getNotFoundUrl(): string
     {
