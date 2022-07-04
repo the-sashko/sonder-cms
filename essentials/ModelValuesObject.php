@@ -2,21 +2,23 @@
 
 namespace Sonder\CMS\Essentials;
 
-use Exception;
 use Sonder\Core\ModelValuesObject as CoreModelValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
 
 abstract class ModelValuesObject extends CoreModelValuesObject
 {
+    protected const ADMIN_VIEW_LINK_PATTERN = null;
+
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getAdminViewLink(): ?string
     {
-        if (empty($this->adminViewLinkPattern)) {
+        if (empty(static::ADMIN_VIEW_LINK_PATTERN) || empty($this->getId())) {
             return null;
         }
 
-        return sprintf($this->adminViewLinkPattern, $this->getId());
+        return sprintf(static::ADMIN_VIEW_LINK_PATTERN, $this->getId());
     }
 }

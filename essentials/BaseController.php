@@ -4,23 +4,28 @@ namespace Sonder\CMS\Essentials;
 
 use Exception;
 use Sonder\Core\CoreController;
-use Sonder\Core\Interfaces\IController;
+use Sonder\Enums\ConfigNamesEnum;
+use Sonder\Interfaces\IController;
 use Sonder\Core\RequestObject;
 
 abstract class BaseController extends CoreController implements IController
 {
-    const MAIN_CONFIG_NAME = 'main';
+    final protected const NOT_FOUND_URL_CONFIG_VALUE = 'not_found_url';
 
-    const NOT_FOUND_URL_CONFIG_VALUE = 'not_found_url';
+    /**
+     * @var int|null
+     */
+    protected readonly ?int $id;
 
-    /* @var int|null $id */
-    protected ?int $id = null;
+    /**
+     * @var string|null
+     */
+    protected readonly ?string $slug;
 
-    /* @var string|null $slug */
-    protected ?string $slug = null;
-
-    /* @var int $page */
-    protected int $page = 1;
+    /**
+     * @var int
+     */
+    protected readonly int $page;
 
     /**
      * @param RequestObject $request
@@ -30,13 +35,9 @@ abstract class BaseController extends CoreController implements IController
     {
         parent::__construct($request);
 
-        $id = $this->request->getUrlValue('id');
-        $slug = $this->request->getUrlValue('slug');
-        $page = $this->request->getUrlValue('page');
-
-        $this->id = empty($id) ? null : (int)$id;
-        $this->slug = empty($slug) ? null : $slug;
-        $this->page = empty($page) ? 1 : (int)$page;
+        $this->_setId();
+        $this->_setSlug();
+        $this->_setPage();
     }
 
     /**
@@ -46,8 +47,38 @@ abstract class BaseController extends CoreController implements IController
     final protected function getNotFoundUrl(): string
     {
         return $this->config->getValue(
-            static::MAIN_CONFIG_NAME,
+            ConfigNamesEnum::MAIN,
             static::NOT_FOUND_URL_CONFIG_VALUE
         );
+    }
+
+    /**
+     * @return void
+     */
+    private function _setId(): void
+    {
+        $id = $this->request->getUrlValue('id');
+
+        $this->id = empty($id) ? null : (int)$id;
+    }
+
+    /**
+     * @return void
+     */
+    private function _setSlug(): void
+    {
+        $slug = $this->request->getUrlValue('slug');
+
+        $this->slug = empty($slug) ? null : $slug;
+    }
+
+    /**
+     * @return void
+     */
+    private function _setPage(): void
+    {
+        $page = $this->request->getUrlValue('page');
+
+        $this->page = empty($page) ? 1 : (int)$page;
     }
 }
