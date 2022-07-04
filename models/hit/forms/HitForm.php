@@ -2,68 +2,54 @@
 
 namespace Sonder\Models\Hit;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Hit\Enums\HitTypesEnum;
+use Sonder\Models\Hit\Interfaces\IHitForm;
 
-final class HitForm extends ModelFormObject
+#[IModelFormObject]
+#[IHitForm]
+final class HitForm extends ModelFormObject implements IHitForm
 {
-    const TYPES = [
-        'article',
-        'topic',
-        'tag'
-    ];
+    final public const INVALID_TYPE_ERROR_MESSAGE = 'Invalid hit type "%s';
 
-    const AGGREGATION_TYPES = [
-        'day',
-        'month',
-        'year'
-    ];
+    final public const INVALID_AGGREGATION_TYPE_ERROR_MESSAGE = 'Invalid aggregation type "%s"';
 
-    const INVALID_TYPE_ERROR_MESSAGE = 'Invalid hit type';
+    final public const HITS_NOT_EXISTS_ERROR_MESSAGE = 'Hit with id "%d" not exists';
 
-    const INVALID_AGGREGATION_TYPE_ERROR_MESSAGE = 'Invalid aggregation type';
+    final public const HITS_AGGREGATION_NOT_EXISTS_ERROR_MESSAGE = 'Hits aggregation with id "%d" not exists';
 
-    const HITS_NOT_EXISTS_ERROR_MESSAGE = 'Hit with id "%d" not exists';
+    final public const ARTICLE_ID_IS_NOT_SET_ERROR_MESSAGE = 'Article ID Is Not Set';
 
-    const HITS_AGGREGATION_BY_DAY_NOT_EXISTS_ERROR_MESSAGE = 'Hits ' .
-    'aggregation by day with id "%d" not exists';
+    final public const TOPIC_ID_IS_NOT_SET_ERROR_MESSAGE = 'Topic ID Is Not Set';
 
-    const HITS_AGGREGATION_BY_MONTH_NOT_EXISTS_ERROR_MESSAGE = 'Hits ' .
-    'aggregation by month with id "%d" not exists';
+    final public const TAG_ID_IS_NOT_SET_ERROR_MESSAGE = 'Topic ID Is Not Set';
 
-    const HITS_AGGREGATION_BY_YEAR_NOT_EXISTS_ERROR_MESSAGE = 'Hits ' .
-    'aggregation by year with id "%d" not exists';
+    final public const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
 
-    const ARTICLE_ID_IS_NOT_SET_ERROR_MESSAGE = 'Article ID Is Not Set';
+    final public const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
-    const TOPIC_ID_IS_NOT_SET_ERROR_MESSAGE = 'Topic ID Is Not Set';
-
-    const TAG_ID_IS_NOT_SET_ERROR_MESSAGE = 'Topic ID Is Not Set';
-
-    const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
-
-    const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
-
-    const TAG_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" not exists';
+    final public const TAG_NOT_EXISTS_ERROR_MESSAGE = 'Tag with id "%d" not exists';
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
         $this->setStatusSuccess();
 
-        $this->_validateAggregationTypeValue();
         $this->_validateTypeValue();
 
         switch ($this->getType()) {
-            case 'article':
+            case HitTypesEnum::ARTICLE->value:
                 $this->_validateArticleIdValue();
                 break;
-            case 'type':
+            case HitTypesEnum::TOPIC->value:
                 $this->_validateTopicIdValue();
                 break;
-            case 'tag':
+            case HitTypesEnum::TAG->value:
                 $this->_validateTagIdValue();
                 break;
         }
@@ -71,7 +57,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -90,7 +76,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getArticleId(): ?int
     {
@@ -109,7 +95,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTopicId(): ?int
     {
@@ -128,7 +114,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTagId(): ?int
     {
@@ -147,37 +133,35 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
-     */
-    final public function getAggregationType(): ?string
-    {
-        $aggregationType = $this->get('aggregation_type');
-
-        if (empty($aggregationType)) {
-            return null;
-        }
-
-        return (string)$aggregationType;
-    }
-
-    /**
-     * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getType(): ?string
     {
-        $aggregationType = $this->get('type');
+        $type = $this->get('type');
 
-        if (empty($aggregationType)) {
+        if (empty($type)) {
             return null;
         }
 
-        return (string)$aggregationType;
+        return (string)$type;
+    }
+
+    /**
+     * @return int|null
+     * @throws ValuesObjectException
+     */
+    final public function getCount(): ?int
+    {
+        if (!$this->has('count')) {
+            return null;
+        }
+
+        return (int)$this->get('count');
     }
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -191,7 +175,7 @@ final class HitForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -199,9 +183,19 @@ final class HitForm extends ModelFormObject
     }
 
     /**
+     * @param int|null $count
+     * @return void
+     * @throws ValuesObjectException
+     */
+    final public function setCount(?int $count = null): void
+    {
+        $this->set('count', (int)$count);
+    }
+
+    /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -210,41 +204,26 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
-     */
-    private function _validateAggregationTypeValue(): void
-    {
-        $aggregationType = $this->getAggregationType();
-
-        if (
-            !empty($aggregationType) &&
-            !in_array($aggregationType, HitForm::AGGREGATION_TYPES)
-        ) {
-            $this->setError(
-                HitForm::INVALID_AGGREGATION_TYPE_ERROR_MESSAGE
-            );
-
-            $this->setStatusFail();
-        }
-    }
-
-    /**
-     * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTypeValue(): void
     {
         $type = $this->getType();
 
-        if (!in_array($type, HitForm::TYPES)) {
-            $this->setError(HitForm::INVALID_TYPE_ERROR_MESSAGE);
+        if (!HitTypesEnum::tryFrom($type)) {
+            $errorMessage = sprintf(
+                HitForm::INVALID_TYPE_ERROR_MESSAGE,
+                $type
+            );
+
+            $this->setError($errorMessage);
             $this->setStatusFail();
         }
     }
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateArticleIdValue(): void
     {
@@ -256,7 +235,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTopicIdValue(): void
     {
@@ -268,7 +247,7 @@ final class HitForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTagIdValue(): void
     {

@@ -2,42 +2,34 @@
 
 namespace Sonder\Models\Hit;
 
-use Exception;
-use Sonder\CMS\Essentials\ModelValuesObject;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Hit\Interfaces\IHitAggregationValuesObject;
+use Sonder\Models\Hit\Interfaces\IHitStore;
+use Sonder\Models\Hit\Interfaces\IHitValuesObject;
 
-final class HitStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[IHitStore]
+final class HitStore extends ModelStore implements IHitStore
 {
-    const HITS_TABLE = 'hits';
+    final protected const SCOPE = 'hit';
 
-    const HITS_BY_DAY_TABLE = 'hits_by_day';
+    private const HITS_TABLE = 'hits';
 
-    const HITS_BY_MONTH_TABLE = 'hits_by_month';
-
-    const HITS_BY_YEAR_TABLE = 'hits_by_year';
-
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'hit';
+    private const HITS_AGGREGATIONS_TABLE = 'hit_aggregations';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getHitRowById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($id)) {
             return null;
         }
@@ -81,39 +73,32 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
     final public function getAggregationRowById(
-        string $type,
-        ?int   $id = null,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): ?array
-    {
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($id)) {
             return null;
         }
 
-        $table = $this->_getAggregationTable($type);
-
-        $sqlWhere = sprintf('"%s"."id" = \'%d\'', $table, $id);
+        $sqlWhere = sprintf('"hit_aggregations"."id" = \'%d\'', $id);
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
                 '
                 %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
+                (
+                    "hit_aggregations"."ddate" IS NULL OR
+                    "hit_aggregations"."ddate" < 1
+                )
                 ',
-                $sqlWhere,
-                $table,
-                $table
+                $sqlWhere
             );
         }
 
@@ -121,10 +106,9 @@ final class HitStore extends ModelStore implements IModelStore
             $sqlWhere = sprintf(
                 '
                 %s AND
-                "%s"."is_active" = true
+                "hit_aggregations"."is_active" = true
                 ',
-                $sqlWhere,
-                $table
+                $sqlWhere
             );
         }
 
@@ -137,8 +121,8 @@ final class HitStore extends ModelStore implements IModelStore
 
         $sql = sprintf(
             $sql,
-            HitStore::HITS_BY_DAY_TABLE,
-            $table,
+            HitStore::HITS_AGGREGATIONS_TABLE,
+            HitStore::HITS_AGGREGATIONS_TABLE,
             $sqlWhere
         );
 
@@ -149,13 +133,11 @@ final class HitStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateHitById(
         ?array $row = null,
-        ?int   $id = null
-    ): bool
-    {
+        ?int $id = null
+    ): bool {
         if (empty($row) || empty($id)) {
             return false;
         }
@@ -168,39 +150,34 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
      */
     final public function updateAggregationById(
-        string $type,
         ?array $row = null,
-        ?int   $id = null,
-    ): bool
-    {
+        ?int $id = null,
+    ): bool {
         if (empty($row) || empty($id)) {
             return false;
         }
 
-        $table = $this->_getAggregationTable($type);
-
-        return $this->updateRowById($table, $row, $id);
+        return $this->updateRowById(
+            HitStore::HITS_AGGREGATIONS_TABLE,
+            $row,
+            $id
+        );
     }
 
     /**
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteHitById(
         ?int $id = null,
         bool $isSoftDelete = true
-    ): bool
-    {
+    ): bool {
         if (empty($id)) {
             return false;
         }
@@ -218,24 +195,17 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
      */
     final public function deleteAggregationById(
-        string $type,
-        ?int   $id = null,
-        bool   $isSoftDelete = true
-    ): bool
-    {
+        ?int $id = null,
+        bool $isSoftDelete = true
+    ): bool {
         if (empty($id)) {
             return false;
         }
-
-        $table = $this->_getAggregationTable($type);
 
         if ($isSoftDelete) {
             $row = [
@@ -243,16 +213,15 @@ final class HitStore extends ModelStore implements IModelStore
                 'is_active' => false
             ];
 
-            return $this->updateAggregationById($table, $row, $id);
+            return $this->updateAggregationById($row, $id);
         }
 
-        return $this->deleteRowById($table, $id);
+        return $this->deleteRowById(HitStore::HITS_AGGREGATIONS_TABLE, $id);
     }
 
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreHitById(?int $id = null): bool
     {
@@ -261,7 +230,7 @@ final class HitStore extends ModelStore implements IModelStore
         }
 
         $row = [
-            'ddate' => NULL,
+            'ddate' => null,
             'is_active' => true
         ];
 
@@ -269,47 +238,36 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    final public function restoreAggregationById(
-        string $type,
-        ?int   $id = null
-    ): bool
+    final public function restoreAggregationById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
         }
 
-        $table = $this->_getAggregationTable($type);
-
         $row = [
-            'ddate' => NULL,
+            'ddate' => null,
             'is_active' => true
         ];
 
-        return $this->updateAggregationById($table, $row, $id);
+        return $this->updateAggregationById($row, $id);
     }
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getHitRowsByPage(
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -332,7 +290,7 @@ final class HitStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
@@ -347,7 +305,7 @@ final class HitStore extends ModelStore implements IModelStore
             $sql,
             HitStore::HITS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -355,37 +313,27 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
     final public function getAggregationRowsByPage(
-        string $type,
-        int    $page = 1,
-        int    $itemsOnPage = 10,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): ?array
-    {
-        $table = $this->_getAggregationTable($type);
-
+        int $page = 1,
+        int $limit = 10,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
                 '
                 %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
+                ("hit_aggregations"."ddate" IS NULL OR "hit_aggregations"."ddate" < 1)
                 ',
-                $sqlWhere,
-                $table,
-                $table
+                $sqlWhere
             );
         }
 
@@ -393,31 +341,28 @@ final class HitStore extends ModelStore implements IModelStore
             $sqlWhere = sprintf(
                 '
                 %s AND
-                "%s"."is_active" = true
+                "hit_aggregations"."is_active" = true
                 ',
-                $sqlWhere,
-                $table
+                $sqlWhere
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
-            FROM "%s" AS "%d"
+            FROM "%s" AS "hit_aggregations"
             WHERE %s
-            ORDER BY "%s"."cdate" DESC
+            ORDER BY "hit_aggregations"."cdate" DESC
             LIMIT %d
             OFFSET %d;
         ';
 
         $sql = sprintf(
             $sql,
-            HitStore::HITS_BY_DAY_TABLE,
-            $table,
+            HitStore::HITS_AGGREGATIONS_TABLE,
             $sqlWhere,
-            $table,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -428,14 +373,11 @@ final class HitStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
-    final public function getHitsRowsCount(
+    final public function getHitsCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -459,7 +401,8 @@ final class HitStore extends ModelStore implements IModelStore
         }
 
         $sql = '
-            SELECT COUNT("hits"."id") AS "count"
+            SELECT
+                COUNT("hits"."id") AS "count"
             FROM "%s" AS "hits"
             WHERE %s;
         ';
@@ -470,33 +413,23 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    final public function getAggregationRowsCount(
-        string $type,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): int
-    {
-        $table = $this->_getAggregationTable($type);
-
+    final public function getHitAggregationsCount(
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): int {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
             $sqlWhere = sprintf(
                 '
                 %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
+                ("hit_aggregations"."ddate" IS NULL OR "hit_aggregations"."ddate" < 1)
                 ',
-                $sqlWhere,
-                $table,
-                $table
+                $sqlWhere
             );
         }
 
@@ -504,40 +437,32 @@ final class HitStore extends ModelStore implements IModelStore
             $sqlWhere = sprintf(
                 '
                 %s AND
-                "%s"."is_active" = true
+                "hit_aggregations"."is_active" = true
                 ',
-                $sqlWhere,
-                $table
+                $sqlWhere
             );
         }
 
         $sql = '
-            SELECT COUNT("%s"."id") AS "count"
-            FROM "%s" AS "%s"
+            SELECT
+                COUNT("hit_aggregations"."id") AS "count"
+            FROM "%s" AS "hit_aggregations"
             WHERE %s;
         ';
 
-        $sql = sprintf(
-            $sql,
-            $table,
-            HitStore::HITS_BY_DAY_TABLE,
-            $table,
-            $sqlWhere
-        );
+        $sql = sprintf($sql, HitStore::HITS_AGGREGATIONS_TABLE, $sqlWhere);
 
         return (int)$this->getOne($sql);
     }
 
     /**
-     * @param HitValuesObject|null $hitVO
+     * @param IHitValuesObject|null $hitVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateHit(
-        ?HitValuesObject $hitVO = null
-    ): bool
-    {
+        ?IHitValuesObject $hitVO = null
+    ): bool {
         $id = $hitVO->getId();
 
         if (empty($id)) {
@@ -552,35 +477,31 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param ModelValuesObject|null $aggregationVO
+     * @param IHitAggregationValuesObject|null $hitAggregationVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateAggregation(
-        ?ModelValuesObject $aggregationVO = null
-    ): bool
-    {
-        $id = $aggregationVO->getId();
-        $type = $aggregationVO->getType();
+        ?IHitAggregationValuesObject $hitAggregationVO = null
+    ): bool {
+        $id = $hitAggregationVO->getId();
 
         if (empty($id)) {
-            $aggregationVO->setCdate();
+            $hitAggregationVO->setCdate();
 
-            return $this->insertAggregation($type, $aggregationVO->exportRow());
+            return $this->insertAggregation($hitAggregationVO->exportRow());
         }
 
-        $aggregationVO->setMdate();
+        $hitAggregationVO->setMdate();
 
-        $row = $aggregationVO->exportRow();
+        $row = $hitAggregationVO->exportRow();
 
-        return $this->updateAggregationById($type, $row, $id);
+        return $this->updateAggregationById($row, $id);
     }
 
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertHit(?array $row = null): bool
     {
@@ -592,24 +513,16 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    final public function insertAggregation(
-        string $type,
-        ?array $row = null
-    ): bool
+    final public function insertAggregation(?array $row = null): bool
     {
         if (empty($row)) {
             return false;
         }
 
-        $table = $this->_getAggregationTable($type);
-
-        return $this->addRow($table, $row);
+        return $this->addRow(HitStore::HITS_AGGREGATIONS_TABLE, $row);
     }
 
     /**
@@ -617,43 +530,50 @@ final class HitStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByArticleId(
         ?int $articleId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
-        $sum = $this->_getCountFromHitsByArticleId(
-            $articleId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+    ): int {
+        $sqlWhere = sprintf('"hit_aggregations"."article_id" = %d', $articleId);
 
-        $sum += $this->_getCountFromAggregationByArticleId(
-            'day',
-            $articleId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeRemoved) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                (
+                    "hit_aggregations"."ddate" IS NULL OR
+                    "hit_aggregations"."ddate" < 1
+                )
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByArticleId(
-            'month',
-            $articleId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeInactive) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                "hit_aggregations"."is_active" = true
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByArticleId(
-            'year',
-            $articleId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        $sql = '
+            SELECT "hit_aggregations"."count" AS "count"
+            FROM "%s" AS "hit_aggregations"
+            WHERE %s;
+        ';
 
-        return $sum;
+        $sql = sprintf($sql, HitStore::HITS_AGGREGATIONS_TABLE, $sqlWhere);
+
+        return (int)$this->getOne($sql) + $this->_getCountOfHitsByArticleId(
+                $articleId,
+                $excludeRemoved,
+                $excludeInactive
+            );
     }
 
     /**
@@ -661,43 +581,49 @@ final class HitStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByTopicId(
         ?int $topicId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
-        $sum = $this->_getCountFromHitsByTopicId(
-            $topicId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+    ): int {
+        $sqlWhere = sprintf('"hit_aggregations"."topic_id" = %d', $topicId);
 
-        $sum += $this->_getCountFromAggregationByTopicId(
-            'day',
-            $topicId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeRemoved) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                (
+                    "hit_aggregations"."ddate" IS NULL OR "hit_aggregations"."ddate" < 1
+                )
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByTopicId(
-            'month',
-            $topicId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeInactive) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                "hit_aggregations"."is_active" = true
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByTopicId(
-            'year',
-            $topicId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        $sql = '
+            SELECT "hit_aggregations"."count" AS "count"
+            FROM "%s" AS "hit_aggregations"
+            WHERE %s;
+        ';
 
-        return $sum;
+        $sql = sprintf($sql, HitStore::HITS_AGGREGATIONS_TABLE, $sqlWhere);
+
+        return (int)$this->getOne($sql) + $this->_getCountOfHitsByTopicId(
+                $topicId,
+                $excludeRemoved,
+                $excludeInactive
+            );
     }
 
     /**
@@ -705,43 +631,49 @@ final class HitStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByTagId(
         ?int $tagId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
-        $sum = $this->_getCountFromHitsByTagId(
-            $tagId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+    ): int {
+        $sqlWhere = sprintf('"hit_aggregations"."tag_id" = %d', $tagId);
 
-        $sum += $this->_getCountFromAggregationByTagId(
-            'day',
-            $tagId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeRemoved) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                (
+                    "hit_aggregations"."ddate" IS NULL OR "hit_aggregations"."ddate" < 1
+                )
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByTagId(
-            'month',
-            $tagId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        if ($excludeInactive) {
+            $sqlWhere = sprintf(
+                '
+                %s AND
+                "hit_aggregations"."is_active" = true
+                ',
+                $sqlWhere
+            );
+        }
 
-        $sum += $this->_getCountFromAggregationByTagId(
-            'year',
-            $tagId,
-            $excludeRemoved,
-            $excludeInactive
-        );
+        $sql = '
+            SELECT "hit_aggregations"."count" AS "count"
+            FROM "%s" AS "hit_aggregations"
+            WHERE %s;
+        ';
 
-        return $sum;
+        $sql = sprintf($sql, HitStore::HITS_AGGREGATIONS_TABLE, $sqlWhere);
+
+        return (int)$this->getOne($sql) + $this->_getCountOfHitsByTagId(
+                $tagId,
+                $excludeRemoved,
+                $excludeInactive
+            );
     }
 
     /**
@@ -749,15 +681,12 @@ final class HitStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
-    private function _getCountFromHitsByArticleId(
+    private function _getCountOfHitsByArticleId(
         ?int $articleId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = sprintf('"hits"."article_id" = %d', $articleId);
 
         if ($excludeRemoved) {
@@ -793,79 +722,16 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
-     * @param int|null $articleId
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
-     */
-    private function _getCountFromAggregationByArticleId(
-        string $type,
-        ?int   $articleId = null,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): int
-    {
-        $table = $this->_getAggregationTable($type);
-
-        $sqlWhere = sprintf(
-            '"%s"."article_id" = %d',
-            $table,
-            $articleId
-        );
-
-        if ($excludeRemoved) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
-                ',
-                $sqlWhere,
-                $table,
-                $table
-            );
-        }
-
-        if ($excludeInactive) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                "%s"."is_active" = true
-                ',
-                $sqlWhere,
-                $table
-            );
-        }
-
-        $sql = '
-            SELECT SUM("%s"."count") AS "count"
-            FROM "%s" AS "%s"
-            WHERE %s
-            GROUP BY "%s"."article_id";
-        ';
-
-        $sql = sprintf($sql, $table, $table, $table, $sqlWhere, $table);
-
-        return (int)$this->getOne($sql);
-    }
-
-    /**
      * @param int|null $topicId
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
-    private function _getCountFromHitsByTopicId(
+    private function _getCountOfHitsByTopicId(
         ?int $topicId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = sprintf('"hits"."topic_id" = %d', $topicId);
 
         if ($excludeRemoved) {
@@ -901,75 +767,16 @@ final class HitStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param string $type
-     * @param int|null $topicId
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
-     */
-    private function _getCountFromAggregationByTopicId(
-        string $type,
-        ?int   $topicId = null,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): int
-    {
-        $table = $this->_getAggregationTable($type);
-
-        $sqlWhere = sprintf('"%s"."topic_id" = %d', $table, $topicId);
-
-        if ($excludeRemoved) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
-                ',
-                $sqlWhere,
-                $table,
-                $table
-            );
-        }
-
-        if ($excludeInactive) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                "%s"."is_active" = true
-                ',
-                $sqlWhere,
-                $table
-            );
-        }
-
-        $sql = '
-            SELECT SUM("%s"."count") AS "count"
-            FROM "%s" AS "%s"
-            WHERE %s
-            GROUP BY "%s"."topic_id";
-        ';
-
-        $sql = sprintf($sql, $table, $table, $table, $sqlWhere, $table);
-
-        return (int)$this->getOne($sql);
-    }
-
-    /**
      * @param int|null $tagId
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
-    private function _getCountFromHitsByTagId(
+    private function _getCountOfHitsByTagId(
         ?int $tagId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = sprintf('"hits"."tag_id" = %d', $tagId);
 
         if ($excludeRemoved) {
@@ -1002,89 +809,5 @@ final class HitStore extends ModelStore implements IModelStore
         $sql = sprintf($sql, HitStore::HITS_TABLE, $sqlWhere);
 
         return (int)$this->getOne($sql);
-    }
-
-    /**
-     * @param string $type
-     * @param int|null $tagId
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
-     */
-    private function _getCountFromAggregationByTagId(
-        string $type,
-        ?int   $tagId = null,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): int
-    {
-        $table = $this->_getAggregationTable($type);
-
-        $sqlWhere = sprintf('"%s"."tag_id" = %d', $table, $tagId);
-
-        if ($excludeRemoved) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                ("%s"."ddate" IS NULL OR "%s"."ddate" < 1)
-                ',
-                $sqlWhere,
-                $table,
-                $table
-            );
-        }
-
-        if ($excludeInactive) {
-            $sqlWhere = sprintf(
-                '
-                %s AND
-                "%s"."is_active" = true
-                ',
-                $sqlWhere,
-                $table
-            );
-        }
-
-        $sql = '
-            SELECT SUM("%s"."count") AS "count"
-            FROM "%s" AS "%s"
-            WHERE %s
-            GROUP BY "%s"."tag_id";
-        ';
-
-        $sql = sprintf($sql, $table, $table, $table, $sqlWhere, $table);
-
-        return (int)$this->getOne($sql);
-    }
-
-    /**
-     * @param string $aggregationType
-     * @return string
-     * @throws Exception
-     */
-    private function _getAggregationTable(string $aggregationType): string
-    {
-        $table = null;
-
-        switch ($aggregationType) {
-            case 'day':
-                $table = HitStore::HITS_BY_DAY_TABLE;
-                break;
-            case 'month':
-                $table = HitStore::HITS_BY_MONTH_TABLE;
-                break;
-            case 'year':
-                $table = HitStore::HITS_BY_YEAR_TABLE;
-                break;
-        }
-
-        if (empty($table)) {
-            throw new Exception('Invalid Aggregation Type');
-        }
-
-        return $table;
     }
 }

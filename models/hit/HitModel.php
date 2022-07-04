@@ -2,45 +2,47 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\CMS\Essentials\ModelValuesObject;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Hit\HitAggregationByDayValuesObject;
-use Sonder\Models\Hit\HitAggregationByMonthValuesObject;
-use Sonder\Models\Hit\HitAggregationByYearValuesObject;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Hit\Enums\HitTypesEnum;
 use Sonder\Models\Hit\HitForm;
-use Sonder\Models\Hit\HitStore;
-use Sonder\Models\Hit\HitValuesObject;
+use Sonder\Models\Hit\Interfaces\IHitAggregationValuesObject;
+use Sonder\Models\Hit\Interfaces\IHitApi;
+use Sonder\Models\Hit\Interfaces\IHitForm;
+use Sonder\Models\Hit\ValuesObjects\HitAggregationValuesObject;
+use Sonder\Models\Hit\ValuesObjects\HitValuesObject;
+use Sonder\Models\Hit\Interfaces\IHitModel;
+use Sonder\Models\Hit\Interfaces\IHitStore;
+use Sonder\Models\Hit\Interfaces\IHitValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 use Throwable;
 
 /**
- * @property HitStore $store
+ * @property IHitApi $api
+ * @property IHitStore $store
  */
-final class Hit extends BaseModel
+#[IModel]
+#[IHitModel]
+final class HitModel extends BaseModel implements IHitModel
 {
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    final protected const ITEMS_ON_PAGE = 10;
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IHitValuesObject|null
+     * @throws ModelException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?IHitValuesObject {
         $row = $this->store->getHitRowById(
             $id,
             $excludeRemoved,
@@ -48,38 +50,34 @@ final class Hit extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getVO($row);
+            /* @var $hitVO HitValuesObject */
+            $hitVO = $this->getVO($row);
+
+            return $hitVO;
         }
 
         return null;
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ModelValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IHitAggregationValuesObject|null
      */
     final public function getAggregationVOById(
-        string $type,
-        ?int   $id = null,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): ?ModelValuesObject
-    {
+        ?int $id = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?IHitAggregationValuesObject {
         $row = $this->store->getAggregationRowById(
-            $type,
             $id,
             $excludeRemoved,
             $excludeInactive
         );
 
         if (!empty($row)) {
-            return $this->_getAggregationVO($type, $row);
+            return $this->_getAggregationVO($row);
         }
 
         return null;
@@ -90,19 +88,16 @@ final class Hit extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getHitVOsByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $rows = $this->store->getHitRowsByPage(
             $page,
-            $this->itemsOnPage,
+            HitModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -115,26 +110,19 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param string $type
      * @param int $page
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
     final public function getAggregationsVOsByPage(
-        string $type,
-        int    $page,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): ?array
-    {
+        int $page,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         $rows = $this->store->getAggregationRowsByPage(
-            $type,
             $page,
-            $this->itemsOnPage,
+            HitModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -143,60 +131,41 @@ final class Hit extends BaseModel
             return null;
         }
 
-        return array_map(function (array $row) use ($type) {
-            return $this->_getAggregationVO($type, $row);
+        return array_map(function (array $row) {
+            return $this->_getAggregationVO($row);
         }, $rows);
     }
 
-    /**
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     */
     final public function getHitsPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
-        $rowsCount = $this->store->getHitsRowsCount(
+    ): int {
+        $rowsCount = $this->store->getHitsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / HitModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * HitModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
         return $pageCount;
     }
 
-    /**
-     * @param string $type
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     */
     final public function getAggregationsPageCount(
-        string $type,
-        bool   $excludeRemoved = true,
-        bool   $excludeInactive = true
-    ): int
-    {
-        $rowsCount = $this->store->getAggregationRowsCount(
-            $type,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): int {
+        $rowsCount = $this->store->getHitAggregationsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / HitModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * HitModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -208,15 +177,12 @@ final class Hit extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByArticleId(
         ?int $articleId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         return $this->store->getCountByArticleId(
             $articleId,
             $excludeRemoved,
@@ -229,15 +195,12 @@ final class Hit extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByTopicId(
         ?int $topicId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         return $this->store->getCountByTopicId(
             $topicId,
             $excludeRemoved,
@@ -250,15 +213,12 @@ final class Hit extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCountByTagId(
         ?int $tagId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         return $this->store->getCountByTagId(
             $tagId,
             $excludeRemoved,
@@ -269,7 +229,6 @@ final class Hit extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeHitById(?int $id = null): bool
     {
@@ -281,31 +240,23 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
-    final public function removeAggregationById(
-        string $type,
-        ?int $id = null
-    ): bool
+    final public function removeAggregationById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
         }
 
-        return $this->store->deleteAggregationById($type, $id);
+        return $this->store->deleteAggregationById($id);
     }
 
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
-    final public function restoreHitById(
-        ?int $id = null
-    ): bool
+    final public function restoreHitById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
@@ -315,31 +266,28 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param string $type
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
-    final public function restoreAggregationById(
-        string $type,
-        ?int $id = null
-    ): bool
+    final public function restoreAggregationById(?int $id = null): bool
     {
         if (empty($id)) {
             return false;
         }
 
-        return $this->store->restoreAggregationById($type, $id);
+        return $this->store->restoreAggregationById($id);
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return bool
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final public function saveHit(HitForm $hitForm): bool
+    final public function saveHit(IHitForm $hitForm): bool
     {
         $hitForm->checkInputValues();
 
@@ -349,16 +297,27 @@ final class Hit extends BaseModel
 
         $this->_checkHitIdInHitForm($hitForm);
 
-        switch ($hitForm->getType()) {
-            case 'article':
+        $type = $hitForm->getType();
+
+        switch ($type) {
+            case HitTypesEnum::ARTICLE->value:
                 $this->_checkArticleIdInHitForm($hitForm);
                 break;
-            case 'type':
+            case HitTypesEnum::TOPIC->value:
                 $this->_checkTopicIdInHitForm($hitForm);
                 break;
-            case 'tag':
+            case HitTypesEnum::TAG->value:
                 $this->_checkTagIdInHitForm($hitForm);
                 break;
+            default:
+                $hitForm->setStatusFail();
+
+                $hitForm->setError(
+                    sprintf(
+                        HitForm::INVALID_TYPE_ERROR_MESSAGE,
+                        $type
+                    )
+                );
         }
 
         if (!$hitForm->getStatus()) {
@@ -384,13 +343,15 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return bool
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final public function saveAggregation(HitForm $hitForm): bool
+    final public function saveAggregation(IHitForm $hitForm): bool
     {
         $hitForm->checkInputValues();
 
@@ -400,16 +361,27 @@ final class Hit extends BaseModel
 
         $this->_checkAggregationIdInHitForm($hitForm);
 
-        switch ($hitForm->getType()) {
-            case 'article':
+        $type = $hitForm->getType();
+
+        switch ($type) {
+            case HitTypesEnum::ARTICLE->value:
                 $this->_checkArticleIdInHitForm($hitForm);
                 break;
-            case 'type':
+            case HitTypesEnum::TOPIC->value:
                 $this->_checkTopicIdInHitForm($hitForm);
                 break;
-            case 'tag':
+            case HitTypesEnum::TAG->value:
                 $this->_checkTagIdInHitForm($hitForm);
                 break;
+            default:
+                $hitForm->setStatusFail();
+
+                $hitForm->setError(
+                    sprintf(
+                        HitForm::INVALID_AGGREGATION_TYPE_ERROR_MESSAGE,
+                        $type
+                    )
+                );
         }
 
         if (!$hitForm->getStatus()) {
@@ -438,13 +410,11 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    private function _checkHitIdInHitForm(HitForm $hitForm): void
+    private function _checkHitIdInHitForm(IHitForm $hitForm): void
     {
         $id = $hitForm->getId();
 
@@ -457,21 +427,20 @@ final class Hit extends BaseModel
         if (empty($hitVO)) {
             $hitForm->setStatusFail();
 
-            $hitForm->setError(sprintf(
-                HitForm::HITS_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
+            $hitForm->setError(
+                sprintf(
+                    HitForm::HITS_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    private function _checkAggregationIdInHitForm(HitForm $hitForm): void
+    private function _checkAggregationIdInHitForm(IHitForm $hitForm): void
     {
         $id = $hitForm->getId();
 
@@ -484,132 +453,103 @@ final class Hit extends BaseModel
         if (empty($aggregationVO)) {
             $hitForm->setStatusFail();
 
-            switch ($hitForm->getAggregationType()) {
-                case 'day':
-                    $errorMessage = sprintf(
-                        HitForm::HITS_AGGREGATION_BY_DAY_NOT_EXISTS_ERROR_MESSAGE,
-                        $id
-                    );
+            $errorMessage = sprintf(
+                HitForm::HITS_AGGREGATION_NOT_EXISTS_ERROR_MESSAGE,
+                $id
+            );
 
-                    $hitForm->setError($errorMessage);
-                    break;
-                case 'month':
-                    $errorMessage = sprintf(
-                        HitForm::HITS_AGGREGATION_BY_MONTH_NOT_EXISTS_ERROR_MESSAGE,
-                        $id
-                    );
-
-                    $hitForm->setError($errorMessage);
-                    break;
-                case 'year':
-                    $errorMessage = sprintf(
-                        HitForm::HITS_AGGREGATION_BY_YEAR_NOT_EXISTS_ERROR_MESSAGE,
-                        $id
-                    );
-
-                    $hitForm->setError($errorMessage);
-                    break;
-            }
+            $hitForm->setError($errorMessage);
         }
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return void
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _checkArticleIdInHitForm(HitForm $hitForm): void
+    private function _checkArticleIdInHitForm(IHitForm $hitForm): void
     {
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
-        $articleVO = $articleModel->getVOById(
-            $hitForm->getArticleId(),
-            true,
-            true
-        );
+        $articleVO = $articleModel->getVOById($hitForm->getArticleId());
 
         if (empty($articleVO)) {
             $hitForm->setStatusFail();
 
-            $hitForm->setError(sprintf(
-                HitForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
-                $hitForm->getId()
-            ));
+            $hitForm->setError(
+                sprintf(
+                    HitForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
+                    $hitForm->getId()
+                )
+            );
         }
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
      */
-    private function _checkTopicIdInHitForm(HitForm $hitForm): void
+    private function _checkTopicIdInHitForm(IHitForm $hitForm): void
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
-        $topicVO = $topicModel->getVOById(
-            $hitForm->getArticleId(),
-            true,
-            true
-        );
+        $topicVO = $topicModel->getVOById($hitForm->getTopicId());
 
         if (empty($topicVO)) {
             $hitForm->setStatusFail();
 
-            $hitForm->setError(sprintf(
-                HitForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
-                $hitForm->getId()
-            ));
+            $hitForm->setError(
+                sprintf(
+                    HitForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
+                    $hitForm->getId()
+                )
+            );
         }
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
      */
-    private function _checkTagIdInHitForm(HitForm $hitForm): void
+    private function _checkTagIdInHitForm(IHitForm $hitForm): void
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
-        $tagVO = $tagModel->getVOById(
-            $hitForm->getArticleId(),
-            true,
-            true
-        );
+        $tagVO = $tagModel->getVOById($hitForm->getTagId());
 
         if (empty($tagVO)) {
             $hitForm->setStatusFail();
 
-            $hitForm->setError(sprintf(
-                HitForm::TAG_NOT_EXISTS_ERROR_MESSAGE,
-                $hitForm->getId()
-            ));
+            $hitForm->setError(
+                sprintf(
+                    HitForm::TAG_NOT_EXISTS_ERROR_MESSAGE,
+                    $hitForm->getId()
+                )
+            );
         }
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @param bool $isCreateVOIfEmptyId
-     * @return HitValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IHitValuesObject|null
+     * @throws ValuesObjectException
      */
     private function _getHitVOFromHitForm(
-        HitForm $hitForm,
-        bool    $isCreateVOIfEmptyId = false
-    ): ?HitValuesObject
-    {
+        IHitForm $hitForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?IHitValuesObject {
         $row = null;
 
         $id = $hitForm->getId();
@@ -634,36 +574,31 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param HitForm $hitForm
+     * @param IHitForm $hitForm
      * @param bool $isCreateVOIfEmptyId
-     * @return ModelValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IHitAggregationValuesObject|null
      */
     private function _getAggregationVOFromHitForm(
-        HitForm $hitForm,
-        bool    $isCreateVOIfEmptyId = false
-    ): ?ModelValuesObject
-    {
+        IHitForm $hitForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?IHitAggregationValuesObject {
         $row = null;
 
         $id = $hitForm->getId();
-        $type = $hitForm->getAggregationType();
 
         if (empty($id) && !$isCreateVOIfEmptyId) {
             return null;
         }
 
         if (!empty($id)) {
-            $row = $this->store->getAggregationRowById($type, $id);
+            $row = $this->store->getAggregationRowById($id);
         }
 
         if (!empty($id) && empty($row)) {
             return null;
         }
 
-        $aggregationVO = $this->_getAggregationVO($type, $row);
+        $aggregationVO = $this->_getAggregationVO($row);
 
         $aggregationVO->setIsActive($hitForm->isActive());
 
@@ -671,34 +606,12 @@ final class Hit extends BaseModel
     }
 
     /**
-     * @param string $aggregationType
      * @param array|null $row
-     * @return ModelValuesObject|null
-     * @throws Exception
+     * @return IHitAggregationValuesObject|null
      */
     private function _getAggregationVO(
-        string $aggregationType,
         ?array $row = null
-    ): ?ModelValuesObject
-    {
-        $aggregationVO = null;
-
-        switch ($aggregationType) {
-            case 'day':
-                $aggregationVO = new HitAggregationByDayValuesObject($row);
-                break;
-            case 'month':
-                $aggregationVO = new HitAggregationByMonthValuesObject($row);
-                break;
-            case 'year':
-                $aggregationVO = new HitAggregationByYearValuesObject($row);
-                break;
-        }
-
-        if (empty($aggregationVO)) {
-            throw new Exception('Invalid Aggregation Type');
-        }
-
-        return $aggregationVO;
+    ): ?IHitAggregationValuesObject {
+        return new HitAggregationValuesObject($row);
     }
 }

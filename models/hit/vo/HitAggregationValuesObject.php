@@ -1,37 +1,33 @@
 <?php
 
-namespace Sonder\Models\Hit;
+namespace Sonder\Models\Hit\ValuesObjects;
 
-use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Hit\Interfaces\IHitAggregationValuesObject;
 
-final class HitAggregationByYearValuesObject extends ModelValuesObject
+#[IValuesObject]
+#[IModelValuesObject]
+#[IHitAggregationValuesObject]
+final class HitAggregationValuesObject
+    extends ModelValuesObject
+    implements IHitAggregationValuesObject
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $editLinkPattern = '/admin/hits/year/%d/';
+    final protected const EDIT_LINK_PATTERN = '/admin/hits/aggregation/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $removeLinkPattern = '/admin/hits/year/remove/%d/';
+    final protected const REMOVE_LINK_PATTERN = '/admin/hits/aggregation/remove/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $restoreLinkPattern = '/admin/hits/year/restore/%d/';
+    final protected const RESTORE_LINK_PATTERN = '/admin/hits/aggregation/restore/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $adminViewLinkPattern = '/admin/hits/year/view/%d/';
+    final protected const ADMIN_VIEW_LINK_PATTERN = '/admin/hits/aggregation/view/%d/';
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    public function getArticleId(): ?int
+    final public function getArticleId(): ?int
     {
         if (!$this->has('article_id')) {
             return null;
@@ -44,7 +40,7 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTopicId(): ?int
     {
@@ -59,7 +55,7 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTagId(): ?int
     {
@@ -74,7 +70,7 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getCount(): int
     {
@@ -82,24 +78,9 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return int|null
-     * @throws Exception
-     */
-    final public function getYear(): ?int
-    {
-        $year = $this->get('year');
-
-        if (empty($year)) {
-            return null;
-        }
-
-        return (int)$year;
-    }
-
-    /**
      * @param int|null $articleId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setArticleId(?int $articleId = null): void
     {
@@ -111,7 +92,7 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
     /**
      * @param int|null $topicId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTopicId(?int $topicId = null): void
     {
@@ -123,7 +104,7 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
     /**
      * @param int|null $tagId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTagId(?int $tagId = null): void
     {
@@ -135,24 +116,12 @@ final class HitAggregationByYearValuesObject extends ModelValuesObject
     /**
      * @param int|null $count
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setCount(?int $count = null): void
     {
         if (!empty($count)) {
             $this->set('count', $count);
-        }
-    }
-
-    /**
-     * @param int|null $year
-     * @return void
-     * @throws Exception
-     */
-    final public function setYear(?int $year = null): void
-    {
-        if (!empty($year)) {
-            $this->set('year', $year);
         }
     }
 }

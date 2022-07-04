@@ -2,29 +2,29 @@
 
 namespace Sonder\Models\Hit;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelApi;
+use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
-use Sonder\Core\ResponseObject;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
-use Sonder\Models\Hit;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Hit\Enums\HitTypesEnum;
+use Sonder\Models\Hit\Exceptions\HitApiException;
+use Sonder\Models\Hit\Exceptions\HitException;
+use Sonder\Models\Hit\Interfaces\IHitApi;
+use Sonder\Models\Hit\Interfaces\IHitModel;
 
 /**
- * @property Hit $model
+ * @property IHitModel $model
  */
-final class HitApi extends ModelApiCore implements IModelApi
+#[IModelApi]
+#[IHitApi]
+final class HitApi extends ModelApiCore implements IHitApi
 {
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    final public function actionCreate(): ResponseObject
+    final public function actionCreate(): IResponseObject
     {
         $apiValues = $this->request->getApiValues();
 
@@ -35,7 +35,7 @@ final class HitApi extends ModelApiCore implements IModelApi
             $apiValues['is_active'] = true;
         }
 
-        /* @var $hitForm HitForm|null */
+        /* @var $hitForm HitForm */
         $hitForm = $this->model->getForm($apiValues);
 
         $this->model->saveHit($hitForm);
@@ -48,48 +48,50 @@ final class HitApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return IResponseObject
+     * @throws HitApiException
      */
-    final public function actionGet(): ResponseObject
+    final public function actionGet(): IResponseObject
     {
         $id = $this->request->getApiValue('id');
         $type = $this->request->getApiValue('type');
 
         if (empty($id) || empty($type)) {
-            throw new ApiException(
-                'Input Values Are Not Set Or Have Invalid Format'
+            throw new HitApiException(
+                HitApiException::MESSAGE_API_INPUT_VALUES_HAVE_INVALID_FORMAT,
+                HitException::CODE_API_INPUT_VALUES_HAVE_INVALID_FORMAT
             );
         }
 
         $response = null;
 
         switch ($type) {
-            case 'article':
+            case HitTypesEnum::ARTICLE->value:
                 $response = $this->_getHitCountByArticleId((int)$id);
                 break;
-            case 'topic':
+            case HitTypesEnum::TOPIC->value:
                 $response = $this->_getHitCountByTopicId((int)$id);
                 break;
-            case 'tag':
+            case HitTypesEnum::TAG->value:
                 $response = $this->_getHitCountByTagId((int)$id);
                 break;
         }
 
         if (empty($response)) {
-            throw new ApiException('Input Type Of Hit');
+            throw new HitApiException(
+                HitApiException::MESSAGE_API_INVALID_TYPE,
+                HitException::CODE_API_INVALID_TYPE
+            );
         }
 
         return $response;
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionUpdate(): ResponseObject
+    final public function actionUpdate(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -98,10 +100,10 @@ final class HitApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionDelete(): ResponseObject
+    final public function actionDelete(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -111,21 +113,19 @@ final class HitApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $id
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws HitApiException
      */
-    private function _getHitCountByArticleId(int $id): ResponseObject
+    private function _getHitCountByArticleId(int $id): IResponseObject
     {
         if ($id < 1) {
-            throw new ApiException(
-                'ID Value Has Invalid Format'
+            throw new HitApiException(
+                HitApiException::MESSAGE_API_ID_HAS_INVALID_FORMAT,
+                HitException::CODE_API_ID_HAS_INVALID_FORMAT
             );
         }
 
-        $count = $this->model->getCountByArticleId($id, true, true);
+        $count = $this->model->getCountByArticleId($id);
 
         return $this->getApiResponse([
             'count' => $count
@@ -134,21 +134,19 @@ final class HitApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $id
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws HitApiException
      */
-    private function _getHitCountByTopicId(int $id): ResponseObject
+    private function _getHitCountByTopicId(int $id): IResponseObject
     {
         if ($id < 1) {
-            throw new ApiException(
-                'ID Value Has Invalid Format'
+            throw new HitApiException(
+                HitApiException::MESSAGE_API_ID_HAS_INVALID_FORMAT,
+                HitException::CODE_API_ID_HAS_INVALID_FORMAT
             );
         }
 
-        $count = $this->model->getCountByTopicId($id, true, true);
+        $count = $this->model->getCountByTopicId($id);
 
         return $this->getApiResponse([
             'count' => $count
@@ -157,21 +155,19 @@ final class HitApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $id
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws HitApiException
      */
-    private function _getHitCountByTagId(int $id): ResponseObject
+    private function _getHitCountByTagId(int $id): IResponseObject
     {
         if ($id < 1) {
-            throw new ApiException(
-                'ID Value Has Invalid Format'
+            throw new HitApiException(
+                HitApiException::MESSAGE_API_ID_HAS_INVALID_FORMAT,
+                HitException::CODE_API_ID_HAS_INVALID_FORMAT
             );
         }
 
-        $count = $this->model->getCountByTagId($id, true, true);
+        $count = $this->model->getCountByTagId($id);
 
         return $this->getApiResponse([
             'count' => $count
