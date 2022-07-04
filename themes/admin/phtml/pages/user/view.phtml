@@ -57,13 +57,13 @@ use Sonder\Models\User\UserValuesObject;
                 <?= $user->isActive() ? 'Yes' : 'No'; ?>
             </td>
         </tr>
-        <?php if (!empty($user->getLastLoginDate())): ?>
+        <?php if (!empty($user->getLastSignInDate())): ?>
             <tr>
                 <td>
                     Last Login At
                 </td>
                 <td>
-                    <?= $user->getLastLoginDate('Y-m-d H:i:s'); ?>
+                    <?= $user->getLastSignInDate('Y-m-d H:i:s'); ?>
                 </td>
             </tr>
         <?php endif; ?>

@@ -43,8 +43,8 @@ use Sonder\Models\Article\ArticleValuesObject;
 
             if (!empty($article->getTopicVO())) {
                 $articleTopic = sprintf(
-                    '<a href="%s">%s</a>',
-                    $article->getTopicVO()->getAdminViewLink(),
+                    '<a href="/admin/taxonomy/topics/view/%d/">%s</a>',
+                    $article->getTopicVO()->getId(),
                     $article->getTopicVO()->getTitle()
                 );
             }
