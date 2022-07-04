@@ -4,7 +4,7 @@ namespace Sonder\Middlewares;
 
 use Sonder\Controllers\AdminMainController;
 use Sonder\Core\CoreMiddleware;
-use Sonder\Core\Interfaces\IMiddleware;
+use Sonder\Interfaces\IMiddleware;
 use Sonder\Core\ResponseObject;
 
 final class AdminMiddleware extends CoreMiddleware implements IMiddleware
@@ -51,6 +51,7 @@ final class AdminMiddleware extends CoreMiddleware implements IMiddleware
     private function _redirect(string $url): void
     {
         $this->response = new ResponseObject();
+
         $this->response->redirect->setUrl($url);
     }
 }
