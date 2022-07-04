@@ -2,18 +2,25 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use ImagickException;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Article\ArticleForm;
-use Sonder\Models\Article\ArticleSimpleValuesObject;
-use Sonder\Models\Article\ArticleStore;
-use Sonder\Models\Article\ArticleValuesObject;
-use Sonder\Models\Topic\TopicSimpleValuesObject;
-use Sonder\Models\Topic\TopicValuesObject;
-use Sonder\Models\User\UserSimpleValuesObject;
-use Sonder\Models\User\UserValuesObject;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Article\Exceptions\ArticleException;
+use Sonder\Models\Article\Exceptions\ArticleModelException;
+use Sonder\Models\Article\Forms\ArticleForm;
+use Sonder\Models\Article\Interfaces\IArticleApi;
+use Sonder\Models\Article\Interfaces\IArticleForm;
+use Sonder\Models\Article\Interfaces\IArticleModel;
+use Sonder\Models\Article\Interfaces\IArticleSimpleValuesObject;
+use Sonder\Models\Article\Interfaces\IArticleStore;
+use Sonder\Models\Article\Interfaces\IArticleValuesObject;
+use Sonder\Models\Article\ValuesObjects\ArticleValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicModel;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
+use Sonder\Models\User\ValuesObjects\UserSimpleValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 use Sonder\Plugins\Image\Exceptions\ImagePluginException;
@@ -26,35 +33,37 @@ use Sonder\Plugins\UploadPlugin;
 use Throwable;
 
 /**
- * @property ArticleStore $store
+ * @property IArticleApi $api
+ * @property IArticleStore $store
  */
-final class Article extends BaseModel
+#[IModel]
+#[IArticleModel]
+final class ArticleModel extends BaseModel implements IArticleModel
 {
-    const DEFAULT_SLUG = 'article';
+    final protected const ITEMS_ON_PAGE = 10;
 
-    const IMAGES_DIR_PATH = '%s/media/articles/%s';
+    private const DEFAULT_SLUG = 'article';
 
-    const UPLOADS_DIR_PATH = 'uploads/articles';
+    private const IMAGES_DIR_PATH = '%s/media/articles/%s';
 
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    private const UPLOADS_DIR_PATH = 'uploads/articles';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
+     * @return IArticleValuesObject|null
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?IArticleValuesObject {
         $row = $this->store->getArticleRowById(
             $id,
             $excludeRemoved,
@@ -72,16 +81,14 @@ final class Article extends BaseModel
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return IArticleSimpleValuesObject|null
+     * @throws ModelException
      */
     final public function getSimpleVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?IArticleSimpleValuesObject {
         $row = $this->store->getArticleRowById(
             $id,
             $excludeRemoved,
@@ -89,7 +96,10 @@ final class Article extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getSimpleVO($row);
+            /* @var $articleSimpleVO IArticleSimpleValuesObject */
+            $articleSimpleVO = $this->getSimpleVO($row);
+
+            return $articleSimpleVO;
         }
 
         return null;
@@ -99,16 +109,18 @@ final class Article extends BaseModel
      * @param string|null $slug
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
+     * @return IArticleValuesObject|null
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function getVOBySlug(
         ?string $slug = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?ValuesObject
-    {
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?IArticleValuesObject {
         $row = $this->store->getArticleRowBySlug(
             $slug,
             $excludeRemoved,
@@ -126,16 +138,14 @@ final class Article extends BaseModel
      * @param string|null $slug
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return IArticleSimpleValuesObject|null
+     * @throws ModelException
      */
     final public function getSimpleVOBySlug(
         ?string $slug = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?ValuesObject
-    {
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?IArticleSimpleValuesObject {
         $row = $this->store->getArticleRowBySlug(
             $slug,
             $excludeRemoved,
@@ -143,7 +153,10 @@ final class Article extends BaseModel
         );
 
         if (!empty($row)) {
-            return $this->getSimpleVO($row);
+            /* @var $articleSimpleVO IArticleSimpleValuesObject */
+            $articleSimpleVO = $this->getSimpleVO($row);
+
+            return $articleSimpleVO;
         }
 
         return null;
@@ -153,20 +166,19 @@ final class Article extends BaseModel
      * @param int $page
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
+     * @param bool $simplify
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getArticlesByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
-        bool $excludeInactive = true
-    ): ?array
-    {
+        bool $excludeInactive = true,
+        bool $simplify = true
+    ): ?array {
         $rows = $this->store->getArticleRowsByPage(
             $page,
-            $this->itemsOnPage,
+            ArticleModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -175,29 +187,30 @@ final class Article extends BaseModel
             return null;
         }
 
-        return $this->getSimpleVOArray($rows);
+        if ($simplify) {
+            return $this->getSimpleVOArray($rows);
+        }
+
+        return $this->getVOArray($rows);
     }
 
     /**
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticlesPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $rowsCount = $this->store->getArticleRowsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / ArticleModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * ArticleModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -208,15 +221,12 @@ final class Article extends BaseModel
      * @param int|null $topicId
      * @param int $page
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getArticlesByTopicId(
         ?int $topicId = null,
-        int  $page = 1
-    ): ?array
-    {
+        int $page = 1
+    ): ?array {
         if (empty($topicId)) {
             return null;
         }
@@ -224,7 +234,7 @@ final class Article extends BaseModel
         $rows = $this->store->getArticleRowsByTopicId(
             $topicId,
             $page,
-            $this->itemsOnPage
+            ArticleModel::ITEMS_ON_PAGE
         );
 
         if (empty($rows)) {
@@ -237,22 +247,19 @@ final class Article extends BaseModel
     /**
      * @param int|null $topicId
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticlesPageCountByTopicId(
         ?int $topicId = null
-    ): int
-    {
+    ): int {
         if (empty($topicId)) {
             return 0;
         }
 
         $rowsCount = $this->store->getArticleRowsCountByTopicId($topicId);
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / ArticleModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * ArticleModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -263,15 +270,12 @@ final class Article extends BaseModel
      * @param int|null $tagId
      * @param int $page
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getArticlesByTagId(
         ?int $tagId = null,
-        int  $page = 1
-    ): ?array
-    {
+        int $page = 1
+    ): ?array {
         if (empty($tagId)) {
             return null;
         }
@@ -279,7 +283,7 @@ final class Article extends BaseModel
         $rows = $this->store->getArticleRowsByTagId(
             $tagId,
             $page,
-            $this->itemsOnPage
+            ArticleModel::ITEMS_ON_PAGE
         );
 
         if (empty($rows)) {
@@ -292,8 +296,6 @@ final class Article extends BaseModel
     /**
      * @param int|null $tagId
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticlesPageCountByTagId(?int $tagId = null): int
     {
@@ -303,9 +305,9 @@ final class Article extends BaseModel
 
         $rowsCount = $this->store->getArticleRowsCountByTopicId($tagId);
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / ArticleModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * ArticleModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -316,15 +318,12 @@ final class Article extends BaseModel
      * @param int|null $userId
      * @param int $page
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getArticlesByUserId(
         ?int $userId = null,
-        int  $page = 1
-    ): ?array
-    {
+        int $page = 1
+    ): ?array {
         if (empty($userId)) {
             return null;
         }
@@ -332,7 +331,7 @@ final class Article extends BaseModel
         $rows = $this->store->getArticleRowsByUserId(
             $userId,
             $page,
-            $this->itemsOnPage
+            ArticleModel::ITEMS_ON_PAGE
         );
 
         if (empty($rows)) {
@@ -345,8 +344,6 @@ final class Article extends BaseModel
     /**
      * @param int|null $userId
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticlesPageCountByUserId(?int $userId = null): int
     {
@@ -356,9 +353,9 @@ final class Article extends BaseModel
 
         $rowsCount = $this->store->getArticleRowsCountByUserId($userId);
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / ArticleModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * ArticleModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -368,7 +365,6 @@ final class Article extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeArticleById(?int $id = null): bool
     {
@@ -382,7 +378,6 @@ final class Article extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreArticleById(?int $id = null): bool
     {
@@ -394,13 +389,12 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleForm $articleForm
+     * @param IArticleForm $articleForm
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    final public function save(ArticleForm $articleForm): bool
+    final public function save(IArticleForm $articleForm): bool
     {
         $articleForm->checkInputValues();
 
@@ -477,12 +471,14 @@ final class Article extends BaseModel
 
     /**
      * @param array|null $row
-     * @return ValuesObject
+     * @return IArticleValuesObject
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final protected function getVO(?array $row = null): ValuesObject
+    final protected function getVO(?array $row = null): IArticleValuesObject
     {
         /* @var $articleVO ArticleValuesObject */
         $articleVO = parent::getVO($row);
@@ -496,15 +492,15 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _setUserVOToVO(ArticleValuesObject $articleVO): void
+    private function _setUserVOToVO(IArticleValuesObject $articleVO): void
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         /* @var $userVO UserSimpleValuesObject */
@@ -516,18 +512,16 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setTopicVOToVO(ArticleValuesObject $articleVO): void
+    private function _setTopicVOToVO(IArticleValuesObject $articleVO): void
     {
-        /* @var $topicModel Topic */
+        /* @var $topicModel ITopicModel */
         $topicModel = $this->getModel('topic');
 
-        /* @var $topicVO TopicSimpleValuesObject */
+        /* @var $topicVO ITopicSimpleValuesObject */
         $topicVO = $topicModel->getSimpleVOById($articleVO->getUserId());
 
         if (!empty($topicVO)) {
@@ -536,15 +530,16 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    private function _setTagsToVO(ArticleValuesObject $articleVO): void
+    private function _setTagsToVO(IArticleValuesObject $articleVO): void
     {
-        /* @var $tagModel Tag */
+        /* @var $tagModel TagModel */
         $tagModel = $this->getModel('tag');
 
         $tagVOs = $tagModel->getTagsByArticleId($articleVO->getId());
@@ -555,15 +550,16 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    private function _setCommentsToVO(ArticleValuesObject $articleVO): void
+    private function _setCommentsToVO(IArticleValuesObject $articleVO): void
     {
-        /* @var $commentModel Comment */
+        /* @var $commentModel CommentModel */
         $commentModel = $this->getModel('comment');
 
         $commentVOs = $commentModel->getCommentsByArticleId(
@@ -576,17 +572,17 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleForm $articleForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @param IArticleForm $articleForm
+     * @return void
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _checkIdInArticleForm(ArticleForm $articleForm): bool
+    private function _checkIdInArticleForm(IArticleForm $articleForm): void
     {
         $id = $articleForm->getId();
 
         if (empty($id)) {
-            return true;
+            return;
         }
 
         $articleVO = $this->_getVOFromArticleForm($articleForm);
@@ -594,30 +590,26 @@ final class Article extends BaseModel
         if (empty($articleVO)) {
             $articleForm->setStatusFail();
 
-            $articleForm->setError(sprintf(
-                ArticleForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
-
-            return false;
+            $articleForm->setError(
+                sprintf(
+                    ArticleForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param ArticleForm $articleForm
+     * @param IArticleForm $articleForm
      * @param bool $isCreateVOIfEmptyId
-     * @return ArticleValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IArticleValuesObject|null
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _getVOFromArticleForm(
-        ArticleForm $articleForm,
-        bool        $isCreateVOIfEmptyId = false
-    ): ?ArticleValuesObject
-    {
+        IArticleForm $articleForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?IArticleValuesObject {
         $row = null;
 
         $id = $articleForm->getId();
@@ -660,15 +652,15 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setSummaryToVO(ArticleValuesObject $articleVO): void
+    private function _setSummaryToVO(IArticleValuesObject $articleVO): void
     {
         $summary = $articleVO->getSummary();
-        $summary = preg_replace('/^\s+$/su', ' ', $summary);
-        $summary = preg_replace('/((^\s)|(\s$))/su', '', $summary);
+        $summary = preg_replace('/^\s+$/u', ' ', $summary);
+        $summary = preg_replace('/((^\s)|(\s$))/u', '', $summary);
 
         if (empty($summary)) {
             $summary = $articleVO->getText();
@@ -684,15 +676,14 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws Exception
      */
-    private function _setMetaTitleToVO(ArticleValuesObject $articleVO): void
+    private function _setMetaTitleToVO(IArticleValuesObject $articleVO): void
     {
         $metaTitle = $articleVO->getMetaTitle();
-        $metaTitle = preg_replace('/^\s+$/su', ' ', $metaTitle);
-        $metaTitle = preg_replace('/((^\s)|(\s$))/su', '', $metaTitle);
+        $metaTitle = preg_replace('/^\s+$/u', ' ', $metaTitle);
+        $metaTitle = preg_replace('/((^\s)|(\s$))/u', '', $metaTitle);
 
         if (empty($metaTitle)) {
             $metaTitle = $articleVO->getTitle();
@@ -702,17 +693,19 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws Exception
      */
     private function _setMetaDescriptionToVO(
-        ArticleValuesObject $articleVO
-    ): void
-    {
+        IArticleValuesObject $articleVO
+    ): void {
         $metaDescription = $articleVO->getMetaDescription();
-        $metaDescription = preg_replace('/^\s+$/su', ' ', $metaDescription);
-        $metaDescription = preg_replace('/((^\s)|(\s$))/su', '', $metaDescription);
+        $metaDescription = preg_replace('/^\s+$/u', ' ', $metaDescription);
+        $metaDescription = preg_replace(
+            '/((^\s)|(\s$))/u',
+            '',
+            $metaDescription
+        );
 
         if (empty($metaDescription)) {
             $metaDescription = $articleVO->getSummary();
@@ -722,11 +715,11 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setHtmlToVO(ArticleValuesObject $articleVO): void
+    private function _setHtmlToVO(IArticleValuesObject $articleVO): void
     {
         $text = $articleVO->getText();
         $html = empty($text) ? null : $this->_text2html($text);
@@ -737,7 +730,7 @@ final class Article extends BaseModel
     /**
      * @param string|null $text
      * @return string|null
-     * @throws Exception
+     * @throws CoreException
      */
     private function _text2html(?string $text = null): ?string
     {
@@ -761,13 +754,11 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleForm $articleForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param IArticleForm $articleForm
+     * @return void
+     * @throws CoreException
      */
-    private function _checkTopicIdInArticleForm(ArticleForm $articleForm): bool
+    private function _checkTopicIdInArticleForm(IArticleForm $articleForm): void
     {
         $topicId = $articleForm->getTopicId();
 
@@ -778,38 +769,33 @@ final class Article extends BaseModel
                 ArticleForm::TOPIC_IS_NOT_SET_ERROR_MESSAGE
             );
 
-            return false;
+            return;
         }
 
-        /* @var $topicModel Topic */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
         if (empty($topicModel->getVOById($topicId))) {
             $articleForm->setStatusFail();
 
-            $articleForm->setError(sprintf(
-                ArticleForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
-                $topicId
-            ));
-
-            return false;
+            $articleForm->setError(
+                sprintf(
+                    ArticleForm::TOPIC_NOT_EXISTS_ERROR_MESSAGE,
+                    $topicId
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param ArticleForm $articleForm
+     * @param IArticleForm $articleForm
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    private function _checkTitleInArticleForm(ArticleForm $articleForm): void
+    private function _checkTitleInArticleForm(IArticleForm $articleForm): void
     {
         $title = $articleForm->getTitle();
-        $title = preg_replace('/^\s+$/su', ' ', $title);
-        $title = preg_replace('/((^\s)|(\s$))/su', '', $title);
+        $title = preg_replace('/^\s+$/u', ' ', $title);
+        $title = preg_replace('/((^\s)|(\s$))/u', '', $title);
 
         $articleForm->setTitle($title);
 
@@ -831,8 +817,6 @@ final class Article extends BaseModel
      * @param string|null $title
      * @param int|null $id
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _isTitleUniq(?string $title = null, ?int $id = null): bool
     {
@@ -842,24 +826,22 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleForm $articleForm
+     * @param IArticleForm $articleForm
      * @return void
-     * @throws Exception
      */
     private function _checkMetaTitleInArticleForm(
-        ArticleForm $articleForm
-    ): void
-    {
+        IArticleForm $articleForm
+    ): void {
         $metaTitle = $articleForm->getMetaTitle();
 
         $metaTitle = preg_replace(
-            '/^\s+$/su',
+            '/^\s+$/u',
             ' ',
             $metaTitle
         );
 
         $metaTitle = preg_replace(
-            '/((^\s)|(\s$))/su',
+            '/((^\s)|(\s$))/u',
             '',
             $metaTitle
         );
@@ -881,47 +863,43 @@ final class Article extends BaseModel
      * @param string|null $title
      * @param int|null $id
      * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _isMetaTitleUniq(
         ?string $title = null,
-        ?int    $id = null
-    ): bool
-    {
+        ?int $id = null
+    ): bool {
         $row = $this->store->getArticleRowByMetaTitle($title, $id);
 
         return empty($row);
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
+     * @param IArticleValuesObject $articleVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _setUniqSlugToVO(ArticleValuesObject $articleVO): void
+    private function _setUniqSlugToVO(IArticleValuesObject $articleVO): void
     {
         /* @var $translitPlugin TranslitPlugin */
         $translitPlugin = $this->getPlugin('translit');
 
         $slug = (string)$articleVO->getSlug();
 
-        $slug = preg_replace('/^\s+$/su', '', $slug);
-        $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+        $slug = preg_replace('/^\s+$/u', '', $slug);
+        $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
 
         if (empty($slug)) {
             $slug = $articleVO->getTitle();
 
-            $slug = preg_replace('/^\s+$/su', '', $slug);
-            $slug = preg_replace('/((^\s)|(\s$))/su', '', $slug);
+            $slug = preg_replace('/^\s+$/u', '', $slug);
+            $slug = preg_replace('/((^\s)|(\s$))/u', '', $slug);
         }
 
         $slug = $translitPlugin->getSlug($slug);
 
         if (empty($slug)) {
-            $slug = Article::DEFAULT_SLUG;
+            $slug = ArticleModel::DEFAULT_SLUG;
         }
 
         $slug = $this->_makeSlugUniq($slug, $articleVO->getId());
@@ -933,26 +911,31 @@ final class Article extends BaseModel
      * @param string $slug
      * @param int|null $id
      * @return string|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     private function _makeSlugUniq(string $slug, ?int $id = null): ?string
     {
-        if (empty($this->store->getArticleRowBySlug($slug, $id, false, false))) {
+        if (empty(
+        $this->store->getArticleRowBySlug(
+            $slug,
+            $id,
+            false,
+            false
+        )
+        )) {
             return $slug;
         }
 
         $slugCount = 1;
 
-        if (preg_match('/^(.*?)-([0-9]+)$/su', $slug)) {
+        if (preg_match('/^(.*?)-(\d+)$/su', $slug)) {
             $slugCount = (int)preg_match(
-                '/^(.*?)-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$2',
                 $slug
             );
 
             $slug = preg_match(
-                '/^(.*?)-([0-9]+)$/su',
+                '/^(.*?)-(\d+)$/su',
                 '$1',
                 $slug
             );
@@ -966,20 +949,20 @@ final class Article extends BaseModel
     }
 
     /**
-     * @param ArticleValuesObject $articleVO
-     * @param ArticleForm $articleForm
+     * @param IArticleValuesObject $articleVO
+     * @param IArticleForm $articleForm
      * @return bool
-     * @throws DatabasePluginException
+     * @throws ArticleModelException
+     * @throws CoreException
      * @throws ImagePluginException
      * @throws ImageSizeException
      * @throws ImagickException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _uploadImageFile(
-        ArticleValuesObject $articleVO,
-        ArticleForm         $articleForm
-    ): bool
-    {
+        IArticleValuesObject $articleVO,
+        IArticleForm $articleForm
+    ): bool {
         $image = $articleForm->getImage();
 
         if (empty($image)) {
@@ -1009,13 +992,21 @@ final class Article extends BaseModel
         $uploadPlugin->upload(
             ArticleForm::IMAGE_EXTENSIONS,
             ArticleForm::IMAGE_FILE_MAX_SIZE,
-            Article::UPLOADS_DIR_PATH
+            ArticleModel::UPLOADS_DIR_PATH
         );
 
         $error = $uploadPlugin->getError();
 
         if (!empty($error)) {
-            throw new Exception($error);
+            $errorMessage = sprintf(
+                ArticleModelException::MESSAGE_MODEL_UPLOAD_FILE_ERROR,
+                $error
+            );
+
+            throw new ArticleModelException(
+                $errorMessage,
+                ArticleException::CODE_MODEL_UPLOAD_FILE_ERROR
+            );
         }
 
         $uploadedFiles = $uploadPlugin->getFiles();
@@ -1058,6 +1049,10 @@ final class Article extends BaseModel
         return true;
     }
 
+    /**
+     * @param string $slug
+     * @return string
+     */
     private function _getImagesDirName(string $slug): string
     {
         return sprintf('%s/%s', date('Y/m/d/h/i/s'), $slug);
@@ -1066,14 +1061,14 @@ final class Article extends BaseModel
     /**
      * @param string $imageDirName
      * @return string
-     * @throws Exception
+     * @throws ArticleModelException
      */
     private function _getImagesDirPath(string $imageDirName): string
     {
         $publicDirPath = $this->_getPublicDirPath();
 
         return sprintf(
-            Article::IMAGES_DIR_PATH,
+            ArticleModel::IMAGES_DIR_PATH,
             $publicDirPath,
             $imageDirName
         );
@@ -1081,7 +1076,7 @@ final class Article extends BaseModel
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ArticleModelException
      */
     private function _getPublicDirPath(): string
     {
@@ -1092,19 +1087,20 @@ final class Article extends BaseModel
         $publicDirPath = realpath(__DIR__ . '/../../../../public');
 
         if (empty($publicDirPath)) {
-            throw new Exception('Can not find public directory path');
+            throw new ArticleModelException(
+                ArticleModelException::MESSAGE_MODEL_NOT_FOUND_PUBLIC_DIRECTORY,
+                ArticleException::CODE_MODEL_NOT_FOUND_PUBLIC_DIRECTORY
+            );
         }
 
         return $publicDirPath;
     }
 
     /**
-     * @param ArticleForm $articleForm
+     * @param IArticleForm $articleForm
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
      */
-    private function _saveSelectedTags(ArticleForm $articleForm): bool
+    private function _saveSelectedTags(IArticleForm $articleForm): bool
     {
         $this->store->deleteArticle2TagRelationsByArticleId(
             $articleForm->getId()

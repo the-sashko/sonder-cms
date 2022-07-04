@@ -1,20 +1,25 @@
 <?php
 
-namespace Sonder\Models\Article;
+namespace Sonder\Models\Article\ValuesObjects;
 
-use Exception;
 use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelSimpleValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Article\Interfaces\IArticleSimpleValuesObject;
 
-final class ArticleSimpleValuesObject extends ModelSimpleValuesObject
+#[IValuesObject]
+#[IModelSimpleValuesObject]
+#[IArticleSimpleValuesObject]
+final class ArticleSimpleValuesObject
+    extends ModelSimpleValuesObject
+    implements IArticleSimpleValuesObject
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $linkPattern = '/p/%s/';
+    final protected const LINK_PATTERN = '/p/%s/';
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -27,7 +32,7 @@ final class ArticleSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSummary(): ?string
     {
@@ -40,7 +45,7 @@ final class ArticleSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final protected function getSlug(): ?string
     {
@@ -52,11 +57,10 @@ final class ArticleSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws ValuesObjectException
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
         return [
             'id' => $this->getId(),

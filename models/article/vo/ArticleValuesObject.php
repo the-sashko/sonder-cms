@@ -1,17 +1,24 @@
 <?php
 
-namespace Sonder\Models\Article;
+namespace Sonder\Models\Article\ValuesObjects;
 
-use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
-use Sonder\Models\Topic\TopicSimpleValuesObject;
-use Sonder\Models\Topic\TopicValuesObject;
-use Sonder\Models\User\UserSimpleValuesObject;
-use Sonder\Models\User\UserValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Article\Interfaces\IArticleValuesObject;
+use Sonder\Models\User\Interfaces\IUserSimpleValuesObject;
+use Sonder\Models\User\ValuesObjects\UserSimpleValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 
-final class ArticleValuesObject extends ModelValuesObject
+#[IValuesObject]
+#[IModelValuesObject]
+#[IArticleValuesObject]
+final class ArticleValuesObject
+    extends ModelValuesObject
+    implements IArticleValuesObject
 {
-    const IMAGE_SIZES = [
+    final public const IMAGE_SIZES = [
         'thumbnail' => [
             'height' => 64,
             'width' => 64,
@@ -31,41 +38,23 @@ final class ArticleValuesObject extends ModelValuesObject
         ]
     ];
 
-    const IMAGE_FORMAT = 'png';
+    final public const IMAGE_FORMAT = 'png';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $editLinkPattern = '/admin/article/%d/';
+    final protected const EDIT_LINK_PATTERN = '/admin/article/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $removeLinkPattern = '/admin/article/remove/%d/';
+    final protected const REMOVE_LINK_PATTERN = '/admin/article/remove/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $restoreLinkPattern = '/admin/article/restore/%d/';
+    final protected const RESTORE_LINK_PATTERN = '/admin/article/restore/%d/';
 
-    /**
-     * @var string
-     */
-    protected string $adminViewLinkPattern = '/admin/articles/view/%d/';
+    final protected const ADMIN_VIEW_LINK_PATTERN = '/admin/articles/view/%d/';
 
-    /**
-     * @var string
-     */
-    protected string $imageLinkPattern = '/media/articles/%s/%s-%s.png';
+    private const IMAGE_LINK_PATTERN = '/media/articles/%s/%s-%s.png';
 
-    /**
-     * @var string
-     */
-    protected string $missingImageLink = '/assets/img/broken.png';
+    private const MISSING_IMAGE_LINK = '/assets/img/broken.png';
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): string
     {
@@ -74,7 +63,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -87,7 +76,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getImageDir(): ?string
     {
@@ -100,7 +89,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSummary(): ?string
     {
@@ -113,7 +102,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getText(): ?string
     {
@@ -126,7 +115,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getHtml(): ?string
     {
@@ -139,7 +128,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTopicId(): int
     {
@@ -147,10 +136,10 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return TopicSimpleValuesObject|null
-     * @throws Exception
+     * @return ITopicSimpleValuesObject|null
+     * @throws ValuesObjectException
      */
-    final public function getTopicVO(): ?TopicSimpleValuesObject
+    final public function getTopicVO(): ?ITopicSimpleValuesObject
     {
         if (!$this->has('topic_simple_vo')) {
             return null;
@@ -161,7 +150,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): int
     {
@@ -170,9 +159,9 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return UserSimpleValuesObject|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    final public function getUserVO(): ?UserSimpleValuesObject
+    final public function getUserVO(): ?IUserSimpleValuesObject
     {
         if (!$this->has('user_simple_vo')) {
             return null;
@@ -183,7 +172,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getMetaTitle(): ?string
     {
@@ -196,7 +185,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getMetaDescription(): ?string
     {
@@ -209,7 +198,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return array|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTags(): ?array
     {
@@ -224,7 +213,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return array|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getComments(): ?array
     {
@@ -239,7 +228,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return array|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTagIds(): ?array
     {
@@ -261,28 +250,28 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string $size
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getImageLink(string $size): string
     {
         $imageDir = $this->getImageDir();
 
         if (empty($imageDir)) {
-            return $this->missingImageLink;
+            return ArticleValuesObject::MISSING_IMAGE_LINK;
         }
 
         if (!array_key_exists($size, ArticleValuesObject::IMAGE_SIZES)) {
-            return $this->missingImageLink;
+            return ArticleValuesObject::MISSING_IMAGE_LINK;
         }
 
         $size = ArticleValuesObject::IMAGE_SIZES[$size];
 
         if (!array_key_exists('file_prefix', $size)) {
-            return $this->missingImageLink;
+            return ArticleValuesObject::MISSING_IMAGE_LINK;
         }
 
         return sprintf(
-            $this->imageLinkPattern,
+            ArticleValuesObject::IMAGE_LINK_PATTERN,
             $imageDir,
             $this->getSlug(),
             $size['file_prefix']
@@ -291,7 +280,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return int
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getViewsCount(): int
     {
@@ -305,7 +294,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -317,7 +306,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -329,7 +318,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $imageDir
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setImageDir(?string $imageDir = null): void
     {
@@ -339,7 +328,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $summary
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSummary(?string $summary = null): void
     {
@@ -351,7 +340,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $text
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setText(?string $text = null): void
     {
@@ -363,7 +352,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $html
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setHtml(?string $html = null): void
     {
@@ -375,7 +364,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param int|null $topicId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTopicId(?int $topicId = null): void
     {
@@ -385,14 +374,13 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param TopicSimpleValuesObject|null $topicVO
+     * @param ITopicSimpleValuesObject|null $topicVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTopicVO(
-        ?TopicSimpleValuesObject $topicVO = null
-    ): void
-    {
+        ?ITopicSimpleValuesObject $topicVO = null
+    ): void {
         if (!empty($topicVO)) {
             $this->set('topic_simple_vo', $topicVO);
         }
@@ -401,7 +389,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param int|null $userId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserId(?int $userId = null): void
     {
@@ -411,14 +399,13 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param UserSimpleValuesObject|null $userVO
+     * @param IUserSimpleValuesObject|null $userVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserVO(
-        ?UserSimpleValuesObject $userVO = null
-    ): void
-    {
+        ?IUserSimpleValuesObject $userVO = null
+    ): void {
         if (!empty($userVO)) {
             $this->set('user_simple_vo', $userVO);
         }
@@ -427,7 +414,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $metaTitle
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setMetaTitle(?string $metaTitle = null): void
     {
@@ -439,12 +426,11 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param string|null $metaDescription
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setMetaDescription(
         ?string $metaDescription = null
-    ): void
-    {
+    ): void {
         if (!empty($metaDescription)) {
             $this->set('meta_description', $metaDescription);
         }
@@ -453,7 +439,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param array|null $tags
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTags(?array $tags = null): void
     {
@@ -465,7 +451,7 @@ final class ArticleValuesObject extends ModelValuesObject
     /**
      * @param array|null $comments
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setComments(?array $comments = null): void
     {
@@ -476,7 +462,7 @@ final class ArticleValuesObject extends ModelValuesObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setViewsCount(): void
     {
@@ -488,15 +474,14 @@ final class ArticleValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @return array
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
-        $row = parent::exportRow($params);
+        $row = parent::exportRow();
 
         if (empty($row)) {
-            return null;
+            return $row;
         }
 
         if (array_key_exists('topic_simple_vo', $row)) {

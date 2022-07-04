@@ -1,73 +1,76 @@
 <?php
 
-namespace Sonder\Models\Article;
+namespace Sonder\Models\Article\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormFileObject;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Article\Interfaces\IArticleForm;
 
-final class ArticleForm extends ModelFormObject
+#[IModelFormObject]
+#[IArticleForm]
+final class ArticleForm extends ModelFormObject implements IArticleForm
 {
-    const TITLE_MIN_LENGTH = 3;
+    final public const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
 
-    const TITLE_MAX_LENGTH = 64;
+    final public const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
 
-    const SLUG_MAX_LENGTH = 128;
+    final public const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 
-    const TEXT_MIN_LENGTH = 3;
+    final public const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
 
-    const SUMMARY_MAX_LENGTH = 512;
+    final public const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
 
-    const META_TITLE_MAX_LENGTH = 255;
+    final public const TITLE_EXISTS_ERROR_MESSAGE = 'Article with this title already exists';
 
-    const META_DESCRIPTION_MAX_LENGTH = 512;
+    final public const TEXT_EMPTY_ERROR_MESSAGE = 'Text is empty';
 
-    const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
+    final public const TEXT_IS_TOO_SHORT_ERROR_MESSAGE = 'Text is too short';
 
-    const IMAGE_EXTENSIONS = ['jpg', 'png', 'gif'];
+    final public const SUMMARY_TOO_LONG_ERROR_MESSAGE = 'Summary is too long';
 
-    const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
+    final public const META_TITLE_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
 
-    const TITLE_TOO_SHORT_ERROR_MESSAGE = 'Title is too short';
+    final public const META_TITLE_EXISTS_ERROR_MESSAGE = 'Article with this meta title already exists';
 
-    const TITLE_TOO_LONG_ERROR_MESSAGE = 'Title is too long';
+    final public const META_DESCRIPTION_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
 
-    const TITLE_EXISTS_ERROR_MESSAGE = 'Article with this title already exists';
+    final public const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
 
-    const TEXT_EMPTY_ERROR_MESSAGE = 'Text is empty';
+    final public const TOPIC_IS_NOT_SET_ERROR_MESSAGE = 'Topic is not set';
 
-    const TEXT_IS_TOO_SHORT_ERROR_MESSAGE = 'Text is too short';
+    final public const TOPICS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active topics exists. You need to add first one for creating articles';
 
-    const SUMMARY_TOO_LONG_ERROR_MESSAGE = 'Summary is too long';
+    final public const TAGS_ARE_NOT_SET_ERROR_MESSAGE = 'Tags are not set';
 
-    const META_TITLE_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
+    final public const TAGS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active tags exists. You need to add first one for creating articles';
 
-    const META_TITLE_EXISTS_ERROR_MESSAGE = 'Article with this meta title ' .
-    'already exists';
+    final public const TAGS_SAVING_ERROR_MESSAGE = 'Can not save article tags';
 
-    const META_DESCRIPTION_TOO_LONG_ERROR_MESSAGE = 'Meta title is too long';
+    final public const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
 
-    const SLUG_TOO_LONG_ERROR_MESSAGE = 'Slug is too long';
+    final public const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
 
-    const TOPIC_IS_NOT_SET_ERROR_MESSAGE = 'Topic is not set';
+    final public const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
 
-    const TOPICS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active topics exists. ' .
-    'You need to add first one for creating articles';
+    private const TITLE_MIN_LENGTH = 3;
 
-    const TAGS_ARE_NOT_SET_ERROR_MESSAGE = 'Tags are not set';
+    private const TITLE_MAX_LENGTH = 64;
 
-    const TAGS_ARE_NOT_EXIST_ERROR_MESSAGE = 'Any active tags exists. You ' .
-    'need to add first one for creating articles';
+    private const SLUG_MAX_LENGTH = 128;
 
-    const TAGS_SAVING_ERROR_MESSAGE = 'Can not save article tags';
+    private const TEXT_MIN_LENGTH = 3;
 
-    const TOPIC_NOT_EXISTS_ERROR_MESSAGE = 'Topic with id "%d" not exists';
+    private const SUMMARY_MAX_LENGTH = 512;
 
-    const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
+    private const META_TITLE_MAX_LENGTH = 255;
 
-    const UPLOAD_IMAGE_FILE_ERROR_MESSAGE = 'Can not upload image file';
+    private const META_DESCRIPTION_MAX_LENGTH = 512;
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
@@ -87,7 +90,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -106,7 +109,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTitle(): ?string
     {
@@ -119,7 +122,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSlug(): ?string
     {
@@ -131,15 +134,16 @@ final class ArticleForm extends ModelFormObject
     }
 
     /**
-     * @return array|null
-     * @throws Exception
+     * @return IModelFormFileObject|null
+     * @throws ValuesObjectException
      */
-    final public function getImage(): ?array
+    final public function getImage(): ?IModelFormFileObject
     {
         if (!$this->has('image')) {
             return null;
         }
 
+        /* @var $image IModelFormFileObject */
         $image = $this->get('image');
 
         if (empty($image) || !is_array($image)) {
@@ -151,7 +155,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getImageDir(): ?string
     {
@@ -164,7 +168,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSummary(): ?string
     {
@@ -177,7 +181,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getText(): ?string
     {
@@ -190,7 +194,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTopicId(): ?int
     {
@@ -209,7 +213,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -228,7 +232,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getMetaTitle(): ?string
     {
@@ -241,7 +245,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getMetaDescription(): ?string
     {
@@ -254,7 +258,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return array|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getTags(): ?array
     {
@@ -273,7 +277,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -287,7 +291,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -297,7 +301,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param string|null $title
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTitle(?string $title = null): void
     {
@@ -307,7 +311,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param string|null $slug
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSlug(?string $slug = null): void
     {
@@ -317,7 +321,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param string|null $summary
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSummary(?string $summary = null): void
     {
@@ -327,7 +331,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param string|null $text
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setText(?string $text = null): void
     {
@@ -337,7 +341,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param int|null $topicId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTopicId(?int $topicId = null): void
     {
@@ -347,18 +351,17 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param int|null $userId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserId(?int $userId = null): void
     {
         $this->set('user_id', $userId);
     }
 
-
     /**
      * @param string|null $metaTitle
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setMetaTitle(?string $metaTitle = null): void
     {
@@ -368,19 +371,18 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param string|null $metaDescription
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setMetaDescription(
         ?string $metaDescription = null
-    ): void
-    {
+    ): void {
         $this->set('meta_description', $metaDescription);
     }
 
     /**
      * @param array|null $tags
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setTags(?array $tags = null): void
     {
@@ -390,7 +392,7 @@ final class ArticleForm extends ModelFormObject
     /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -399,7 +401,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTitleValue(): void
     {
@@ -429,7 +431,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTextValue(): void
     {
@@ -451,7 +453,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateSlugValue(): void
     {
@@ -465,7 +467,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTopicIdValue(): void
     {
@@ -479,7 +481,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTags(): void
     {
@@ -493,7 +495,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateSummaryValue(): void
     {
@@ -510,7 +512,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateMetaTitleValue(): void
     {
@@ -530,7 +532,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateMetaDescriptionValue(): void
     {
@@ -552,7 +554,7 @@ final class ArticleForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _setImageFileFromRequest(): void
     {

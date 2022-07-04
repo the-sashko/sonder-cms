@@ -2,39 +2,35 @@
 
 namespace Sonder\Models\Article;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Article\Interfaces\IArticleStore;
+use Sonder\Models\Article\Interfaces\IArticleValuesObject;
 
-final class ArticleStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[IArticleStore]
+final class ArticleStore extends ModelStore implements IArticleStore
 {
-    const ARTICLES_TABLE = 'articles';
-    const TOPICS_TABLE = 'topics';
-    const TAG_TO_ARTICLE_TABLE = 'tag2article';
-    const TAGS_TABLE = 'tags';
-    const USERS_TABLE = 'users';
+    final protected const SCOPE = 'article';
 
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'article';
+    private const ARTICLES_TABLE = 'articles';
+    private const TOPICS_TABLE = 'topics';
+    private const TAG_TO_ARTICLE_TABLE = 'tag2article';
+    private const TAGS_TABLE = 'tags';
+    private const USERS_TABLE = 'users';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($id)) {
             return null;
         }
@@ -88,8 +84,6 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param string|null $slug
      * @return int|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleIdBySlug(?string $slug = null): ?int
     {
@@ -119,16 +113,13 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowByTitle(
         ?string $title = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($title)) {
             return null;
         }
@@ -187,22 +178,12 @@ final class ArticleStore extends ModelStore implements IModelStore
         return $this->getRow($sql);
     }
 
-    /**
-     * @param string|null $metaTitle
-     * @param int|null $excludeId
-     * @param bool $excludeRemoved
-     * @param bool $excludeInactive
-     * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     */
     final public function getArticleRowByMetaTitle(
         ?string $metaTitle = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($metaTitle)) {
             return null;
         }
@@ -267,16 +248,13 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowBySlug(
         ?string $slug = null,
-        ?int    $excludeId = null,
-        bool    $excludeRemoved = true,
-        bool    $excludeInactive = true
-    ): ?array
-    {
+        ?int $excludeId = null,
+        bool $excludeRemoved = true,
+        bool $excludeInactive = true
+    ): ?array {
         if (empty($slug)) {
             return null;
         }
@@ -339,13 +317,11 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateArticleById(
         ?array $row = null,
-        ?int   $id = null
-    ): bool
-    {
+        ?int $id = null
+    ): bool {
         if (empty($row) || empty($id)) {
             return false;
         }
@@ -361,13 +337,11 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteArticleById(
         ?int $id = null,
         bool $isSoftDelete = true
-    ): bool
-    {
+    ): bool {
         if (empty($id)) {
             return false;
         }
@@ -389,7 +363,6 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreArticleById(?int $id = null): bool
     {
@@ -398,7 +371,7 @@ final class ArticleStore extends ModelStore implements IModelStore
         }
 
         $row = [
-            'ddate' => NULL,
+            'ddate' => null,
             'is_active' => true
         ];
 
@@ -407,20 +380,17 @@ final class ArticleStore extends ModelStore implements IModelStore
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsByPage(
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -447,7 +417,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT "articles".*
@@ -466,7 +436,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -477,14 +447,11 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $sqlWhere = 'true';
 
         if ($excludeRemoved) {
@@ -533,21 +500,18 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param int|null $topicId
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsByTopicId(
         ?int $topicId = null,
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($topicId)) {
             return null;
         }
@@ -581,7 +545,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT "articles".*
@@ -600,7 +564,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -612,15 +576,12 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsCountByTopicId(
         ?int $topicId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         if (empty($topicId)) {
             return 0;
         }
@@ -676,21 +637,18 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param int|null $tagId
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsByTagId(
         ?int $tagId = null,
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($tagId)) {
             return null;
         }
@@ -723,8 +681,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             );
         }
 
-
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT "articles".*
@@ -748,7 +705,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -760,15 +717,12 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsCountByTagId(
         ?int $tagId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         if (empty($tagId)) {
             return 0;
         }
@@ -828,21 +782,18 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param int|null $userId
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsByUserId(
         ?int $userId = null,
-        int  $page = 1,
-        int  $itemsOnPage = 10,
+        int $page = 1,
+        int $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($userId)) {
             return null;
         }
@@ -876,7 +827,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT "articles".*
@@ -895,7 +846,7 @@ final class ArticleStore extends ModelStore implements IModelStore
             ArticleStore::TOPICS_TABLE,
             ArticleStore::USERS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -907,15 +858,12 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticleRowsCountByUserId(
         ?int $userId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         if (empty($userId)) {
             return 0;
         }
@@ -969,15 +917,13 @@ final class ArticleStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param ArticleValuesObject|null $articleVO
+     * @param IArticleValuesObject|null $articleVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateArticle(
-        ?ArticleValuesObject $articleVO = null
-    ): bool
-    {
+        ?IArticleValuesObject $articleVO = null
+    ): bool {
         $id = $articleVO->getId();
 
         if (empty($id)) {
@@ -994,7 +940,6 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertArticle(?array $row = null): bool
     {
@@ -1009,13 +954,11 @@ final class ArticleStore extends ModelStore implements IModelStore
      * @param int|null $tagId
      * @param int|null $articleId
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertArticle2TagRelation(
         ?int $tagId = null,
         ?int $articleId = null
-    ): bool
-    {
+    ): bool {
         if (empty($articleId) || empty($tagId)) {
             return false;
         }
@@ -1031,12 +974,10 @@ final class ArticleStore extends ModelStore implements IModelStore
     /**
      * @param int|null $articleId
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteArticle2TagRelationsByArticleId(
         ?int $articleId = null
-    ): bool
-    {
+    ): bool {
         if (empty($articleId)) {
             return false;
         }
