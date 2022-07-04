@@ -2,24 +2,26 @@
 
 namespace Sonder\Models\PossibleUser;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelApi;
+use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
-use Sonder\Core\ResponseObject;
 use Sonder\Exceptions\ApiException;
-use Sonder\Models\PossibleUser;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\PossibleUser\Forms\PossibleUserForm;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserApi;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserModel;
 
 /**
- * @property PossibleUser $model
+ * @property IPossibleUserModel $model
  */
-final class PossibleUserApi extends ModelApiCore implements IModelApi
+#[IModelApi]
+#[IPossibleUserApi]
+final class PossibleUserApi extends ModelApiCore implements IPossibleUserApi
 {
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
-     * @throws Exception
      */
-    final public function actionCreate(): ResponseObject
+    final public function actionCreate(): IResponseObject
     {
         $apiValues = $this->request->getApiValues();
 
@@ -36,10 +38,9 @@ final class PossibleUserApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
-     * @throws Exception
+     * @return IResponseObject
      */
-    final public function actionGet(): ResponseObject
+    final public function actionGet(): IResponseObject
     {
         $possibleUserVO = $this->model->getVOFromSession();
 
@@ -51,11 +52,10 @@ final class PossibleUserApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
-     * @throws Exception
      */
-    final public function actionUpdate(): ResponseObject
+    final public function actionUpdate(): IResponseObject
     {
         $apiValues = $this->request->getApiValues();
 
@@ -72,14 +72,13 @@ final class PossibleUserApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
-     * @throws Exception
+     * @return IResponseObject
      */
-    final public function actionDelete(): ResponseObject
+    final public function actionDelete(): IResponseObject
     {
         return $this->getApiResponse(
             null,
-            $this->model->removePossibleUser()
+            $this->model->remove()
         );
     }
 }

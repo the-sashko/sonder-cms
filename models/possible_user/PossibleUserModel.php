@@ -2,24 +2,29 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\PossibleUser\PossibleUserForm;
-use Sonder\Models\PossibleUser\PossibleUserValuesObject;
-use Sonder\Models\User\UserValuesObject;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\IPossibleUser\Interfaces\IPossibleUserValuesObject;
+use Sonder\Models\PossibleUser\Forms\PossibleUserForm;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserApi;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserForm;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserModel;
+use Sonder\Models\PossibleUser\ValuesObjects\PossibleUserValuesObject;
+use Sonder\Models\Shortener\Interfaces\IShortenerModel;
+use Sonder\Models\User\ValuesObjects\UserValuesObject;
 
 /**
+ * @property IPossibleUserApi $api
  * @property null $store
  */
-final class PossibleUser extends BaseModel
+#[IModel]
+#[IShortenerModel]
+final class PossibleUserModel extends BaseModel implements IPossibleUserModel
 {
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    final protected const ITEMS_ON_PAGE = 10;
 
     /**
      * @return PossibleUserValuesObject|null
@@ -34,7 +39,7 @@ final class PossibleUser extends BaseModel
     /**
      * @return bool
      */
-    final public function removePossibleUser(): bool
+    final public function remove(): bool
     {
         //TODO
 
@@ -42,11 +47,10 @@ final class PossibleUser extends BaseModel
     }
 
     /**
-     * @param PossibleUserForm $possibleUserForm
+     * @param IPossibleUserForm $possibleUserForm
      * @return bool
-     * @throws Exception
      */
-    final public function create(PossibleUserForm $possibleUserForm): bool
+    final public function create(IPossibleUserForm $possibleUserForm): bool
     {
         $possibleUserForm->checkInputValues();
 
@@ -65,11 +69,11 @@ final class PossibleUser extends BaseModel
     }
 
     /**
-     * @param PossibleUserForm $possibleUserForm
+     * @param IPossibleUserForm $possibleUserForm
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    final public function update(PossibleUserForm $possibleUserForm): bool
+    final public function update(IPossibleUserForm $possibleUserForm): bool
     {
         $possibleUserForm->checkInputValues();
 
@@ -95,12 +99,14 @@ final class PossibleUser extends BaseModel
 
     /**
      * @param array|null $row
-     * @return ValuesObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IPossibleUserValuesObject
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final protected function getVO(?array $row = null): ValuesObject
+    final protected function getVO(
+        ?array $row = null
+    ): IPossibleUserValuesObject
     {
         /* @var $possibleUserVO PossibleUserValuesObject */
         $possibleUserVO = parent::getVO($row);
@@ -113,15 +119,14 @@ final class PossibleUser extends BaseModel
     /**
      * @param PossibleUserValuesObject $possibleUserVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
+     * @throws CoreException
+     * @throws ModelException
      */
     private function _setUserVOToVO(
         PossibleUserValuesObject $possibleUserVO
-    ): void
-    {
-        /* @var $userModel User */
+    ): void {
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         /* @var $userVO UserValuesObject */
@@ -133,14 +138,13 @@ final class PossibleUser extends BaseModel
     }
 
     /**
-     * @param PossibleUserForm $possibleUserForm
+     * @param IPossibleUserForm $possibleUserForm
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _checkSessionTokenInPossibleUserForm(
-        PossibleUserForm $possibleUserForm
-    ): void
-    {
+        IPossibleUserForm $possibleUserForm
+    ): void {
         if (empty($possibleUserForm->getSessionToken())) {
             $possibleUserForm->setStatusFail();
 
@@ -172,6 +176,5 @@ final class PossibleUser extends BaseModel
                 PossibleUserForm::INVALID_SESSION_TOKEN_ERROR_MESSAGE
             );
         }
-
     }
 }

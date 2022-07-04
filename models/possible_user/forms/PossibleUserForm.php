@@ -1,18 +1,22 @@
 <?php
 
-namespace Sonder\Models\PossibleUser;
+namespace Sonder\Models\PossibleUser\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\PossibleUser\Interfaces\IPossibleUserForm;
 
-final class PossibleUserForm extends ModelFormObject
+#[IModelFormObject]
+#[IPossibleUserForm]
+final class PossibleUserForm extends ModelFormObject implements IPossibleUserForm
 {
-    const SESSION_TOKEN_IS_EMPTY_ERROR_MESSAGE = 'Session token is empty';
+    final public const SESSION_TOKEN_IS_EMPTY_ERROR_MESSAGE = 'Session token is empty';
 
-    const INVALID_SESSION_TOKEN_ERROR_MESSAGE = 'Invalid session token';
+    final public const INVALID_SESSION_TOKEN_ERROR_MESSAGE = 'Invalid session token';
 
     /**
-     * @throws Exception
+     * @return void
      */
     final public function checkInputValues(): void
     {
@@ -21,7 +25,7 @@ final class PossibleUserForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -40,7 +44,7 @@ final class PossibleUserForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSessionToken(): ?string
     {
@@ -59,7 +63,7 @@ final class PossibleUserForm extends ModelFormObject
 
     /**
      * @return array|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getAdditionalInfo(): ?array
     {

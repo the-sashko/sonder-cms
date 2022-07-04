@@ -1,16 +1,22 @@
 <?php
 
-namespace Sonder\Models\PossibleUser;
+namespace Sonder\Models\PossibleUser\ValuesObjects;
 
-use Exception;
 use Sonder\Core\ValuesObject;
-use Sonder\Models\User\UserValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\IPossibleUser\Interfaces\IPossibleUserValuesObject;
+use Sonder\Models\User\Interfaces\IUserValuesObject;
 
-final class PossibleUserValuesObject extends ValuesObject
+#[IValuesObject]
+#[IPossibleUserValuesObject]
+final class PossibleUserValuesObject
+    extends ValuesObject
+    implements IPossibleUserValuesObject
 {
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -25,7 +31,7 @@ final class PossibleUserValuesObject extends ValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getIp(): ?string
     {
@@ -40,7 +46,7 @@ final class PossibleUserValuesObject extends ValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getSessionToken(): ?string
     {
@@ -54,10 +60,10 @@ final class PossibleUserValuesObject extends ValuesObject
     }
 
     /**
-     * @return ValuesObject|null
-     * @throws Exception
+     * @return IValuesObject|null
+     * @throws ValuesObjectException
      */
-    final public function getAdditionalInfo(): ?ValuesObject
+    final public function getAdditionalInfo(): ?IValuesObject
     {
         if (!$this->has('additional_info')) {
             return null;
@@ -74,10 +80,10 @@ final class PossibleUserValuesObject extends ValuesObject
     }
 
     /**
-     * @return UserValuesObject|null
-     * @throws Exception
+     * @return IUserValuesObject|null
+     * @throws ValuesObjectException
      */
-    final public function getUserVO(): ?UserValuesObject
+    final public function getUserVO(): ?IUserValuesObject
     {
         if (!$this->has('user_vo')) {
             return null;
@@ -89,7 +95,7 @@ final class PossibleUserValuesObject extends ValuesObject
     /**
      * @param int|null $userId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserId(?int $userId = null): void
     {
@@ -101,7 +107,7 @@ final class PossibleUserValuesObject extends ValuesObject
     /**
      * @param string|null $ip
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIp(?string $ip = null): void
     {
@@ -113,7 +119,7 @@ final class PossibleUserValuesObject extends ValuesObject
     /**
      * @param string|null $sessionToken
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setSessionToken(?string $sessionToken = null): void
     {
@@ -125,7 +131,7 @@ final class PossibleUserValuesObject extends ValuesObject
     /**
      * @param array|null $additionalInfo
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setAdditionalInfo(?array $additionalInfo = null): void
     {
@@ -135,11 +141,11 @@ final class PossibleUserValuesObject extends ValuesObject
     }
 
     /**
-     * @param UserValuesObject|null $userVO
+     * @param IUserValuesObject|null $userVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    final public function setUserVO(?UserValuesObject $userVO = null): void
+    final public function setUserVO(?IUserValuesObject $userVO = null): void
     {
         if (!empty($userVO)) {
             $this->set('user_vo', $userVO);
@@ -147,18 +153,17 @@ final class PossibleUserValuesObject extends ValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @return array
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
-        $row = parent::exportRow($params);
+        $row = parent::exportRow();
 
         if (empty($row)) {
-            return null;
+            return $row;
         }
 
-        if (array_key_exists('user_vo', $row) && empty($row['user_vo'])) {
+        if (array_key_exists('user_vo', $row)) {
             unset($row['user_vo']);
         }
 
