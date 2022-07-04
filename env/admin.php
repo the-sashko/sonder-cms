@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('APP_MIDDLEWARES')) {
     define('APP_MIDDLEWARES', ['user', 'admin', 'csrf']);
 }
@@ -16,7 +17,7 @@ if (!defined('APP_CACHE')) {
 }
 
 if (!defined('APP_CACHE_TTL')) {
-    define('APP_CACHE_TTL', 60 * 30);
+    define('APP_CACHE_TTL', 1800); // 30 min
 }
 
 if (!defined('APP_NOT_FOUND_URL')) {
@@ -30,5 +31,3 @@ if (!defined('APP_DEFAULT_LANGUAGE')) {
 if (!defined('APP_MULTI_LANGUAGE')) {
     define('APP_MULTI_LANGUAGE', false);
 }
-
-
