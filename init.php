@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('APP_ROUTING_TYPE')) {
     define('APP_ROUTING_TYPE', 'annotations');
 }
@@ -35,6 +36,11 @@ if (!defined('APP_SOURCE_PATHS')) {
     define(
         'APP_SOURCE_PATHS',
         [
+            'enums' => [
+                APP_PROTECTED_DIR_PATH . '/enums',
+                APP_CMS_DIR_PATH . '/enums'
+            ],
+
             'endpoints' => [
                 APP_PROTECTED_DIR_PATH . '/endpoints',
                 APP_CMS_DIR_PATH . '/endpoints',
