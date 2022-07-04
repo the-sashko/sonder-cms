@@ -7,33 +7,30 @@ use Sonder\Plugins\Page\PageValuesObject;
 
 final class PagePlugin
 {
-    const DEFAULT_TEMPLATE_NAME = 'default';
+    private const DEFAULT_TEMPLATE_NAME = 'default';
 
-    const DEFAULT_TEMPLATE_PAGE = 'page';
+    private const DEFAULT_TEMPLATE_PAGE = 'page';
 
-    const DEFAULT_NOT_FOUND_URL = '/error/404/';
+    private const DEFAULT_NOT_FOUND_URL = '/error/404/';
 
-    const TEMPLATES_DIR = __DIR__ . '/../../../res/tpl';
+    private const TEMPLATES_DIR = __DIR__ . '/../../../res/tpl';
 
-    const STATIC_PAGES_DIR = __DIR__ . '/../../../res/pages';
+    private const STATIC_PAGES_DIR = __DIR__ . '/../../../res/pages';
 
-    const STATIC_PAGE_DATA_SECTIONS = 2;
+    private const STATIC_PAGE_DATA_SECTIONS = 2;
 
     /**
      * @param string|null $staticPageName
      * @param string|null $templateName
      * @param string|null $templatePage
-     *
      * @return PageValuesObject
-     *
      * @throws PageException
      */
     final public function getVO(
         ?string $staticPageName = null,
         ?string $templateName = null,
         ?string $templatePage = null
-    ): PageValuesObject
-    {
+    ): PageValuesObject {
         $staticPagePath = $this->_getStaticPagePath($staticPageName);
 
         if (!$this->_isTemplatePageExists($templateName, $templatePage)) {
@@ -50,9 +47,7 @@ final class PagePlugin
 
     /**
      * @param string|null $staticPageName
-     *
      * @return string
-     *
      * @throws PageException
      */
     private function _getStaticPagePath(?string $staticPageName = null): string
@@ -91,14 +86,12 @@ final class PagePlugin
     /**
      * @param string|null $templateName
      * @param string|null $templatePage
-     *
      * @return bool
      */
     private function _isTemplatePageExists(
         ?string $templateName = null,
         ?string $templatePage = null
-    ): bool
-    {
+    ): bool {
         if (empty($templateName)) {
             $templateName = PagePlugin::DEFAULT_TEMPLATE_NAME;
         }
@@ -120,7 +113,6 @@ final class PagePlugin
     /**
      * @param string $staticPagePath
      * @return array
-     *
      * @throws PageException
      */
     private function _getStaticPageData(string $staticPagePath): array

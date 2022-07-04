@@ -4,7 +4,7 @@ namespace Sonder\Plugins;
 
 final class VersionPlugin
 {
-    const CONFIG_FILE_PATHS = [
+    private const CONFIG_FILE_PATHS = [
         __DIR__ . '/../../../config/cms.json',
         __DIR__ . '/../../config/cms.json'
     ];
