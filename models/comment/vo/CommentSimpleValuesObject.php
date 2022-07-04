@@ -1,16 +1,24 @@
 <?php
 
-namespace Sonder\Models\Comment;
+namespace Sonder\Models\Comment\ValuesObjects;
 
-use Exception;
 use Sonder\Core\ModelSimpleValuesObject;
-use Sonder\Models\User\UserSimpleValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelSimpleValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Comment\Interfaces\ICommentSimpleValuesObject;
+use Sonder\Models\User\Interfaces\IUserSimpleValuesObject;
 
-final class CommentSimpleValuesObject extends ModelSimpleValuesObject
+#[IValuesObject]
+#[IModelSimpleValuesObject]
+#[ICommentSimpleValuesObject]
+final class CommentSimpleValuesObject
+    extends ModelSimpleValuesObject
+    implements ICommentSimpleValuesObject
 {
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -25,7 +33,7 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserName(): ?string
     {
@@ -40,7 +48,7 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserEmail(): ?string
     {
@@ -54,10 +62,10 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @return UserSimpleValuesObject|null
-     * @throws Exception
+     * @return IUserSimpleValuesObject|null
+     * @throws ValuesObjectException
      */
-    final public function getUserVO(): ?UserSimpleValuesObject
+    final public function getUserVO(): ?IUserSimpleValuesObject
     {
         if (!$this->has('user_simple_vo')) {
             return null;
@@ -68,7 +76,7 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getHtml(): ?string
     {
@@ -80,12 +88,12 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @param UserSimpleValuesObject|null $userSimpleVO
+     * @param IUserSimpleValuesObject|null $userSimpleVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserVO(
-        ?UserSimpleValuesObject $userSimpleVO = null
+        ?IUserSimpleValuesObject $userSimpleVO = null
     ): void
     {
         if (!empty($userSimpleVO)) {
@@ -94,11 +102,10 @@ final class CommentSimpleValuesObject extends ModelSimpleValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws ValuesObjectException
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
         $userName = $this->getUserName();
         $userEmail = $this->getUserEmail();

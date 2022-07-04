@@ -2,29 +2,33 @@
 
 namespace Sonder\Models\Comment;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelApi;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
-use Sonder\Core\ResponseObject;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
-use Sonder\Models\Comment;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Interfaces\IResponseObject;
+use Sonder\Models\Comment\Exceptions\CommentApiException;
+use Sonder\Models\Comment\Exceptions\CommentException;
+use Sonder\Models\Comment\Interfaces\ICommentApi;
+use Sonder\Models\Comment\Interfaces\ICommentForm;
+use Sonder\Models\Comment\Interfaces\ICommentModel;
+use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
+
+
 
 /**
- * @property Comment $model
+ * @property ICommentModel $model
  */
-final class CommentApi extends ModelApiCore implements IModelApi
+#[IModelApi]
+#[ICommentApi]
+final class CommentApi extends ModelApiCore implements ICommentApi
 {
     /**
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws CommentApiException
      */
-    final public function actionCreate(): ResponseObject
+    final public function actionCreate(): IResponseObject
     {
         $apiValues = $this->request->getApiValues();
 
@@ -35,7 +39,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
             $apiValues['is_active'] = true;
         }
 
-        /* @var $commentForm CommentForm|null */
+        /* @var $commentForm ICommentForm|null */
         $commentForm = $this->model->getForm($apiValues);
 
         $this->model->save($commentForm);
@@ -44,42 +48,47 @@ final class CommentApi extends ModelApiCore implements IModelApi
             return $this->getApiResponse();
         }
 
-        throw new ApiException('Can Not Create New Comment');
+        throw new CommentApiException(
+            CommentApiException::MESSAGE_API_CAN_NOT_CREATE_COMMENT,
+            CommentException::CODE_API_CAN_NOT_CREATE_COMMENT
+        );
     }
 
     /**
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return IResponseObject
+     * @throws CommentApiException
+     * @throws ValuesObjectException
      */
-    final public function actionGet(): ResponseObject
+    final public function actionGet(): IResponseObject
     {
         $sessionToken = $this->request->getApiValue('session_token');
         $userId = $this->request->getApiValue('additional_info');
 
         if (empty($id) && empty($articleId) && empty($userId)) {
-            throw new ApiException(
-                'Input Values Are Not Set Or Have Invalid Format'
+            throw new CommentApiException(
+                CommentApiException::MESSAGE_API_INPUT_VALUES_HAVE_INVALID_FORMAT,
+                CommentException::CODE_API_INPUT_VALUES_HAVE_INVALID_FORMAT
             );
         }
 
         if (!empty($id) && !empty($articleId)) {
-            throw new ApiException(
-                'Both Input Values "id" And "article_id" Can Not Be Set'
+            throw new CommentApiException(
+                CommentApiException::MESSAGE_API_BOTH_ID_AND_ARTICLE_ID_CAN_NOT_BE_SET,
+                CommentException::CODE_API_BOTH_ID_AND_ARTICLE_ID_CAN_NOT_BE_SET
             );
         }
 
         if (!empty($id) && !empty($userId)) {
-            throw new ApiException(
-                'Both Input Values "id" And "user_id" Can Not Be Set'
+            throw new CommentApiException(
+                CommentApiException::MESSAGE_API_BOTH_ID_AND_USER_ID_CAN_NOT_BE_SET,
+                CommentException::CODE_API_BOTH_ID_AND_USER_ID_CAN_NOT_BE_SET
             );
         }
 
         if (!empty($articleId) && !empty($userId)) {
-            throw new ApiException(
-                'Both Input Values "article_id" And "user_id" Can ' .
-                'Not Be Set'
+            throw new CommentApiException(
+                CommentApiException::MESSAGE_API_BOTH_ARTICLE_ID_AND_USER_ID_CAN_NOT_BE_SET,
+                CommentException::CODE_API_BOTH_ARTICLE_ID_AND_USER_ID_CAN_NOT_BE_SET
             );
         }
 
@@ -95,10 +104,10 @@ final class CommentApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionUpdate(): ResponseObject
+    final public function actionUpdate(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -107,10 +116,10 @@ final class CommentApi extends ModelApiCore implements IModelApi
     }
 
     /**
-     * @return ResponseObject
+     * @return IResponseObject
      * @throws ApiException
      */
-    final public function actionDelete(): ResponseObject
+    final public function actionDelete(): IResponseObject
     {
         throw new ApiException(
             ApiException::MESSAGE_API_METHOD_IS_NOT_SUPPORTED,
@@ -120,31 +129,31 @@ final class CommentApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $id
-     * @return ResponseObject
-     * @throws ApiException
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
+     * @throws CommentApiException
+     * @throws ValuesObjectException
      */
-    private function _getRowById(int $id): ResponseObject
+    private function _getRowById(int $id): IResponseObject
     {
         if ($id < 1) {
-            throw new ApiException(
-                'ID Value Has Invalid Format'
+            throw new CommentApiException(
+                CommentApiException::MESSAGE_API_ID_VALUE_HAS_INVALID_FORMAT,
+                CommentException::CODE_API_ID_VALUE_HAS_INVALID_FORMAT
             );
         }
 
-        $commentVO = $this->model->getSimpleVOById(
-            $id,
-            true,
-            true
-        );
+        $commentVO = $this->model->getSimpleVOById($id);
 
         if (empty($commentVO)) {
-            throw new ApiException(sprintf(
-                'Comment With ID "%d" Not Exists',
+            $errorMessage = sprintf(
+                CommentApiException::MESSAGE_API_COMMENT_WITH_ID_NOT_EXISTS,
                 $id
-            ));
+            );
+
+            throw new CommentApiException(
+                $errorMessage,
+                CommentException::CODE_API_COMMENT_WITH_ID_NOT_EXISTS
+            );
         }
 
         return $this->getApiResponse($commentVO->exportRow());
@@ -152,14 +161,11 @@ final class CommentApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $articleId
-     * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
      */
-    private function _getRowsByArticleId(int $articleId): ResponseObject
+    private function _getRowsByArticleId(int $articleId): IResponseObject
     {
-        $comments = $this->model->getSimpleCommentsByArticleId($articleId);
+        $comments = $this->model->getCommentsByArticleId($articleId);
 
         if (empty($comments)) {
             return $this->getApiResponse([
@@ -167,7 +173,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
             ]);
         }
 
-        $comments = array_map(function (CommentValuesObject $commentVO) {
+        $comments = array_map(function (ICommentValuesObject $commentVO) {
             return $commentVO->exportRow();
         }, $comments);
 
@@ -178,14 +184,11 @@ final class CommentApi extends ModelApiCore implements IModelApi
 
     /**
      * @param int $userId
-     * @return ResponseObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return IResponseObject
      */
-    private function _getRowsByUserId(int $userId): ResponseObject
+    private function _getRowsByUserId(int $userId): IResponseObject
     {
-        $comments = $this->model->getSimpleCommentsByUserId($userId);
+        $comments = $this->model->getCommentsByUserId($userId);
 
         if (empty($comments)) {
             return $this->getApiResponse([
@@ -193,7 +196,7 @@ final class CommentApi extends ModelApiCore implements IModelApi
             ]);
         }
 
-        $comments = array_map(function (CommentValuesObject $commentVO) {
+        $comments = array_map(function (ICommentValuesObject $commentVO) {
             return $commentVO->exportRow();
         }, $comments);
 

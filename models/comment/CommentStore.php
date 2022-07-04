@@ -2,28 +2,25 @@
 
 namespace Sonder\Models\Comment;
 
-use Exception;
-use Sonder\Core\Interfaces\IModelStore;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelStore;
 use Sonder\Core\ModelStore;
-use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
-use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
+use Sonder\Models\Comment\Interfaces\ICommentStore;
+use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
 
-final class CommentStore extends ModelStore implements IModelStore
+#[IModelStore]
+#[ICommentStore]
+final class CommentStore extends ModelStore implements ICommentStore
 {
-    const COMMENTS_TABLE = 'comments';
+    final protected const SCOPE ='comment';
 
-    /**
-     * @var string|null
-     */
-    public ?string $scope = 'comment';
+    private const COMMENTS_TABLE = 'comments';
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowById(
         ?int $id = null,
@@ -78,8 +75,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsByParentId(
         ?int $parentId = null,
@@ -136,8 +131,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsByUserId(
         ?int $userId = null,
@@ -191,8 +184,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsByArticleId(
         ?int $articleId = null,
@@ -248,7 +239,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param array|null $row
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function updateCommentById(
         ?array $row = null,
@@ -270,7 +260,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param int|null $id
      * @param bool $isSoftDelete
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function deleteCommentById(
         ?int $id = null,
@@ -296,7 +285,6 @@ final class CommentStore extends ModelStore implements IModelStore
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreCommentById(?int $id = null): bool
     {
@@ -314,16 +302,14 @@ final class CommentStore extends ModelStore implements IModelStore
 
     /**
      * @param int $page
-     * @param int $itemsOnPage
+     * @param int $limit
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsByPage(
         int  $page = 1,
-        int  $itemsOnPage = 10,
+        int  $limit = 10,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
     ): ?array
@@ -350,7 +336,7 @@ final class CommentStore extends ModelStore implements IModelStore
             );
         }
 
-        $offset = $itemsOnPage * ($page - 1);
+        $offset = $limit * ($page - 1);
 
         $sql = '
             SELECT *
@@ -365,7 +351,7 @@ final class CommentStore extends ModelStore implements IModelStore
             $sql,
             CommentStore::COMMENTS_TABLE,
             $sqlWhere,
-            $itemsOnPage,
+            $limit,
             $offset
         );
 
@@ -376,8 +362,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsCount(
         bool $excludeRemoved = true,
@@ -426,8 +410,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsCountByArticleId(
         ?int $articleId = null,
@@ -484,8 +466,6 @@ final class CommentStore extends ModelStore implements IModelStore
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentRowsCountByUserId(
         ?int $userId = null,
@@ -538,13 +518,12 @@ final class CommentStore extends ModelStore implements IModelStore
     }
 
     /**
-     * @param CommentValuesObject|null $commentVO
+     * @param ICommentValuesObject|null $commentVO
      * @return bool
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function insertOrUpdateComment(
-        ?CommentValuesObject $commentVO = null
+        ?ICommentValuesObject $commentVO = null
     ): bool
     {
         $id = $commentVO->getId();
@@ -563,7 +542,6 @@ final class CommentStore extends ModelStore implements IModelStore
     /**
      * @param array|null $row
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function insertComment(?array $row = null): bool
     {

@@ -1,36 +1,32 @@
 <?php
 
-namespace Sonder\Models\Comment;
+namespace Sonder\Models\Comment\ValuesObjects;
 
-use Exception;
 use Sonder\CMS\Essentials\ModelValuesObject;
-use Sonder\Models\User\UserValuesObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelValuesObject;
+use Sonder\Interfaces\IValuesObject;
+use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
+use Sonder\Models\User\Interfaces\IUserValuesObject;
 
-final class CommentValuesObject extends ModelValuesObject
+#[IValuesObject]
+#[IModelValuesObject]
+#[ICommentValuesObject]
+final class CommentValuesObject
+    extends ModelValuesObject
+    implements ICommentValuesObject
 {
-    /**
-     * @var string|null
-     */
-    protected ?string $editLinkPattern = '/admin/comment/%d/';
+    final protected const EDIT_LINK_PATTERN = '/admin/comment/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $removeLinkPattern = '/admin/comment/remove/%d/';
+    final protected const REMOVE_LINK_PATTERN = '/admin/comment/remove/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $restoreLinkPattern = '/admin/comment/restore/%d/';
+    final protected const RESTORE_LINK_PATTERN = '/admin/comment/restore/%d/';
 
-    /**
-     * @var string|null
-     */
-    protected ?string $adminViewLinkPattern = '/admin/comment/view/%d/';
+    final protected const ADMIN_VIEW_LINK_PATTERN = '/admin/comment/view/%d/';
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getParentId(): ?int
     {
@@ -45,7 +41,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getArticleId(): ?int
     {
@@ -60,7 +56,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -75,7 +71,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserName(): ?string
     {
@@ -90,7 +86,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserEmail(): ?string
     {
@@ -105,7 +101,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserIp(): ?string
     {
@@ -119,10 +115,10 @@ final class CommentValuesObject extends ModelValuesObject
     }
 
     /**
-     * @return UserValuesObject|null
-     * @throws Exception
+     * @return IUserValuesObject|null
+     * @throws ValuesObjectException
      */
-    final public function getUserVO(): ?UserValuesObject
+    final public function getUserVO(): ?IUserValuesObject
     {
         if (!$this->has('user_vo')) {
             return null;
@@ -133,7 +129,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getText(): string
     {
@@ -142,7 +138,7 @@ final class CommentValuesObject extends ModelValuesObject
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getHtml(): string
     {
@@ -152,7 +148,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param int|null $parentId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setParentId(?int $parentId = null): void
     {
@@ -164,7 +160,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param int|null $articleId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setArticleId(?int $articleId = null): void
     {
@@ -176,7 +172,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param int|null $userId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserId(?int $userId = null): void
     {
@@ -188,7 +184,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param string|null $userName
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserName(?string $userName = null): void
     {
@@ -200,7 +196,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param string|null $userEmail
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserEmail(?string $userEmail = null): void
     {
@@ -212,7 +208,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param string|null $userIp
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserIp(?string $userIp = null): void
     {
@@ -222,11 +218,11 @@ final class CommentValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param UserValuesObject|null $userVO
+     * @param IUserValuesObject|null $userVO
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
-    final public function setUserVO(?UserValuesObject $userVO = null): void
+    final public function setUserVO(?IUserValuesObject $userVO = null): void
     {
         if (!empty($userVO)) {
             $this->set('user_vo', $userVO);
@@ -236,7 +232,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param string|null $text
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setText(?string $text = null): void
     {
@@ -248,7 +244,7 @@ final class CommentValuesObject extends ModelValuesObject
     /**
      * @param string|null $html
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setHtml(?string $html = null): void
     {
@@ -258,15 +254,14 @@ final class CommentValuesObject extends ModelValuesObject
     }
 
     /**
-     * @param array|null $params
-     * @return array|null
+     * @return array
      */
-    final public function exportRow(?array $params = null): ?array
+    final public function exportRow(): array
     {
-        $row = parent::exportRow($params);
+        $row = parent::exportRow();
 
         if (empty($row)) {
-            return null;
+            return $row;
         }
 
         if (array_key_exists('user_vo', $row) && empty($row['user_vo'])) {

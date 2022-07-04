@@ -1,51 +1,55 @@
 <?php
 
-namespace Sonder\Models\Comment;
+namespace Sonder\Models\Comment\Forms;
 
-use Exception;
 use Sonder\Core\ModelFormObject;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModelFormObject;
+use Sonder\Models\Comment\Interfaces\ICommentForm;
 
-final class CommentForm extends ModelFormObject
+#[IModelFormObject]
+#[ICommentForm]
+final class CommentForm extends ModelFormObject implements ICommentForm
 {
-    const TEXT_MAX_LENGTH = 1024;
+    final public const TEXT_EMPTY_ERROR_MESSAGE = 'Text is empty';
 
-    const USER_NAME_MIN_LENGTH = 3;
+    final public const TEXT_IS_TOO_LONG_ERROR_MESSAGE = 'Text is too long';
 
-    const USER_NAME_MAX_LENGTH = 255;
+    final public const USER_NAME_IS_EMPTY_ERROR_MESSAGE = 'Name is empty';
 
-    const USER_EMAIl_MAX_LENGTH = 255;
+    final public const USER_NAME_IS_TOO_SHORT_ERROR_MESSAGE = 'Name is too short';
 
-    const EMAIL_PATTERN = '/^(.*?)@(.*?)\.(.*?)$/su';
+    final public const USER_NAME_IS_TOO_LONG_ERROR_MESSAGE = 'Name is too long';
 
-    const TEXT_EMPTY_ERROR_MESSAGE = 'Text is empty';
+    final public const USER_EMAIL_IS_EMPTY_ERROR_MESSAGE = 'Email is empty';
 
-    const TEXT_IS_TOO_LONG_ERROR_MESSAGE = 'Text is too long';
+    final public const USER_EMAIL_IS_TOO_LONG_ERROR_MESSAGE = 'Email is too long';
 
-    const USER_NAME_IS_EMPTY_ERROR_MESSAGE = 'Name is empty';
+    final public const USER_EMAIL_HAS_BAD_FORMAT_ERROR_MESSAGE = 'Email has bad format';
 
-    const USER_NAME_IS_TOO_SHORT_ERROR_MESSAGE = 'Name is too short';
+    final public const ARTICLE_ID_IS_NOT_SET_ERROR_MESSAGE = 'Article ID Is Not Set';
 
-    const USER_NAME_IS_TOO_LONG_ERROR_MESSAGE = 'Name is too long';
+    final public const COMMENT_NOT_EXISTS_ERROR_MESSAGE = 'Comment with id "%d" not exists';
 
-    const USER_EMAIL_IS_EMPTY_ERROR_MESSAGE = 'Email is empty';
+    final public const PARENT_COMMENT_NOT_EXISTS_ERROR_MESSAGE = 'Parent comment with id "%d" not exists';
 
-    const USER_EMAIL_IS_TOO_LONG_ERROR_MESSAGE = 'Email is too long';
+    final public const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
 
-    const USER_EMAIL_HAS_BAD_FORMAT_ERROR_MESSAGE = 'Email has bad format';
+    final public const USER_NOT_EXISTS_ERROR_MESSAGE = 'User with id "%d" not exists';
 
-    const ARTICLE_ID_IS_NOT_SET_ERROR_MESSAGE = 'Article ID Is Not Set';
+    private const TEXT_MAX_LENGTH = 1024;
 
-    const COMMENT_NOT_EXISTS_ERROR_MESSAGE = 'Comment with id "%d" not exists';
+    private const USER_NAME_MIN_LENGTH = 3;
 
-    const PARENT_COMMENT_NOT_EXISTS_ERROR_MESSAGE = 'Parent comment with ' .
-    'id "%d" not exists';
+    private const USER_NAME_MAX_LENGTH = 255;
 
-    const ARTICLE_NOT_EXISTS_ERROR_MESSAGE = 'Article with id "%d" not exists';
+    private const USER_EMAIl_MAX_LENGTH = 255;
 
-    const USER_NOT_EXISTS_ERROR_MESSAGE = 'User with id "%d" not exists';
+    private const EMAIL_PATTERN = '/^(.*?)@(.*?)\.(.*?)$/su';
 
     /**
-     * @throws Exception
+     * @return void
+     * @throws ValuesObjectException
      */
     final public function checkInputValues(): void
     {
@@ -59,7 +63,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getId(): ?int
     {
@@ -76,10 +80,9 @@ final class CommentForm extends ModelFormObject
         return (int)$id;
     }
 
-
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getParentId(): ?int
     {
@@ -98,7 +101,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getText(): ?string
     {
@@ -111,7 +114,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getArticleId(): ?int
     {
@@ -130,7 +133,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return int|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserId(): ?int
     {
@@ -149,7 +152,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserName(): ?string
     {
@@ -162,7 +165,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function getUserEmail(): ?string
     {
@@ -170,7 +173,7 @@ final class CommentForm extends ModelFormObject
             $emailEmail = $this->get('user_email');
 
             $emailEmail = preg_replace(
-                '/(\s+)/su',
+                '/(\s+)/u',
                 '',
                 $emailEmail
             );
@@ -183,7 +186,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function isActive(): bool
     {
@@ -197,7 +200,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param int|null $id
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setId(?int $id = null): void
     {
@@ -207,7 +210,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param int|null $parentId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setParentId(?int $parentId = null): void
     {
@@ -217,7 +220,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param string|null $text
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setText(?string $text = null): void
     {
@@ -227,7 +230,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param int|null $articleId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setArticleId(?int $articleId = null): void
     {
@@ -237,7 +240,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param int|null $userId
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserId(?int $userId = null): void
     {
@@ -247,7 +250,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param string|null $userName
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserName(?string $userName = null): void
     {
@@ -257,12 +260,12 @@ final class CommentForm extends ModelFormObject
     /**
      * @param string|null $userEmail
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setUserEmail(?string $userEmail = null): void
     {
         $userEmail = preg_replace(
-            '/(\s+)/su',
+            '/(\s+)/u',
             '',
             $userEmail
         );
@@ -273,7 +276,7 @@ final class CommentForm extends ModelFormObject
     /**
      * @param bool $isActive
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     final public function setIsActive(bool $isActive = false): void
     {
@@ -282,7 +285,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateTextValue(): void
     {
@@ -304,7 +307,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateArticleIdValue(): void
     {
@@ -321,7 +324,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateUserNameValue(): void
     {
@@ -359,7 +362,7 @@ final class CommentForm extends ModelFormObject
 
     /**
      * @return void
-     * @throws Exception
+     * @throws ValuesObjectException
      */
     private function _validateUserEmailValue(): void
     {

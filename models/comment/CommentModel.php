@@ -2,15 +2,22 @@
 
 namespace Sonder\Models;
 
-use Exception;
 use Sonder\CMS\Essentials\BaseModel;
-use Sonder\Core\ValuesObject;
-use Sonder\Models\Comment\CommentForm;
-use Sonder\Models\Comment\CommentSimpleValuesObject;
-use Sonder\Models\Comment\CommentStore;
-use Sonder\Models\Comment\CommentValuesObject;
-use Sonder\Models\User\UserSimpleValuesObject;
-use Sonder\Models\User\UserValuesObject;
+use Sonder\Exceptions\CoreException;
+use Sonder\Exceptions\ModelException;
+use Sonder\Exceptions\ValuesObjectException;
+use Sonder\Interfaces\IModel;
+use Sonder\Models\Comment\Forms\CommentForm;
+use Sonder\Models\Comment\Interfaces\ICommentApi;
+use Sonder\Models\Comment\Interfaces\ICommentForm;
+use Sonder\Models\Comment\Interfaces\ICommentModel;
+use Sonder\Models\Comment\Interfaces\ICommentSimpleValuesObject;
+use Sonder\Models\Comment\Interfaces\ICommentStore;
+use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
+use Sonder\Models\Comment\ValuesObjects\CommentSimpleValuesObject;
+use Sonder\Models\Comment\ValuesObjects\CommentValuesObject;
+use Sonder\Models\User\ValuesObjects\UserSimpleValuesObject;
+use Sonder\Models\User\ValuesObjects\UserValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
 use Sonder\Plugins\IpPlugin;
@@ -19,29 +26,29 @@ use Sonder\Plugins\MarkupPlugin;
 use Throwable;
 
 /**
- * @property CommentStore $store
+ * @property ICommentApi $api
+ * @property ICommentStore $store
  */
-final class Comment extends BaseModel
+#[IModel]
+#[ICommentModel]
+final class CommentModel extends BaseModel implements ICommentModel
 {
-    /**
-     * @var int
-     */
-    protected int $itemsOnPage = 10;
+    final protected const ITEMS_ON_PAGE = 10;
 
     /**
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return ICommentValuesObject|null
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function getVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?ICommentValuesObject {
         $row = $this->store->getCommentRowById(
             $id,
             $excludeRemoved,
@@ -59,16 +66,16 @@ final class Comment extends BaseModel
      * @param int|null $id
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
-     * @return ValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
+     * @return ICommentSimpleValuesObject|null
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     final public function getSimpleVOById(
         ?int $id = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?ValuesObject
-    {
+    ): ?ICommentSimpleValuesObject {
         $row = $this->store->getCommentRowById(
             $id,
             $excludeRemoved,
@@ -87,19 +94,16 @@ final class Comment extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getCommentsByPage(
-        int  $page,
+        int $page,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         $rows = $this->store->getCommentRowsByPage(
             $page,
-            $this->itemsOnPage,
+            CommentModel::ITEMS_ON_PAGE,
             $excludeRemoved,
             $excludeInactive
         );
@@ -115,22 +119,19 @@ final class Comment extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentsPageCount(
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         $rowsCount = $this->store->getCommentRowsCount(
             $excludeRemoved,
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / CommentModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * CommentModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -142,16 +143,13 @@ final class Comment extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getCommentsByArticleId(
         ?int $articleId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): ?array
-    {
+    ): ?array {
         if (empty($articleId)) {
             return null;
         }
@@ -174,15 +172,12 @@ final class Comment extends BaseModel
      * @param bool $excludeRemoved
      * @param bool $excludeInactive
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getArticlesPageCountByArticleId(
         ?int $articleId = null,
         bool $excludeRemoved = true,
         bool $excludeInactive = true
-    ): int
-    {
+    ): int {
         if (empty($articleId)) {
             return 0;
         }
@@ -193,9 +188,9 @@ final class Comment extends BaseModel
             $excludeInactive
         );
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / CommentModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * CommentModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -206,15 +201,12 @@ final class Comment extends BaseModel
      * @param int|null $userId
      * @param int $page
      * @return array|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
      */
     final public function getCommentsByUserId(
         ?int $userId = null,
-        int  $page = 1
-    ): ?array
-    {
+        int $page = 1
+    ): ?array {
         if (empty($userId)) {
             return null;
         }
@@ -222,7 +214,7 @@ final class Comment extends BaseModel
         $rows = $this->store->getCommentRowsByUserId(
             $userId,
             $page,
-            $this->itemsOnPage
+            CommentModel::ITEMS_ON_PAGE
         );
 
         if (empty($rows)) {
@@ -235,8 +227,6 @@ final class Comment extends BaseModel
     /**
      * @param int|null $userId
      * @return int
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
      */
     final public function getCommentsPageCountByUserId(?int $userId = null): int
     {
@@ -246,9 +236,9 @@ final class Comment extends BaseModel
 
         $rowsCount = $this->store->getCommentRowsCountByUserId($userId);
 
-        $pageCount = (int)($rowsCount / $this->itemsOnPage);
+        $pageCount = (int)($rowsCount / CommentModel::ITEMS_ON_PAGE);
 
-        if ($pageCount * $this->itemsOnPage < $rowsCount) {
+        if ($pageCount * CommentModel::ITEMS_ON_PAGE < $rowsCount) {
             $pageCount++;
         }
 
@@ -258,7 +248,6 @@ final class Comment extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function removeCommentById(?int $id = null): bool
     {
@@ -272,7 +261,6 @@ final class Comment extends BaseModel
     /**
      * @param int|null $id
      * @return bool
-     * @throws DatabasePluginException
      */
     final public function restoreCommentById(?int $id = null): bool
     {
@@ -284,13 +272,15 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentForm $commentForm
+     * @param ICommentForm $commentForm
      * @return bool
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
-     * @throws Exception
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final public function save(CommentForm $commentForm): bool
+    final public function save(ICommentForm $commentForm): bool
     {
         $commentForm->checkInputValues();
 
@@ -330,12 +320,12 @@ final class Comment extends BaseModel
 
     /**
      * @param array|null $row
-     * @return ValuesObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ICommentValuesObject
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final protected function getVO(?array $row = null): ValuesObject
+    final protected function getVO(?array $row = null): ICommentValuesObject
     {
         /* @var $commentVO CommentValuesObject */
         $commentVO = parent::getVO($row);
@@ -347,13 +337,14 @@ final class Comment extends BaseModel
 
     /**
      * @param array|null $row
-     * @return ValuesObject
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ICommentSimpleValuesObject
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    final protected function getSimpleVO(?array $row = null): ValuesObject
-    {
+    final protected function getSimpleVO(
+        ?array $row = null
+    ): ICommentSimpleValuesObject {
         /* @var $commentSimpleVO CommentSimpleValuesObject */
         $commentSimpleVO = parent::getVO($row);
 
@@ -363,15 +354,15 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentValuesObject $commentVO
+     * @param ICommentValuesObject $commentVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _setUserVOToVO(CommentValuesObject $commentVO): void
+    private function _setUserVOToVO(ICommentValuesObject $commentVO): void
     {
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         /* @var $userVO UserValuesObject */
@@ -383,16 +374,16 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentSimpleValuesObject $commentSimpleVO
+     * @param ICommentSimpleValuesObject $commentSimpleVO
      * @return void
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     private function _setSimpleUserVOToSimpleVO(
-        CommentSimpleValuesObject $commentSimpleVO): void
-    {
-        /* @var $userModel User */
+        ICommentSimpleValuesObject $commentSimpleVO
+    ): void {
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         /* @var $userVO UserSimpleValuesObject */
@@ -404,18 +395,17 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentForm $commentForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param ICommentForm $commentForm
+     * @return void
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
-    private function _checkIdInCommentForm(CommentForm $commentForm): bool
+    private function _checkIdInCommentForm(ICommentForm $commentForm): void
     {
         $id = $commentForm->getId();
 
         if (empty($id)) {
-            return true;
+            return;
         }
 
         $commentVO = $this->_getVOFromCommentForm($commentForm);
@@ -423,88 +413,85 @@ final class Comment extends BaseModel
         if (empty($commentVO)) {
             $commentForm->setStatusFail();
 
-            $commentForm->setError(sprintf(
-                CommentForm::COMMENT_NOT_EXISTS_ERROR_MESSAGE,
-                $id
-            ));
-
-            return false;
+            $commentForm->setError(
+                sprintf(
+                    CommentForm::COMMENT_NOT_EXISTS_ERROR_MESSAGE,
+                    $id
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param CommentForm $commentForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param ICommentForm $commentForm
+     * @return void
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _checkParentIdInCommentForm(CommentForm $commentForm): bool
-    {
+    private function _checkParentIdInCommentForm(
+        ICommentForm $commentForm
+    ): void {
         $parentId = $commentForm->getParentId();
 
         if (empty($parentId)) {
-            return true;
+            return;
         }
 
         if (empty($this->getVOById($parentId))) {
             $commentForm->setStatusFail();
 
-            $commentForm->setError(sprintf(
-                CommentForm::PARENT_COMMENT_NOT_EXISTS_ERROR_MESSAGE,
-                $parentId
-            ));
-
-            return false;
+            $commentForm->setError(
+                sprintf(
+                    CommentForm::PARENT_COMMENT_NOT_EXISTS_ERROR_MESSAGE,
+                    $parentId
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param CommentForm $commentForm
-     * @return bool
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @param ICommentForm $commentForm
+     * @return void
+     * @throws CoreException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
-    private function _checkUserIdInCommentForm(CommentForm $commentForm): bool
+    private function _checkUserIdInCommentForm(ICommentForm $commentForm): void
     {
         $userId = $commentForm->getUserId();
 
         if (empty($userId)) {
-            return true;
+            return;
         }
 
-        /* @var $userModel User */
+        /* @var $userModel UserModel */
         $userModel = $this->getModel('user');
 
         if (empty($userModel->getVOById($userId))) {
             $commentForm->setStatusFail();
 
-            $commentForm->setError(sprintf(
-                CommentForm::USER_NOT_EXISTS_ERROR_MESSAGE,
-                $userId
-            ));
-
-            return false;
+            $commentForm->setError(
+                sprintf(
+                    CommentForm::USER_NOT_EXISTS_ERROR_MESSAGE,
+                    $userId
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param CommentForm $commentForm
-     * @return bool
+     * @param ICommentForm $commentForm
+     * @return void
+     * @throws CoreException
      * @throws DatabaseCacheException
      * @throws DatabasePluginException
+     * @throws ModelException
+     * @throws ValuesObjectException
      */
     private function _checkArticleIdInCommentForm(
-        CommentForm $commentForm
-    ): bool
-    {
+        ICommentForm $commentForm
+    ): void {
         $articleId = $commentForm->getArticleId();
 
         if (empty($articleId)) {
@@ -514,39 +501,35 @@ final class Comment extends BaseModel
                 CommentForm::ARTICLE_ID_IS_NOT_SET_ERROR_MESSAGE
             );
 
-            return false;
+            return;
         }
 
-        /* @var $articleModel Article */
+        /* @var $articleModel ArticleModel */
         $articleModel = $this->getModel('article');
 
         if (empty($articleModel->getVOById($articleId))) {
             $commentForm->setStatusFail();
 
-            $commentForm->setError(sprintf(
-                CommentForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
-                $articleId
-            ));
-
-            return false;
+            $commentForm->setError(
+                sprintf(
+                    CommentForm::ARTICLE_NOT_EXISTS_ERROR_MESSAGE,
+                    $articleId
+                )
+            );
         }
-
-        return true;
     }
 
     /**
-     * @param CommentForm $commentForm
+     * @param ICommentForm $commentForm
      * @param bool $isCreateVOIfEmptyId
-     * @return CommentValuesObject|null
-     * @throws DatabaseCacheException
-     * @throws DatabasePluginException
-     * @throws Exception
+     * @return ICommentValuesObject|null
+     * @throws CoreException
+     * @throws ValuesObjectException
      */
     private function _getVOFromCommentForm(
-        CommentForm $commentForm,
-        bool        $isCreateVOIfEmptyId = false
-    ): ?CommentValuesObject
-    {
+        ICommentForm $commentForm,
+        bool $isCreateVOIfEmptyId = false
+    ): ?ICommentValuesObject {
         $row = null;
 
         $id = $commentForm->getId();
@@ -583,11 +566,11 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentValuesObject $commentVO
+     * @param ICommentValuesObject $commentVO
      * @return void
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setHtmlToVO(CommentValuesObject $commentVO): void
+    private function _setHtmlToVO(ICommentValuesObject $commentVO): void
     {
         $text = $commentVO->getText();
         $html = empty($text) ? null : $this->_text2html($text);
@@ -596,11 +579,11 @@ final class Comment extends BaseModel
     }
 
     /**
-     * @param CommentValuesObject $commentVO
+     * @param ICommentValuesObject $commentVO
      * @return void
-     * @throws Exception
+     * @throws CoreException
      */
-    private function _setUserIpToVO(CommentValuesObject $commentVO): void
+    private function _setUserIpToVO(ICommentValuesObject $commentVO): void
     {
         if (empty($commentVO->getUserId()) && empty($commentVO->getUserIp())) {
             /* @var $ipPlugin IpPlugin */
@@ -613,7 +596,7 @@ final class Comment extends BaseModel
     /**
      * @param string|null $text
      * @return string|null
-     * @throws Exception
+     * @throws CoreException
      */
     private function _text2html(?string $text = null): ?string
     {
