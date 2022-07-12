@@ -2,14 +2,14 @@
 
 namespace Sonder\Models\Tag\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormObject;
 use Sonder\Models\Tag\Interfaces\ITagForm;
 
 #[IModelFormObject]
 #[ITagForm]
-final class TagForm extends ModelFormObject implements ITagForm
+final class TagForm extends BaseForm implements ITagForm
 {
     final public const TITLE_EMPTY_ERROR_MESSAGE = 'Title is empty';
 

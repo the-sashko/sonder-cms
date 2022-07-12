@@ -1,21 +1,21 @@
 <?php
 
-namespace Sonder\Models\Article\ValuesObjects;
+namespace Sonder\Models\Tag\ValuesObjects;
 
-use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\CMS\Essentials\BaseModelSimpleValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelSimpleValuesObject;
 use Sonder\Interfaces\IValuesObject;
-use Sonder\Models\Article\Interfaces\IArticleSimpleValuesObject;
+use Sonder\Models\Tag\Interfaces\ITagSimpleValuesObject;
 
 #[IValuesObject]
 #[IModelSimpleValuesObject]
-#[IArticleSimpleValuesObject]
-final class ArticleSimpleValuesObject
-    extends ModelSimpleValuesObject
-    implements IArticleSimpleValuesObject
+#[ITagSimpleValuesObject]
+final class TagSimpleValuesObject
+    extends BaseModelSimpleValuesObject
+    implements ITagSimpleValuesObject
 {
-    final protected const LINK_PATTERN = '/p/%s/';
+    final protected const LINK_PATTERN = '/tag/%s/';
 
     /**
      * @return string|null
@@ -28,19 +28,6 @@ final class ArticleSimpleValuesObject
         }
 
         return (string)$this->get('title');
-    }
-
-    /**
-     * @return string|null
-     * @throws ValuesObjectException
-     */
-    final public function getSummary(): ?string
-    {
-        if (!$this->has('summary')) {
-            return null;
-        }
-
-        return (string)$this->get('summary');
     }
 
     /**
@@ -65,7 +52,6 @@ final class ArticleSimpleValuesObject
         return [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
-            'summary' => $this->getSummary(),
             'link' => empty($this->getSlug()) ? null : $this->getLink()
         ];
     }

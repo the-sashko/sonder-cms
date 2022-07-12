@@ -17,9 +17,11 @@ use Sonder\Models\Article\Interfaces\IArticleModel;
 use Sonder\Models\Article\Interfaces\IArticleSimpleValuesObject;
 use Sonder\Models\Article\Interfaces\IArticleStore;
 use Sonder\Models\Article\Interfaces\IArticleValuesObject;
+use Sonder\Models\Article\ValuesObjects\ArticleSimpleValuesObject;
 use Sonder\Models\Article\ValuesObjects\ArticleValuesObject;
 use Sonder\Models\Topic\Interfaces\ITopicModel;
 use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
+use Sonder\Models\Topic\ValuesObjects\TopicSimpleValuesObject;
 use Sonder\Models\User\ValuesObjects\UserSimpleValuesObject;
 use Sonder\Plugins\Database\Exceptions\DatabaseCacheException;
 use Sonder\Plugins\Database\Exceptions\DatabasePluginException;
@@ -96,7 +98,7 @@ final class ArticleModel extends BaseModel implements IArticleModel
         );
 
         if (!empty($row)) {
-            /* @var $articleSimpleVO IArticleSimpleValuesObject */
+            /* @var $articleSimpleVO ArticleSimpleValuesObject */
             $articleSimpleVO = $this->getSimpleVO($row);
 
             return $articleSimpleVO;
@@ -153,7 +155,7 @@ final class ArticleModel extends BaseModel implements IArticleModel
         );
 
         if (!empty($row)) {
-            /* @var $articleSimpleVO IArticleSimpleValuesObject */
+            /* @var $articleSimpleVO ArticleSimpleValuesObject */
             $articleSimpleVO = $this->getSimpleVO($row);
 
             return $articleSimpleVO;
@@ -518,10 +520,10 @@ final class ArticleModel extends BaseModel implements IArticleModel
      */
     private function _setTopicVOToVO(IArticleValuesObject $articleVO): void
     {
-        /* @var $topicModel ITopicModel */
+        /* @var $topicModel TopicModel */
         $topicModel = $this->getModel('topic');
 
-        /* @var $topicVO ITopicSimpleValuesObject */
+        /* @var $topicVO TopicSimpleValuesObject */
         $topicVO = $topicModel->getSimpleVOById($articleVO->getUserId());
 
         if (!empty($topicVO)) {

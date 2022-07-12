@@ -2,15 +2,15 @@
 
 namespace Sonder\Models\Comment;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Comment\Interfaces\ICommentStore;
 use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
 
 #[IModelStore]
 #[ICommentStore]
-final class CommentStore extends ModelStore implements ICommentStore
+final class CommentStore extends BaseModelStore implements ICommentStore
 {
     final protected const SCOPE ='comment';
 

@@ -2,14 +2,12 @@
 
 namespace Sonder\Models\Article\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
-use Sonder\Exceptions\BaseException;
+use Sonder\CMS\Essentials\BaseException;
 use Sonder\Models\Article\Interfaces\IArticleException;
 
 #[ICoreException]
 #[IArticleException]
-#[Attribute(Attribute::TARGET_CLASS)]
 class ArticleException extends BaseException implements IArticleException
 {
     final public const CODE_MODEL_NOT_FOUND_PUBLIC_DIRECTORY = 1001;

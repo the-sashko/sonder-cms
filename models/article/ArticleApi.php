@@ -2,8 +2,8 @@
 
 namespace Sonder\Models\Article;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Interfaces\IModelApi;
-use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
 use Sonder\Interfaces\IResponseObject;
@@ -15,7 +15,7 @@ use Sonder\Models\Article\Interfaces\IArticleModel;
  */
 #[IModelApi]
 #[IArticleApi]
-final class ArticleApi extends ModelApiCore implements IArticleApi
+final class ArticleApi extends BaseModelApi implements IArticleApi
 {
     /**
      * @return IResponseObject

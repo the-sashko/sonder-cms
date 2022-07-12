@@ -2,15 +2,15 @@
 
 namespace Sonder\Models\Article;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Article\Interfaces\IArticleStore;
 use Sonder\Models\Article\Interfaces\IArticleValuesObject;
 
 #[IModelStore]
 #[IArticleStore]
-final class ArticleStore extends ModelStore implements IArticleStore
+final class ArticleStore extends BaseModelStore implements IArticleStore
 {
     final protected const SCOPE = 'article';
 
@@ -178,6 +178,13 @@ final class ArticleStore extends ModelStore implements IArticleStore
         return $this->getRow($sql);
     }
 
+    /**
+     * @param string|null $metaTitle
+     * @param int|null $excludeId
+     * @param bool $excludeRemoved
+     * @param bool $excludeInactive
+     * @return array|null
+     */
     final public function getArticleRowByMetaTitle(
         ?string $metaTitle = null,
         ?int $excludeId = null,

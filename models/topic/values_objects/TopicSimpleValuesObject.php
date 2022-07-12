@@ -1,21 +1,21 @@
 <?php
 
-namespace Sonder\Models\Tag\ValuesObjects;
+namespace Sonder\Models\Topic\ValuesObjects;
 
-use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\CMS\Essentials\BaseModelSimpleValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelSimpleValuesObject;
 use Sonder\Interfaces\IValuesObject;
-use Sonder\Models\Tag\Interfaces\ITagSimpleValuesObject;
+use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 
 #[IValuesObject]
 #[IModelSimpleValuesObject]
-#[ITagSimpleValuesObject]
-final class TagSimpleValuesObject
-    extends ModelSimpleValuesObject
-    implements ITagSimpleValuesObject
+#[ITopicSimpleValuesObject]
+final class TopicSimpleValuesObject
+    extends BaseModelSimpleValuesObject
+    implements ITopicSimpleValuesObject
 {
-    final protected const LINK_PATTERN = '/tag/%s/';
+    final protected const LINK_PATTERN = '/topic/%s/';
 
     /**
      * @return string|null
@@ -27,7 +27,7 @@ final class TagSimpleValuesObject
             return null;
         }
 
-        return (string)$this->get('title');
+        return (string)$this->get('slug');
     }
 
     /**

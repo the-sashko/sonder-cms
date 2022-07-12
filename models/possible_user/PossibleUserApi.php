@@ -2,8 +2,8 @@
 
 namespace Sonder\Models\PossibleUser;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Interfaces\IModelApi;
-use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
 use Sonder\Interfaces\IResponseObject;
 use Sonder\Models\PossibleUser\Forms\PossibleUserForm;
@@ -15,7 +15,7 @@ use Sonder\Models\PossibleUser\Interfaces\IPossibleUserModel;
  */
 #[IModelApi]
 #[IPossibleUserApi]
-final class PossibleUserApi extends ModelApiCore implements IPossibleUserApi
+final class PossibleUserApi extends BaseModelApi implements IPossibleUserApi
 {
     /**
      * @return IResponseObject

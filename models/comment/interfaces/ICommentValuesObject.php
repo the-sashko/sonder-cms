@@ -4,10 +4,9 @@ namespace Sonder\Models\Comment\Interfaces;
 
 use Attribute;
 use Sonder\Interfaces\IModelValuesObject;
-use Sonder\Interfaces\IValuesObject;
 use Sonder\Models\User\Interfaces\IUserValuesObject;
 
-#[IValuesObject]
+#[IModelValuesObject]
 #[Attribute(Attribute::TARGET_CLASS)]
 interface ICommentValuesObject extends IModelValuesObject
 {

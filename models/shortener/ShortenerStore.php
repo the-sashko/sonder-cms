@@ -2,15 +2,15 @@
 
 namespace Sonder\Models\Shortener;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Shortener\Interfaces\IShortenerStore;
 use Sonder\Models\Shortener\Interfaces\IShortenerValuesObject;
 
 #[IModelStore]
 #[IShortenerStore]
-final class ShortenerStore extends ModelStore implements IShortenerStore
+final class ShortenerStore extends BaseModelStore implements IShortenerStore
 {
     final protected const SCOPE ='shortener';
 

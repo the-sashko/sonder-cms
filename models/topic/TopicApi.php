@@ -2,8 +2,8 @@
 
 namespace Sonder\Models\Topic;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Interfaces\IModelApi;
-use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
 use Sonder\Interfaces\IResponseObject;
@@ -15,7 +15,7 @@ use Sonder\Models\Topic\Interfaces\ITopicModel;
  */
 #[IModelApi]
 #[ITopicApi]
-final class TopicApi extends ModelApiCore implements ITopicApi
+final class TopicApi extends BaseModelApi implements ITopicApi
 {
     /**
      * @return IResponseObject

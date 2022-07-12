@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Comment\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -13,7 +13,7 @@ use Sonder\Models\User\Interfaces\IUserValuesObject;
 #[IModelValuesObject]
 #[ICommentValuesObject]
 final class CommentValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements ICommentValuesObject
 {
     final protected const EDIT_LINK_PATTERN = '/admin/comment/%d/';

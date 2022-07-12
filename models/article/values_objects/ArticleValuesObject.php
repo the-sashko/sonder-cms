@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Article\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -15,7 +15,7 @@ use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 #[IModelValuesObject]
 #[IArticleValuesObject]
 final class ArticleValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements IArticleValuesObject
 {
     final public const IMAGE_SIZES = [

@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Article\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormFileObject;
 use Sonder\Interfaces\IModelFormObject;
@@ -10,7 +10,7 @@ use Sonder\Models\Article\Interfaces\IArticleForm;
 
 #[IModelFormObject]
 #[IArticleForm]
-final class ArticleForm extends ModelFormObject implements IArticleForm
+final class ArticleForm extends BaseForm implements IArticleForm
 {
     final public const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
 

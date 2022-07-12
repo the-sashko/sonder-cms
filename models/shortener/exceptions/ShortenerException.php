@@ -2,14 +2,12 @@
 
 namespace Sonder\Models\Shortener\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
-use Sonder\Exceptions\BaseException;
+use Sonder\CMS\Essentials\BaseException;
 use Sonder\Models\Shortener\Interfaces\IShortenerException;
 
 #[ICoreException]
 #[IShortenerException]
-#[Attribute(Attribute::TARGET_CLASS)]
 class ShortenerException extends BaseException implements IShortenerException
 {
     final public const CODE_API_CAN_NOT_CREATE_SHORT_LINK = 1001;

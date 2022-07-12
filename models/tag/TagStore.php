@@ -2,15 +2,15 @@
 
 namespace Sonder\Models\Tag;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Tag\Interfaces\ITagStore;
 use Sonder\Models\Tag\Interfaces\ITagValuesObject;
 
 #[IModelStore]
 #[ITagStore]
-final class TagStore extends ModelStore implements ITagStore
+final class TagStore extends BaseModelStore implements ITagStore
 {
     final protected const SCOPE ='tag';
 

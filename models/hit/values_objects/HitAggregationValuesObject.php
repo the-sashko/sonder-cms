@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Hit\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -12,7 +12,7 @@ use Sonder\Models\Hit\Interfaces\IHitAggregationValuesObject;
 #[IModelValuesObject]
 #[IHitAggregationValuesObject]
 final class HitAggregationValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements IHitAggregationValuesObject
 {
     final protected const EDIT_LINK_PATTERN = '/admin/hits/aggregation/%d/';

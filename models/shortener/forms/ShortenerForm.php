@@ -2,14 +2,14 @@
 
 namespace Sonder\Models\Shortener\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormObject;
 use Sonder\Models\Shortener\Interfaces\IShortenerForm;
 
 #[IModelFormObject]
 #[IShortenerForm]
-final class ShortenerForm extends ModelFormObject implements IShortenerForm
+final class ShortenerForm extends BaseForm implements IShortenerForm
 {
     final public const URL_EMPTY_ERROR_MESSAGE = 'URL is empty';
 

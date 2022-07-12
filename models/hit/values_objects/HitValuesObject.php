@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Hit\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -12,7 +12,7 @@ use Sonder\Models\Hit\Interfaces\IHitValuesObject;
 #[IModelValuesObject]
 #[IHitValuesObject]
 final class HitValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements IHitValuesObject
 {
     final protected const EDIT_LINK_PATTERN = '/admin/hit/%d/';

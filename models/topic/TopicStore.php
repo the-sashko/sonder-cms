@@ -2,15 +2,15 @@
 
 namespace Sonder\Models\Topic;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Topic\Interfaces\ITopicStore;
 use Sonder\Models\Topic\Interfaces\ITopicValuesObject;
 
 #[IModelStore]
 #[ITopicStore]
-final class TopicStore extends ModelStore implements ITopicStore
+final class TopicStore extends BaseModelStore implements ITopicStore
 {
     final protected const SCOPE = 'topic';
 

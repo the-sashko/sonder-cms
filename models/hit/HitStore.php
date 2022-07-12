@@ -2,16 +2,16 @@
 
 namespace Sonder\Models\Hit;
 
+use Sonder\CMS\Essentials\BaseModelStore;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelStore;
-use Sonder\Core\ModelStore;
 use Sonder\Models\Hit\Interfaces\IHitAggregationValuesObject;
 use Sonder\Models\Hit\Interfaces\IHitStore;
 use Sonder\Models\Hit\Interfaces\IHitValuesObject;
 
 #[IModelStore]
 #[IHitStore]
-final class HitStore extends ModelStore implements IHitStore
+final class HitStore extends BaseModelStore implements IHitStore
 {
     final protected const SCOPE = 'hit';
 

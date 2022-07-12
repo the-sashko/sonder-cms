@@ -2,14 +2,14 @@
 
 namespace Sonder\Models\Comment\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormObject;
 use Sonder\Models\Comment\Interfaces\ICommentForm;
 
 #[IModelFormObject]
 #[ICommentForm]
-final class CommentForm extends ModelFormObject implements ICommentForm
+final class CommentForm extends BaseForm implements ICommentForm
 {
     final public const TEXT_EMPTY_ERROR_MESSAGE = 'Text is empty';
 

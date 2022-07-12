@@ -1,21 +1,21 @@
 <?php
 
-namespace Sonder\Models\Topic\ValuesObjects;
+namespace Sonder\Models\Article\ValuesObjects;
 
-use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\CMS\Essentials\BaseModelSimpleValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelSimpleValuesObject;
 use Sonder\Interfaces\IValuesObject;
-use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
+use Sonder\Models\Article\Interfaces\IArticleSimpleValuesObject;
 
 #[IValuesObject]
 #[IModelSimpleValuesObject]
-#[ITopicSimpleValuesObject]
-final class TopicSimpleValuesObject
-    extends ModelSimpleValuesObject
-    implements ITopicSimpleValuesObject
+#[IArticleSimpleValuesObject]
+final class ArticleSimpleValuesObject
+    extends BaseModelSimpleValuesObject
+    implements IArticleSimpleValuesObject
 {
-    final protected const LINK_PATTERN = '/topic/%s/';
+    final protected const LINK_PATTERN = '/p/%s/';
 
     /**
      * @return string|null
@@ -27,7 +27,20 @@ final class TopicSimpleValuesObject
             return null;
         }
 
-        return (string)$this->get('slug');
+        return (string)$this->get('title');
+    }
+
+    /**
+     * @return string|null
+     * @throws ValuesObjectException
+     */
+    final public function getSummary(): ?string
+    {
+        if (!$this->has('summary')) {
+            return null;
+        }
+
+        return (string)$this->get('summary');
     }
 
     /**
@@ -52,6 +65,7 @@ final class TopicSimpleValuesObject
         return [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
+            'summary' => $this->getSummary(),
             'link' => empty($this->getSlug()) ? null : $this->getLink()
         ];
     }

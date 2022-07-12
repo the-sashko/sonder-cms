@@ -2,8 +2,8 @@
 
 namespace Sonder\Models\Tag;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Interfaces\IModelApi;
-use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
 use Sonder\Interfaces\IResponseObject;
@@ -15,7 +15,7 @@ use Sonder\Models\Tag\Interfaces\ITagModel;
  */
 #[IModelApi]
 #[ITagApi]
-final class TagApi extends ModelApiCore implements ITagApi
+final class TagApi extends BaseModelApi implements ITagApi
 {
     /**
      * @return IResponseObject

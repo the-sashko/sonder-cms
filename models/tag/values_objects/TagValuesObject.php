@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Tag\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -12,7 +12,7 @@ use Sonder\Models\Tag\Interfaces\ITagValuesObject;
 #[IModelValuesObject]
 #[ITagValuesObject]
 final class TagValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements ITagValuesObject
 {
     final public const TAGS_LINK = '/tags/';

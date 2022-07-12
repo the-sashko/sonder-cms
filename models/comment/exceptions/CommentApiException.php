@@ -2,13 +2,11 @@
 
 namespace Sonder\Models\Comment\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
 use Sonder\Models\Comment\Interfaces\ICommentException;
 
 #[ICoreException]
 #[ICommentException]
-#[Attribute(Attribute::TARGET_CLASS)]
 final class CommentApiException extends CommentException
 {
     final public const MESSAGE_API_CAN_NOT_CREATE_COMMENT = 'Can Not Create New Comment';

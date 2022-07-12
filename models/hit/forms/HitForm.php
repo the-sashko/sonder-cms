@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Hit;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormObject;
 use Sonder\Models\Hit\Enums\HitTypesEnum;
@@ -10,7 +10,7 @@ use Sonder\Models\Hit\Interfaces\IHitForm;
 
 #[IModelFormObject]
 #[IHitForm]
-final class HitForm extends ModelFormObject implements IHitForm
+final class HitForm extends BaseForm implements IHitForm
 {
     final public const INVALID_TYPE_ERROR_MESSAGE = 'Invalid hit type "%s';
 

@@ -2,13 +2,11 @@
 
 namespace Sonder\Models\Shortener\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
 use Sonder\Models\Shortener\Interfaces\IShortenerException;
 
 #[ICoreException]
 #[IShortenerException]
-#[Attribute(Attribute::TARGET_CLASS)]
 final class ShortenerApiException extends ShortenerException
 {
     final public const MESSAGE_API_CAN_NOT_CREATE_SHORT_LINK = 'Can Not Create New Short Link';

@@ -2,14 +2,12 @@
 
 namespace Sonder\Models\Comment\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
-use Sonder\Exceptions\BaseException;
+use Sonder\CMS\Essentials\BaseException;
 use Sonder\Models\Comment\Interfaces\ICommentException;
 
 #[ICoreException]
 #[ICommentException]
-#[Attribute(Attribute::TARGET_CLASS)]
 class CommentException extends BaseException implements ICommentException
 {
     final public const CODE_API_CAN_NOT_CREATE_COMMENT = 1001;

@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Hit\ValuesObjects;
 
-use Sonder\Core\ModelSimpleValuesObject;
+use Sonder\CMS\Essentials\BaseModelSimpleValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelSimpleValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -15,7 +15,7 @@ use Sonder\Models\Hit\Interfaces\IHitSimpleValuesObject;
 #[IModelSimpleValuesObject]
 #[IHitSimpleValuesObject]
 final class HitSimpleValuesObject
-    extends ModelSimpleValuesObject
+    extends BaseModelSimpleValuesObject
     implements IHitSimpleValuesObject
 {
     /**

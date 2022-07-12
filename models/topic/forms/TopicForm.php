@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Topic\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormFileObject;
 use Sonder\Interfaces\IModelFormObject;
@@ -10,7 +10,7 @@ use Sonder\Models\Topic\Interfaces\ITopicForm;
 
 #[IModelFormObject]
 #[ITopicForm]
-final class TopicForm extends ModelFormObject implements ITopicForm
+final class TopicForm extends BaseForm implements ITopicForm
 {
     final public const IMAGE_FILE_MAX_SIZE = 1024 * 1024 * 16; //16MB
 

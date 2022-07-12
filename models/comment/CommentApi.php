@@ -2,9 +2,9 @@
 
 namespace Sonder\Models\Comment;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelApi;
-use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
 use Sonder\Exceptions\AppException;
 use Sonder\Interfaces\IResponseObject;
@@ -22,7 +22,7 @@ use Sonder\Models\Comment\Interfaces\ICommentValuesObject;
  */
 #[IModelApi]
 #[ICommentApi]
-final class CommentApi extends ModelApiCore implements ICommentApi
+final class CommentApi extends BaseModelApi implements ICommentApi
 {
     /**
      * @return IResponseObject

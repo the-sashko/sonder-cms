@@ -3,12 +3,11 @@
 namespace Sonder\Models\Article\Interfaces;
 
 use Attribute;
-use Sonder\Interfaces\IModelSimpleValuesObject;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Models\Topic\Interfaces\ITopicSimpleValuesObject;
 use Sonder\Models\User\Interfaces\IUserSimpleValuesObject;
 
-#[IModelSimpleValuesObject]
+#[IModelValuesObject]
 #[Attribute(Attribute::TARGET_CLASS)]
 interface IArticleValuesObject extends IModelValuesObject
 {

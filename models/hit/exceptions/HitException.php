@@ -2,14 +2,12 @@
 
 namespace Sonder\Models\Hit\Exceptions;
 
-use Attribute;
 use Sonder\Core\Interfaces\ICoreException;
-use Sonder\Exceptions\BaseException;
+use Sonder\CMS\Essentials\BaseException;
 use Sonder\Models\Hit\Interfaces\IHitException;
 
 #[ICoreException]
 #[IHitException]
-#[Attribute(Attribute::TARGET_CLASS)]
 class HitException extends BaseException implements IHitException
 {
     final public const CODE_SIMPLE_VALUES_OBJECT_INVALID_TYPE = 1001;

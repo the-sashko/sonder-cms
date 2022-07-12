@@ -2,14 +2,14 @@
 
 namespace Sonder\Models\PossibleUser\Forms;
 
-use Sonder\Core\ModelFormObject;
+use Sonder\CMS\Essentials\BaseForm;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelFormObject;
 use Sonder\Models\PossibleUser\Interfaces\IPossibleUserForm;
 
 #[IModelFormObject]
 #[IPossibleUserForm]
-final class PossibleUserForm extends ModelFormObject implements IPossibleUserForm
+final class PossibleUserForm extends BaseForm implements IPossibleUserForm
 {
     final public const SESSION_TOKEN_IS_EMPTY_ERROR_MESSAGE = 'Session token is empty';
 

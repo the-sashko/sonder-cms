@@ -2,7 +2,7 @@
 
 namespace Sonder\Models\Shortener\ValuesObjects;
 
-use Sonder\CMS\Essentials\ModelValuesObject;
+use Sonder\CMS\Essentials\BaseModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
@@ -12,7 +12,7 @@ use Sonder\Models\Shortener\Interfaces\IShortenerValuesObject;
 #[IModelValuesObject]
 #[IShortenerValuesObject]
 final class ShortenerValuesObject
-    extends ModelValuesObject
+    extends BaseModelValuesObject
     implements IShortenerValuesObject
 {
     final protected const EDIT_LINK_PATTERN = '/admin/shortener/%d/';

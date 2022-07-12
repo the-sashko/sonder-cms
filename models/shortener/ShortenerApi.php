@@ -2,6 +2,7 @@
 
 namespace Sonder\Models\Shortener;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
@@ -19,7 +20,7 @@ use Sonder\Models\Shortener\Interfaces\IShortenerModel;
  */
 #[IModelApi]
 #[IShortenerApi]
-final class ShortenerApi extends ModelApiCore implements IShortenerApi
+final class ShortenerApi extends BaseModelApi implements IShortenerApi
 {
     /**
      * @return IResponseObject

@@ -2,6 +2,7 @@
 
 namespace Sonder\Models\Hit;
 
+use Sonder\CMS\Essentials\BaseModelApi;
 use Sonder\Interfaces\IModelApi;
 use Sonder\Core\ModelApiCore;
 use Sonder\Exceptions\ApiException;
@@ -18,7 +19,7 @@ use Sonder\Models\Hit\Interfaces\IHitModel;
  */
 #[IModelApi]
 #[IHitApi]
-final class HitApi extends ModelApiCore implements IHitApi
+final class HitApi extends BaseModelApi implements IHitApi
 {
     /**
      * @return IResponseObject
