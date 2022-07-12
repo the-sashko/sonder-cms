@@ -2,14 +2,16 @@
 
 namespace Sonder\CMS\Essentials;
 
-use Sonder\Core\ModelValuesObject as CoreModelValuesObject;
+use Sonder\Core\ModelValuesObject;
 use Sonder\Exceptions\ValuesObjectException;
 use Sonder\Interfaces\IModelValuesObject;
 use Sonder\Interfaces\IValuesObject;
 
 #[IValuesObject]
 #[IModelValuesObject]
-abstract class ModelValuesObject extends CoreModelValuesObject
+abstract class BaseModelValuesObject
+    extends ModelValuesObject
+    implements IModelValuesObject
 {
     protected const ADMIN_VIEW_LINK_PATTERN = null;
 
