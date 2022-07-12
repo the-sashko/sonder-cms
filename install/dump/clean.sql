@@ -1,3 +1,4 @@
+TRUNCATE "references" CASCADE;
 TRUNCATE "topics" CASCADE;
 TRUNCATE "tags" CASCADE;
 TRUNCATE "users" CASCADE;
@@ -20,6 +21,7 @@ DELETE
 FROM cron_jobs
 WHERE "id" > 2;
 
+ALTER SEQUENCE "references" RESTART WITH 1;
 ALTER SEQUENCE "users_id_seq" RESTART WITH 1;
 ALTER SEQUENCE "cron_jobs_id_seq" RESTART WITH 3;
 ALTER SEQUENCE "role2action_id_seq" RESTART WITH 1;
